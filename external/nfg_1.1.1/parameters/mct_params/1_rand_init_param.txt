@@ -1,0 +1,41 @@
+# --- The parameters used to randomly initialise a strand collection. ---
+#
+# Please enter parameter names on separate lines (with no preceding space) followed by a single space
+# and then its value. Lines without recognised parameter names in this format will be ignored. 
+#
+# E.g. 
+# name 0.0 		(Remember, no preceding space!)
+# 
+#
+# NB: The generated phantom is scale invariant.  All parameters representing spatial quantities are only 
+# relative to one another and therefore defined in abstract units (U).
+#
+
+# seed 1214358027		# (dimensionless) Random seed for all the generated quantities, two collections generated
+					# with the same seed (and other parameters) will be identical. Omit this parameter
+					# to use the default, which is generated from the CPU clock time 
+
+sphere_r 1.5			# (U) The radius of the sphere the strands will be created in.
+
+control_point_freq 50		# (1/U) The frequency of the control-points generated between a 
+				# strand's end-points.  
+
+# The radius of each strand is randomly selected from a uniform distribution between an lower 
+# (strand_r_lbound) and upper bound (strand_r_ubound).  However, please note that although the radii are 
+# selected from a uniform distribution, newly generated strands that overlap with an existing strand at their 
+# endpoints are rejected, which makes smaller radii more likely.   
+
+strand_r_lbound 0.12		# (U) The minimum strand radius
+strand_r_ubound 0.3		# (U) The maximum strand radius
+strand_r_buffer_ratio 1.12	# (dimensionless) Scales the 'buffer radius' around the endpoints of each 
+				# strand that other strands cannot overlap. 'buffer radius' = strand radius, 
+				# when strand_r_buffer_ratio = 1.  Therefore it should always be > 1.  Is used 
+				# to control the density of the strand packing at the sphere surface.   
+
+max_attempts 1000000		# (dimensionless) The number of new strands that are rejected (EITHER BECAUSE 
+				# their endpoints overlap with another strand OR by an internal rejection 
+				# sampling process, which prefers longer strands) before the algorithm decides 
+				# it cannot place any more strands.
+
+
+

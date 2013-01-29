@@ -1,0 +1,19 @@
+# --- The parameters used to trim strands to fit sphere. ---
+#
+# Please enter parameter names on separate lines (with no preceding space) followed by a single space 
+# and then its value. Lines without recognised parameter names in this format will be ignored. 
+#
+# E.g. 
+# name 0.0 		(Remember, NO preceding space and only ONE space between name and value!)
+# 
+#
+# NB: The generated phantom is scale invariant.  All parameters representing spatial quantities are only 
+# relative to one another and therefore defined in abstract units (U).
+#
+
+new_sphere_r 2.25		# (U) Defines the radius outside which all strands are trimmed.
+
+length_reject_threshold	0.05	# (U) Defines the length threshold, below which any section of 
+				# trimmed strand is rejected. 
+
+save_seperate_bundles 0	# If a strand is split into multiple sections, this parameter decides whether they are assigned different bundle indexes or not.  Usually set to 1 before subdivision and 0 after subdivision. 

@@ -1,0 +1,49 @@
+# --- The parameters used to simulate the DW-MR images emanating from the strands. ---
+#
+# Please enter parameter names on separate lines (with no preceding space) followed by a single space
+# and then its value. Lines without recognised parameter names in this format will be ignored. 
+#
+# E.g. 
+# name 0.0 		(Remember, NO preceding space and only ONE space between name and value!)
+# 
+#
+# NB: The generated phantom is scale invariant.  All parameters representing spatial quantities are only
+# relative to one another and therefore defined in abstract units (U).
+#
+
+fa 0.8					# (dimensionless) The fractional anisotropy of the diffusion model
+						# used at each sub-voxel grid element.
+
+diffusivity 0.0009			# (mm^2/s) The simulated diffusivity of liquid in the tissue   
+
+num_voxels 20				# (dimensionless) Defines the field of view. The number of voxels 
+						# along each dimension of the image (The field of view is a
+						 cube)
+voxel_size 0.1				# (U) The size of each dimension of the voxel (the voxels are cubes)
+
+subvoxel_size 0.01			# (U) The size of each dimension of the subvoxel grid elements (the 
+						# grid elements are cubes). NB: Will be rounded down to the
+						# nearest whole divisor of the voxel size.	
+
+sphere_r 1.0				# For use in calculating the filling fraction of the final strand 
+						# configuration (see the output file '{strand_directory}/stats/stats.txt' for this value)
+
+# **** CHANGED ****
+save_subvoxels 1			# Specifies that the subvoxel orientations should be saved (to a file 
+						# './subvoxels/subvoxels.dat') for debugging purposes.  These
+						# orientations can then be displayed with the
+						# 'display_subvoxels' matlab script.  Note that these files will
+						#  be quite large for high resolution images (300 x 300 x 300 
+						# subvoxels ~ 600MB) so it is probably not recommended for a 
+						# resolution over 200 x 200 x 200 subvoxels.	
+						
+save_ext_segment_stats 0		# Specifies that extended statistics on a segment-by-segment basis should be saved ( into
+						# './stats/') for debugging purposes.  
+
+save_ext_fill_radial_stats 0		# Specifies that extended statistics radial distance the filling occurs should be saved ( into
+						# './stats/') for debugging purposes (can take a large amount of space for fine subvoxel grids).  
+
+
+
+output_format analyze			# The output format in which the images will be saved in
+

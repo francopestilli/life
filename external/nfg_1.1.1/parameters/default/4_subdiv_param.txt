@@ -1,0 +1,15 @@
+# --- The parameter (yes, very simple only one!) used to subdivide strands into thinner strands. ---
+#
+# Please enter parameter names on separate lines (with no preceding space) followed by a single space
+# and then its value. Lines without recognised parameter names in this format will be ignored. 
+#
+# E.g. 
+# name 0.0 		(Remember, NO preceding space and only ONE space between name and value!)
+# 
+#
+# NB: The generated phantom is scale invariant.  All parameters representing spatial quantities are only
+# relative to one another and therefore defined in abstract units (U).
+#
+
+strand_r_final 0.03	# (U) Defines the radius of the subdivided strands
+

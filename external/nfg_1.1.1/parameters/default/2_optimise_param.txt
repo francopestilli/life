@@ -1,0 +1,88 @@
+# --- The parameters used to optimise the control points of a strand collection. ---
+#
+# Please enter parameter names on separate lines (with no preceding space) followed by a single space 
+# and then its value. Lines without recognised parameter names in this format will be ignored. 
+#
+# E.g. 
+# name 0.0 		(Remember, NO preceding space and only ONE space between name and value!)
+# 
+#
+# NB: The generated phantom is scale invariant.  All parameters representing spatial quantities are only 
+# relative to one another and therefore defined in abstract units (U).
+#
+
+fov 1.6				# (U) Defines the length of the cubic region around the origin in which 
+				# repulsion terms will be calculated.
+
+# The relative weighting between the three cost function penalties: overlap between strands; strand curvature; 
+#  and strand length is defined by three weighting terms 'cost_repulsion_weight', 'cost_bending_weight' and 
+# 'cost_length_weight'.
+
+cost_repulsion_weight 1500.0	# (dimensionless) Weighting applied to the overlap penalty.
+cost_bending_weight 1.0		# (dimensionless) Weighting applied to the curvature penalty.
+cost_length_weight 20.0		# (dimensionless) Weighting applied to the length penalty.
+
+# In addition to the scalar weighting it is also possible to alter the power to which each term is raised 
+# before they are combined.  The default is 2.0 for each term as this gives a quadratic cost function.  
+# Although it is possible to change these parameters it is not recommended as a quadratic cost function should 
+# be easier for the minimisation algorithm to solve. 
+
+cost_repulsion_power 2.0	# (dimensionless) Power to which the overlap penalty is raised.
+cost_bending_power 2.0		# (dimensionless) Power to which the curvature penalty is raised.
+cost_length_power 2.0		# (dimensionless) Power to which the length penalty is raised.
+
+
+relative_isotropic_repulsion_weight 1	# Scales the effective sample length (what length of strand the 
+					# repulsion from the region would correspond to if it were a strand)
+					#  of the isotropic regions
+
+# The overlap between neighbouring strands is calculated at samples along each of the strand segments.  
+# Calculating the overlap at these samples is the rate determining step in the algorithm! The position of 
+# these samples is determined with each cost function call by evenly spacing samples at a rate of 
+# 'sample_density' along each segment.  This guarantees that no matter how long the segment is, the overlap 
+# will still be calculated at finely spaced intervals along it.  This method avoids the case where a thin 
+# perpendicular strand sits in the 'groove' between two samples on a given strand.  So care should be taken 
+# when changing this parameter as it should be >= 2 * 1/(minimum strand radius) but not too much higher as has 
+# a large impact on performance.
+
+sample_density 100.0		# (1/U) The minimum density of samples along the strands when calculating the 
+				# overlap penalty. 
+
+grid_reference_size 10		# (1/U) The number reference grid elements along each dimension the FOV is 
+				# divided into.  The repulsion cost between two samples is only calculated if 
+				# their spatial extents (balls of radius 'strand_r' centred around them) 
+				# intersect the same grid reference).   
+
+# Since strand configurations after either 'rand_init' and 'subdiv' (the starting points for the first and 
+# second pass optimisations respectively) will have highly regular characteristics (either control points 
+# arranged on a straight line or hexagonally packed surrounding strands respectively) it will be hard for the 
+# optimisation algorithm to move away from them.  Therefore performance is greatly improved by first 
+# 'jittering' the control points slightly. 
+
+
+jitter_dev 0.01		# (U) the maximum deviation of the 'jitter' (which is uniformly distributed) added to each control 
+				# point co-ordinate before the optimisation. (Should be significantly less 
+				# than the smallest strand radius)
+
+#jitter_seed 1193125662		# (dimensionless) The number used to seed the random number generator that 
+				# adds the jitter to the control points.
+
+initial_step_size 1.0		# (U) Passed directly to the optimisation algorithm: specifies the size of the 
+				# initial trial step attempted in the optimisation.
+step_tol 0.1			# (dimensionless) Passed directly to the optimisation algorithm: Determines 
+				# when a trial step is accepted. A trial step is accepted if (the cost 
+				# function evaluated at the trial step) < (the cost function at the current 				# state) - (the gradient at the current state) * step_tol. 
+
+optimization_tol 1.0e-2		# (dimensionless) Passed directly to the optimisation algorithm: Specifies the 
+				# target gradient value at which the algorithm is satisfied.  NB: This value 
+				# is rarely achieved as the optimisation algorithm is usually allow to run 
+				# until it cannot progress any further or exceeds the maximum number of 
+				# iterations.  Both these cases are usually sufficient. 
+
+max_iterations 200		# (dimensionless) Number of iterations before the algorithm gives up.
+
+
+iterations_save_freq 1		# (dimensionless) For debugging purposes the complete state can be saved every 
+				# 'iterations_save_freq' iterations.  The state after (x) iterations is saved 
+				# in the folder (output_directory)/'iterations/iteration_'(x). Set to 0 to skip. 
+

@@ -1,0 +1,41 @@
+%% Beherens (1,0) and optimal tensor (1.8,0.2)
+% Probabilitic tractography 
+s_ms_test_connectomes('p',2,1)
+s_ms_test_connectomes('p',8,1)
+s_ms_test_connectomes('p',10,1)
+s_ms_test_connectomes('p',16,1)
+s_ms_test_connectomes('p',4,1)
+s_ms_test_connectomes('p',6,1)
+s_ms_test_connectomes('p',12,1)
+s_ms_test_connectomes('p',14,1)
+
+% Deterministic tractography
+s_ms_test_connectomes('d',2,1)
+s_ms_test_connectomes('d',8,1)
+s_ms_test_connectomes('d',10,1)
+s_ms_test_connectomes('d',16,1)
+s_ms_test_connectomes('d',4,1)
+s_ms_test_connectomes('d',6,1)
+s_ms_test_connectomes('d',12,1)
+s_ms_test_connectomes('d',14,1)
+
+%% Spherical (1,1) and smaller tensor (1,.5)
+% Probabilitic tractography 
+s_ms_test_connectomes('p',2,2)
+s_ms_test_connectomes('p',8,2)
+s_ms_test_connectomes('p',10,2)
+s_ms_test_connectomes('p',16,2)
+s_ms_test_connectomes('p',4,2)
+s_ms_test_connectomes('p',6,2)
+s_ms_test_connectomes('p',12,2)
+s_ms_test_connectomes('p',14,2)
+
+% Deterministic tractography
+s_ms_test_connectomes('d',2,2)
+s_ms_test_connectomes('d',8,2)
+s_ms_test_connectomes('d',10,2)
+s_ms_test_connectomes('d',16,2)
+s_ms_test_connectomes('d',4,2)
+s_ms_test_connectomes('d',6,2)
+s_ms_test_connectomes('d',12,2)
+s_ms_test_connectomes('d',14,2)

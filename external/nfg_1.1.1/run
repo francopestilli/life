@@ -1,0 +1,255 @@
+#!/bin/sh
+
+# run
+# Numerical Fibre Generator
+#
+# Created by Tom Close on 25/06/07.
+# Copyright 2007 Tom Close.
+# Distributed under the GNU General Public Licence.
+#
+#
+#
+# This file is part of 'Numerical Fibre Generator'.
+#
+# 'Numerical Fibre Generator' is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# 'Numerical Fibre Generator' is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with 'Numerical Fibre Generator'.  If not, see <http://www.gnu.org/licenses/>
+#/
+
+
+
+OUTPUT_DIR='./generated_collections/'
+PARAMETERS_DIR='./parameters/default/'
+GRADIENT_DIRECTIONS_PATH='./gradient_directions/encoding_dir60.txt'
+ISOTROPIC_REGIONS_PATH=''
+COLLECTION_DIR=$(date ``+%y%m%d%H%M%S'')
+
+
+DEFAULT_PARAMETERS_DIR='./parameters/default/'
+
+if [ $# -gt 4 ] || [ $# -eq 1 ] && [ $1 = '--help' ]; then
+	echo
+	echo "Numerical Fibre Generator (v1.0): 'run'"
+	echo ''
+	echo "Number of suplied arguments ${#}."
+	echo "     arg[1]: (optional) parameters directory path"
+	echo "     arg[2]: (optional) gradient directions path"
+	echo '                 (gradient directions are stored on seperate lines in cartesian coordinates followed '
+	echo '                  by their corresponding b-value. eg. x y z b\n'	
+	echo "     arg[3]: (optional) base output directory path"
+	echo "     arg[4]: (optional) isotropic regions file path"
+	echo "     arg[5]: (optional) output directory name"
+	echo ""
+	exit
+fi
+
+if [ $# -ge 1 ]; then
+	PARAMETERS_DIR=$1
+fi
+	
+if [ $# -ge 2 ]; then
+	GRADIENT_DIRECTIONS_PATH=$2
+fi
+
+
+if [ $# -ge 3 ]; then
+	OUTPUT_DIR=$3
+fi
+
+if [ $# -ge 4 ]; then
+	ISOTROPIC_REGIONS_PATH=$4
+fi
+
+if [ $# -ge 5 ]; then
+	COLLECTION_DIR=$5
+fi
+
+echo "output directory $OUTPUT_DIR"
+echo "collection dir $COLLECTION_DIR"
+echo "gradient directions $GRADIENT_DIRECTIONS_PATH"
+echo "parameters dir $PARAMETERS_DIR"
+
+# Make the output directory
+
+if [ -e "$OUTPUT_DIR/$COLLECTION_DIR" ]; then
+	echo ''
+	echo "Error! ${OUTPUT_DIR}/${COLLECTION_DIR} already exisits! Exiting ..."
+	echo ''	
+	exit 0
+fi
+
+
+mkdir "$OUTPUT_DIR/$COLLECTION_DIR"
+
+if [ ! -f $GRADIENT_DIRECTIONS_PATH ]; then
+	echo ''
+	echo "Error! Did not find a gradient directions file at ${GRADIENT_DIRECTIONS_PATH}! Exiting ..."
+	echo ''
+	exit 0
+fi
+
+
+if [ -f "$PARAMETERS_DIR/1_rand_init_param.txt" ]; then
+	RAND_INIT_PARAMETERS_PATH="$PARAMETERS_DIR/1_rand_init_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/1_rand_init_param.txt" ]; then
+	RAND_INIT_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/1_rand_init_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for rand_init not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	RAND_INIT_PARAMETERS_PATH='.'
+fi
+
+	
+if [ -f "$PARAMETERS_DIR/2_optimise_param.txt" ]; then
+	FIRST_OPTIMISE_PARAMETERS_PATH="$PARAMETERS_DIR/2_optimise_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/2_optimise_param.txt" ]; then
+	FIRST_OPTIMISE_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/2_optimise_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for 2_optimise not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	FIRST_OPTIMISE_PARAMETERS_PATH='.'
+fi
+
+if [ -f "$PARAMETERS_DIR/3_trim_param.txt" ]; then
+	FIRST_TRIM_PARAMETERS_PATH="$PARAMETERS_DIR/3_trim_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/3_trim_param.txt" ]; then
+	FIRST_TRIM_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/3_trim_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for 3_trim not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	FIRST_TRIM_PARAMETERS_PATH='.'
+fi
+
+
+if [ -f "$PARAMETERS_DIR/4_subdiv_param.txt" ]; then
+	SUBDIV_PARAMETERS_PATH="$PARAMETERS_DIR/4_subdiv_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/4_subdiv_param.txt" ]; then
+	SUBDIV_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/4_subdiv_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for 4_subdiv not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	SUBDIV_PARAMETERS_PATH='.'
+fi
+
+
+if [ -f "$PARAMETERS_DIR/5_resample_param.txt" ]; then
+	RESAMPLE_PARAMETERS_PATH="$PARAMETERS_DIR/5_resample_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/5_resample_param.txt" ]; then
+	RESAMPLE_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/5_resample_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for 5_resample not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	RESAMPLE_PARAMETERS_PATH='.'
+fi
+
+
+if [ -f "$PARAMETERS_DIR/6_optimise_param.txt" ]; then
+	SECOND_OPTIMISE_PARAMETERS_PATH="$PARAMETERS_DIR/6_optimise_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/6_optimise_param.txt" ]; then
+	SECOND_OPTIMISE_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/6_optimise_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for 6_optimise not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	SECOND_OPTIMISE_PARAMETERS_PATH='.'
+fi
+
+
+if [ -f "$PARAMETERS_DIR/7_trim_param.txt" ]; then
+	SECOND_TRIM_PARAMETERS_PATH="$PARAMETERS_DIR/7_trim_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/7_trim_param.txt" ]; then
+	SECOND_TRIM_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/7_trim_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for 7_trim not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	SECOND_TRIM_PARAMETERS_PATH='.'
+fi
+
+
+if [ -f "$PARAMETERS_DIR/8_mri_sim_param.txt" ]; then
+	MRI_SIM_PARAMETERS_PATH="$PARAMETERS_DIR/8_mri_sim_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/8_mri_sim_param.txt" ]; then
+	MRI_SIM_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/8_mri_sim_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for 8_mri_sim not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	MRI_SIM_PARAMETERS_PATH='.'
+fi
+
+
+if [ -f "$PARAMETERS_DIR/9_noisify_param.txt" ]; then
+	NOISIFY_PARAMETERS_PATH="$PARAMETERS_DIR/9_noisify_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/9_noisify_param.txt" ]; then
+	NOISIFY_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/9_noisify_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for 9_noisify not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	NOISIFY_PARAMETERS_PATH='.'
+fi
+
+if [ -f "$PARAMETERS_DIR/draw_rois_param.txt" ]; then
+	DRAW_ROIS_PARAMETERS_PATH="$PARAMETERS_DIR/draw_rois_param.txt"
+elif [ -f "$DEFAULT_PARAMETERS_DIR/draw_rois_param.txt" ]; then
+	DRAW_ROIS_PARAMETERS_PATH="$DEFAULT_PARAMETERS_DIR/draw_rois_param.txt"
+else
+	echo ''
+	echo "Warning! Parameters file for draw_rois not found at path '$PARAMETERS_DIR' or '$DEFAULT_PARAMETERS_DIR'! Using built-in defaults!"
+	echo ''
+	DRAW_ROIS_PARAMETERS_PATH='.'
+fi
+
+
+
+
+
+if [ "$ISOTROPIC_REGIONS_PATH " != " " ]; then
+	rand_init "$OUTPUT_DIR/$COLLECTION_DIR/1_rand_init" $RAND_INIT_PARAMETERS_PATH $ISOTROPIC_REGIONS_PATH
+else
+	rand_init "$OUTPUT_DIR/$COLLECTION_DIR/1_rand_init" $RAND_INIT_PARAMETERS_PATH 
+fi
+
+
+optimise "$OUTPUT_DIR/$COLLECTION_DIR/1_rand_init" "$OUTPUT_DIR/$COLLECTION_DIR/2_optimise" $FIRST_OPTIMISE_PARAMETERS_PATH
+
+trim "$OUTPUT_DIR/$COLLECTION_DIR/2_optimise" "$OUTPUT_DIR/$COLLECTION_DIR/3_trim" $FIRST_TRIM_PARAMETERS_PATH
+
+subdiv "$OUTPUT_DIR/$COLLECTION_DIR/3_trim" "$OUTPUT_DIR/$COLLECTION_DIR/4_subdiv" $SUBDIV_PARAMETERS_PATH
+
+resample "$OUTPUT_DIR/$COLLECTION_DIR/4_subdiv" "$OUTPUT_DIR/$COLLECTION_DIR/5_resample" $RESAMPLE_PARAMETERS_PATH
+
+optimise "$OUTPUT_DIR/$COLLECTION_DIR/5_resample" "$OUTPUT_DIR/$COLLECTION_DIR/6_optimise" $SECOND_OPTIMISE_PARAMETERS_PATH
+
+trim "$OUTPUT_DIR/$COLLECTION_DIR/6_optimise" "$OUTPUT_DIR/$COLLECTION_DIR/7_trim" $SECOND_TRIM_PARAMETERS_PATH
+
+mri_sim "$OUTPUT_DIR/$COLLECTION_DIR/7_trim" "$OUTPUT_DIR/$COLLECTION_DIR/8_mri_sim" $GRADIENT_DIRECTIONS_PATH $MRI_SIM_PARAMETERS_PATH
+
+noisify "$OUTPUT_DIR/$COLLECTION_DIR/8_mri_sim" "$OUTPUT_DIR/$COLLECTION_DIR/9_noisify" $NOISIFY_PARAMETERS_PATH
+
+draw_rois "$OUTPUT_DIR/$COLLECTION_DIR/7_trim" "$OUTPUT_DIR/$COLLECTION_DIR/rois" $DRAW_ROIS_PARAMETERS_PATH
+
+#mri_sim "$OUTPUT_DIR/$COLLECTION_DIR/7_trim" "$OUTPUT_DIR/$COLLECTION_DIR/8_mri_sim-20dir" $GRADIENT_DIRECTIONS_PATH $MRI_SIM_PARAMETERS_PATH
+
+#noisify "$OUTPUT_DIR/$COLLECTION_DIR/8_mri_sim-20dir" "$OUTPUT_DIR/$COLLECTION_DIR/9_noisify-20dir" $NOISIFY_PARAMETERS_PATH
+
+
+echo '\nAll done!\n'
+echo "Please check the './generated_collections/$COLLECTION_DIR/8_mri_sim/stats/stats.txt' file to see if the generated structure meets your requirements.\n"
+echo "NB: To Display the final strand collection use the following MATLAB code:\n\naddpath('./matlab_scripts');\ndisplay_strands('./generated_collections/$COLLECTION_DIR/7_trim');\n"
+echo "For more information please refer to ./README.txt"

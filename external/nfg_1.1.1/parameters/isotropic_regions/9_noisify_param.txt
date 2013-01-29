@@ -1,0 +1,22 @@
+# --- The parameters used to simulate the DW-MR images emanating from the strands. ---
+#
+# Please enter parameter names on separate lines (with no preceding space) followed by a single space
+ and then its value. Lines without recognised parameter names in this format will be ignored. 
+#
+# E.g. 
+# name 0.0 		(Remember, NO preceding space and only ONE space between name and value!)
+# 
+#
+# NB: The generated phantom is scale invariant.  All parameters representing spatial quantities are only 
+relative to one another and therefore defined in abstract units (U).
+#
+
+
+
+noise_level 0.06			# The sigma parameter in the Rician noise model (i.e. the standard 
+						deviation of the Gaussian noise added to the real and
+						 imaginary components of the simulated signal)
+
+output_format analyze			# The output format in which the images will be saved in (and read
+						 from)
+
