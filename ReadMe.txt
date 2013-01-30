@@ -1,5 +1,7 @@
-Linear Fascicle Evaluation.
+Linear Fascicle Evaluation (LiFE).
 
-This software is intended to evaluate the quality of a connectome.
+This software is intended for evaluating the quality of white-matter connectomes.
 
 (c) Franco Pestilli, Stanford University 2013 
+    Other contributors Brian Wandell, Jason Yeatman, 
+    Ariel Rokem, Kendrick Kay.
