@@ -44,7 +44,7 @@ roisFileNames = {fullfile(saveDir,'rois','optic_radiation_AND_roi.mat'), ...
                  fullfile(saveDir,'rois','RV1_useme.mat')};
 roiOperations = {'and','not','and'}; % Operations to apply with each ROI
 
-%% Load the data part
+%% Load the data:
 if recompute_fe
   % Recompute the fe structure from the original fiber group
   % Initialize the Connectome
