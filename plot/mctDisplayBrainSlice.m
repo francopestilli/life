@@ -36,7 +36,7 @@ function h = mctDisplayBrainSlice(nifti, slice, cmap, rescale,alpha)
 %
 % h = mctDisplayBrainSlice(nifti, [-20 0 0])
 %
-% (C) 2012 Stanford VISTA team.
+% Franco (C) 2012 Stanford VISTA team.
 %
 % Modified from Jason's code
 
@@ -47,18 +47,21 @@ end
 if ~exist('rescale','var') || isempty(rescale)
     rescale = 1;
 end
+
 % Make sure only one plane was designated for plotting
-plane = ~isnan(slice);
+plane = ~isnan(slice(1:3));
 if sum(plane) > 1
-    plane = slice ~= 0;
+    plane = slice(1:3) ~= 0;
 end
 if sum(plane) > 1
     error('Only one slice can be plotted. Other values should be nan or 0')
 end
+
 % Replace nans with zeros
-slice = slice .* plane;
+slice(1:3) = slice(1:3) .* plane;
+
 % Make sure slice is a row vector
-if size(slice,2) ~= 3
+if size(slice,1) ~= 1
     slice = slice';
 end
 
@@ -68,39 +71,45 @@ if notDefined('alpha'), alpha=1;end
 % The variable slice is given in acpc coordinates.  Transform acpc to image
 % coordinates
 imgXform = nifti.qto_ijk;
-ImCoords = floor(imgXform * [slice 1]');
-imIndx = ImCoords(find(slice));
+ImCoords = floor(imgXform * [slice(1:3) 1]');
+imIndx = ImCoords(slice(1:3)~=0);
+
+if length(slice) == 4
+  fourDindx = slice(4);
+else
+  fourDindx = 1;
+end
 
 % Pull the desired slice out of the 3d image volume
 if find(plane) == 1
-    image = squeeze(nifti.data(imIndx,:,:));
+    image = squeeze(nifti.data(imIndx,:,:,fourDindx));
     % Define the minimum and maximum coordinates of the image in each
     % dimension in acpc mm space.
     min_x = slice(1); max_x = min_x;
     [y z] = size(image);
-    max_corner = inv(imgXform) * [imIndx y z 1]';
+    max_corner = (imgXform) \[imIndx y z 1]';
     max_y = max_corner(2); max_z = max_corner(3);
-    min_corner = inv(imgXform) * [imIndx 0 0 1]';
+    min_corner = (imgXform) \ [imIndx 0 0 1]';
     min_y = min_corner(2); min_z = min_corner(3);
 elseif find(plane) == 2
-    image = squeeze(nifti.data(:,imIndx,:));
+    image = squeeze(nifti.data(:,imIndx,:,fourDindx));
     % Define the minimum and maximum coordinates of the image in each
     % dimension in acpc mm space.
     min_y = slice(2); max_y = min_y;
     [x z] = size(image);
-    max_corner = inv(imgXform) * [x imIndx z 1]';
+    max_corner = (imgXform) \ [x imIndx z 1]';
     max_x = max_corner(1); max_z = max_corner(3);
-    min_corner = inv(imgXform) * [0 imIndx 0 1]';
+    min_corner = (imgXform) \ [0 imIndx 0 1]';
     min_x = min_corner(1); min_z = min_corner(3);
 else
-    image = squeeze(nifti.data(:,:,imIndx));
+    image = squeeze(nifti.data(:,:,imIndx,fourDindx));
     % Define the minimum and maximum coordinates of the image in each
     % dimension in acpc mm space.
     min_z = slice(3); max_z = min_z;
     [x y] = size(image);
-    max_corner = inv(imgXform) * [x y imIndx 1]';
+    max_corner = (imgXform) \ [x y imIndx 1]';
     max_x = max_corner(1); max_y = max_corner(2);
-    min_corner = inv(imgXform) * [0 0 imIndx 1]';
+    min_corner = (imgXform) \ [0 0 imIndx 1]';
     min_x = min_corner(1); min_y = min_corner(2);
 end
 
@@ -110,7 +119,7 @@ scale = diag(nifti.qto_xyz); scale = scale(1:3);
 % The new dimensions will be the old dimensions multiplied by the scale
 % factors for the plane
 oldDim = size(image);
-newDim = oldDim .* scale(find(plane == 0))';
+newDim = oldDim .* scale(plane == 0)';
 % Resize the image
 image = double(imresize(image,newDim));
 

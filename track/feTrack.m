@@ -72,7 +72,7 @@ elseif ischar(algo)
   switch algo
      case {'prob','probabilistic','mrtrix probabilistic'}
       algo = 'prob';
-    case {'stream','streamline','determinstic', 'mrtrix deterministic'}
+    case {'stream','streamline','deterministic', 'mrtrix deterministic'}
       algo = 'stream';
     case {'tensor','tensor based','mrtrix tensor based tractography'}
       algo = 'tensor';

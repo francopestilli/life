@@ -21,21 +21,55 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [algo, dtFile,fibersFolder,lmax,nSeeds,wmMask] = getConditions(runType)
 
-algo         = {'probabilistic'};
-nSeeds       = 500000;
-dtFile       = '/biac2/wandell2/data/diffusion/PATH/to/dt6.mat';
-wmMask       = [];
-lmax         = 2:2:12;
-
 switch runType
   %% Subject 1
   case 1
-    fibersFolder = '/azure/scr1/htakemura/connectomes/SUBJ1';
-    
-    %% subject 2
+    fibersFolder = '/azure/scr1/frk/FP_96dirs_b2000_1p5iso/life_mrtrix_rep1/';
+    algo         = {'probabilistic','deterministic'};
+    nSeeds       = 500000;
+    dtFile       = '/biac2/wandell2/data/diffusion/pestilli/20120718_2975/96dirs_b2000_1point5iso_1/dt6.mat';
+    wmMask       = [];
+    lmax         = 2:2:12;
   case 2
-    fibersFolder = '/azure/scr1/htakemura/connectomes/SUBJ2'; 
+    fibersFolder = '/azure/scr1/frk/FP_96dirs_b2000_1p5iso/life_mrtrix_rep2/';
+    algo         = {'probabilistic','deterministic'};
+    nSeeds       = 500000;
+    dtFile       = '/biac2/wandell2/data/diffusion/pestilli/20120718_2975/96dirs_b2000_1point5iso_1/dt6.mat';
+    wmMask       = [];
+    lmax         = 2:2:12;
+  case 3
+    fibersFolder = '/azure/scr1/frk/FP_96dirs_b2000_1p5iso/life_mrtrix_rep3/';
+    algo         = {'probabilistic','deterministic'};
+    nSeeds       = 500000;
+    dtFile       = '/biac2/wandell2/data/diffusion/pestilli/20120718_2975/96dirs_b2000_1point5iso_1/dt6.mat';
+    wmMask       = [];
+    lmax         = 2:2:12;
     
+    %% tensor
+  case 4
+    fibersFolder = '/azure/scr1/frk/FP_96dirs_b2000_1p5iso/life_mrtrix_rep1/';
+    algo         = {'tensor'};
+    nSeeds       = 500000;
+    dtFile       = '/biac2/wandell2/data/diffusion/pestilli/20120718_2975/96dirs_b2000_1point5iso_1/dt6.mat';
+    wmMask       = [];
+    lmax         = 1;
+    
+  case 5
+    fibersFolder = '/azure/scr1/frk/FP_96dirs_b2000_1p5iso/life_mrtrix_rep2/';
+    algo         = {'tensor'};
+    nSeeds       = 500000;
+    dtFile       = '/biac2/wandell2/data/diffusion/pestilli/20120718_2975/96dirs_b2000_1point5iso_1/dt6.mat';
+    wmMask       = [];
+    lmax         = 1;
+    
+  case 6
+    fibersFolder = '/azure/scr1/frk/FP_96dirs_b2000_1p5iso/life_mrtrix_rep3/';
+    algo         = {'tensor'};
+    nSeeds       = 500000;
+    dtFile       = '/biac2/wandell2/data/diffusion/pestilli/20120718_2975/96dirs_b2000_1point5iso_1/dt6.mat';
+    wmMask       = [];
+    lmax         = 1;
+   
   otherwise
     keyboard
 end

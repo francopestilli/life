@@ -32,9 +32,9 @@ switch runType
   
     %% Probabilistic
   case 2
-    algo         = {'probabilistic'};
+    algo         = {'probabilistic','deterministic'};
     fibersFolder = '/azure/scr1/frk/JW_96dirs_b2000_1p5iso/life_mrtrix_rep1/';
-    lmax         = [8];
+    lmax         = [2:2:12];
     nSeeds       = 500000;
     dtFile       = '/biac2/wandell2/data/diffusion/winawer/20120410_2202/96dirs_b2000_1point5iso_1/dt6.mat';
     wmMask       = [];

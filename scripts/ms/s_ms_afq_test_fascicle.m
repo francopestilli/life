@@ -17,7 +17,7 @@ function s_ms_afq_test_fascicle
 % PARAMETERS
 diffusionModelParams = [1,0];       % The parameters of the tensor model AD, RD
 maxVolDist           = 1;           % Max distance in mm from the ROI edges.
-sdCutoff             = [3.3];     % One per conenctome, generally smaller for smaller lmax values
+sdCutoff             = [3 3 3.5 3.5];     % One per conenctome, generally smaller for smaller lmax values
 clobber              = [0 0 0 0 1 0]; % Owerwrite all the files.
 
 % DIRECTORY TO LOAD FILES FROM:
@@ -43,6 +43,11 @@ roi_saveDir          =  'roi_arcuate_importance';
 arcuateRoiFileName   =  'arcuate_roi_lmax12_prob_importance';  
 
 
+% FASCICLES:
+fascicleNames   = {'rArc', 'lArc','rSlf', 'lSlf'};
+fascicleIndices = {20,19,16,15};
+
+
 % Handling parallel processing
 poolwasopen=1; % if a matlabpool was open already we do not open nor close one
 if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
@@ -66,9 +71,9 @@ for irep = 1:length(connectSubfolders)
     % Build the full name of the two fascicles FE's structures
     feSaveNameAll     = sprintf('%s_diffModAx%sRd%s_%s',cName,num2str(100*diffusionModelParams(1)), ...
                                                               num2str(100*diffusionModelParams(2)));
-    feSaveNameArcuate = sprintf('arcuateFE_%s_sd%2.0f',feSaveNameAll,100*sdCutoff(1));
-    feSaveNameNOArc   = sprintf('arcuateFE_NOT_%s_sd%2.0f',feSaveNameAll,100*sdCutoff(1));
-    feSaveNameWITHArc   = sprintf('arcuateFE_WITH_%s_sd%2.0f',feSaveNameAll,100*sdCutoff(1));
+    feSaveNameArcuate = sprintf('%s_%s_sd%2.0f',cName,feSaveNameAll,100*sdCutoff(1));
+    feSaveNameNOArc   = sprintf('%s_NOT_%s_sd%2.0f',cName,feSaveNameAll,100*sdCutoff(1));
+    feSaveNameWITHArc   = sprintf('%s_WITH_%s_sd%2.0f',cName,feSaveNameAll,100*sdCutoff(1));
     
     % Name and path for saving the fascicles
     fasSaveName        = sprintf('fas_%s',feSaveNameAll);
@@ -139,7 +144,7 @@ for irep = 1:length(connectSubfolders)
       fe    = feSet(fe,'fit',feFitModel(feGet(fe,'Mfiber'),feGet(fe,'dsig demeaned'),'sgdnn'));
       
       % Fit the model with voxel-wise weights.
-      fe = feFitModelByVoxel(fe);
+      %fe = feFitModelByVoxel(fe);
       feConnectomeSave(fe,feSaveNameArcuate);
       clear fe
       
