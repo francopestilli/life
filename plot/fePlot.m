@@ -51,6 +51,100 @@ plotType = mrvParamFormat(plotType);
 
 % Find the plot
 switch plotType
+  case {'fiberdensityhist'}
+    % get the fiber density
+    fd = feGet(fe,'fiber density');
+    close g
+    g(1) = mrvNewGraphWin('Fiber density');
+    set(gcf,'color','w')
+    
+    % Fiber density before life
+    edges = logspace(.5,3.2,100);
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    y = histc(fd(:,1),edges)/size(fd,1)*100;
+    h = bar(y,'r');
+    set(h,'edgecolor','r','linewidth',.01)
+    set(get(h,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5)
+    
+    % Fiber density after life
+    hold on
+    y = histc(fd(:,2),edges)/size(fd,1)*100;
+    h = bar(y,'b');
+    set(h,'edgecolor','b','linewidth',.01)
+    set(get(h,'Children'),'FaceAlpha',.35,'EdgeAlpha',.35)
+    set(gca,'ylim',[0 3],'xlim',[1 100])
+    ticks = get(gca,'xtick'); 
+    ylabel('Percent white-matter volume')
+    xlabel('Number of fibers per voxel')
+    set(gca,  'ytick',[0 1 2 3], ...
+      'xticklabel', ceil(centers(ticks-1)) ,...
+      'box','off','tickDir','out','xscale','lin')
+    
+    % Weigth density (sum of weights)
+    g(2) = mrvNewGraphWin('Weight density (sum of weights)');
+    set(gcf,'color','w')
+    edges = logspace(-7,0,100);
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    y = histc(fd(:,3),edges)/size(fd,1)*100;
+    h = bar(y,'k');
+    set(h,'edgecolor','k','linewidth',.01)
+    ylabel('Percent white-matter volume')
+    xlabel('Sum of fascicles'' contribution to the voxel signal')
+    set(gca,'ylim',[0 ceil(max(y))],'xlim',[.5 100])
+    ticks = get(gca,'xtick');
+    set(gca, 'ytick',[0 ceil(max(y))./2 ceil(max(y))], ...
+      'xticklabel', ceil(1000000*centers(ticks-1))/1000000 ,...
+      'box','off','tickDir','out','xscale','lin')
+    
+    % Weight density (mean of weights)
+    g(3) = mrvNewGraphWin('Weight density (mean of weights)');
+    set(gcf,'color','w')
+    edges = logspace(-7,0,100);
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    y = histc(fd(:,4),edges)/size(fd,1)*100;
+    h = bar(y,'k');
+    set(h,'edgecolor','k','linewidth',.01)
+    ylabel('Percent white-matter volume')
+    xlabel('Mean fascicles'' contribution to the voxel signal')
+      set(gca,'ylim',[0 ceil(max(y))],'xlim',[.5 100])
+    ticks = get(gca,'xtick');
+    set(gca, 'ytick',[0 ceil(max(y))./2 ceil(max(y))], ...
+      'xticklabel', ceil(1000000*centers(ticks-1))/1000000 ,...
+      'box','off','tickDir','out','xscale','lin')
+
+    % Weight density (var of weights)
+    g(4) = mrvNewGraphWin('Weight density (variance of weights)');
+    set(gcf,'color','w')
+    edges = logspace(-7,0,100);
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    y = histc(fd(:,4),edges)/size(fd,1)*100;
+    h = bar(y,'k');
+    set(h,'edgecolor','k','linewidth',.01)
+    ylabel('Percent white-matter volume')
+    xlabel('Variance of fascicles'' contribution to the voxel signal')
+    set(gca,'ylim',[0 ceil(max(y))],'xlim',[.5 100])
+    ticks = get(gca,'xtick');
+    set(gca, 'ytick',[0 ceil(max(y))./2 ceil(max(y))], ...
+      'xticklabel', ceil(1000000*centers(ticks-1))/1000000 ,...
+      'box','off','tickDir','out','xscale','lin')
+    
+  case {'rmseratiohistogram'}
+    % Weigth density after life
+    g(3) = mrvNewGraphWin('RMSE ratio');
+    set(gcf,'color','w')
+    edges = logspace(-.3,.6,100);
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    y = histc(R,edges)/length(R)*100;
+    h = bar(y,'k');
+    set(h,'edgecolor','k','linewidth',.01)
+    ylabel('Percent white-matter volume')
+    xlabel('R_{rmse}')
+    set(gca,'ylim',[0 6],'xlim',[.5 100])
+    ticks = get(gca,'xtick');
+    set(gca, 'ytick',[0 3 6], ...
+      'xticklabel', ceil(100*centers(ticks-1))/100 ,...
+      'box','off','tickDir','out','xscale','lin')
+    
   case {'map','maprep'}
     % Generate the requested map and save it to volume.
     if (length(plotType) > 3)
