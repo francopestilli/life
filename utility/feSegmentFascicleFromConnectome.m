@@ -89,15 +89,18 @@ for ir = 1:length(rois)
   clear keep
 end
 
-% Save the indices of the fibers that survived all the operations/
+% Save the indices of the fibers that survived all the operations.
 keepFG( currentFibIndices{end} ) = true;
 
 % Clean up the rest of the fields in the fiber group.
 % dtiIntersectFibersWithRoi.m does not handle other fields but the .fiber
 % one.
-fg.pathwayInfo = fg.pathwayInfo(keepFG);
+fg.pathwayInfo = [];
+fg.seeds       = [];
+fg.Q           = [];
+fg.params      = [];
 
-% Change the fibergroup name if requested
+% Change the fibergroup name
 fg.name = fascicleFileName;
 
 return
