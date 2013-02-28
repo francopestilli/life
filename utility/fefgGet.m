@@ -331,6 +331,94 @@ switch strrep(lower(param),' ','')
       end
     end
     fprintf('[%s] fiber/node pairing completed in: %2.3fs.\n',mfilename, toc)
+  
+  case {'voxel2fibers','fiberdensity'}
+    % voxel2FNpairs = fefgGet(fgImg,'fiber density',roiCoords);
+    %
+    % The return is a cell array whose size is the number of voxels.
+    % The cell is a Nx1 matrix of fiber counts. How many fibers in each
+    % voxel.
+    %
+    fprintf('[%s] Computing fiber density in each voxel..\n',mfilename)
+   
+    if (length(varargin) < 1), error('Requires the roiCoords.');
+    else
+      roiCoords = varargin{1};
+      nCoords   = size(roiCoords,1);
+    end
+    if length(varargin) < 2
+      % We assume the fg and the ROI coordinates are in the same
+      % coordinate frame.
+      tic,nodes2voxels    = fefgGet(fg,'nodes 2 voxels',roiCoords);
+    else nodes2voxels = varargin{2};
+    end
+    
+    nFibers      = fefgGet(fg,'nFibers');
+    voxelsInFG   = fefgGet(fg,'voxels in fg',nodes2voxels);      
+
+    tic, fibersInVox = cell(1,nCoords);
+    for thisFiber=1:nFibers
+      voxelsInFiber = voxelsInFG{thisFiber};   % A few voxels, in a list
+      
+      % Then add a row for each (fiber,node) pairs that pass through
+      % the voxels for this fiber.
+      for jj=1:length(voxelsInFiber)
+        thisVoxel = voxelsInFiber(jj);
+        % Print out roi coord and fiber coord to verify match
+        % roiCoords(thisVoxel,:)
+        % fg.fibers{thisFiber}(:,nodesInFiber(jj))
+        % Would horzcat be faster?
+        fibersInVox{thisVoxel} = cat(1,fibersInVox{thisVoxel},thisFiber);
+      end
+    end
+    
+    % Now create the fiber density, the unique fibers in each voxel
+    val = zeros(length(fibersInVox),1);
+    for ivx = 1:length(fibersInVox)
+      val(ivx) = length(unique(fibersInVox{ivx}));
+    end
+    
+    fprintf('[%s] fiber density completed in: %2.3fs.\n',mfilename, toc)
+  
+  case {'uniquefibersinvox'}
+    % uniquefvx = fefgGet(fgImg,'uniquefibrsinvox',roiCoords);
+    %
+    % The return is a vector whose size is the number of voxels containing
+    % the unique fibers in each voxel
+    %
+    fprintf('[%s] Computing the unique fibers in eahc voxel...\n',mfilename)
+   tic
+    if (length(varargin) < 1), error('Requires the roiCoords.');
+    else
+      roiCoords = varargin{1};
+      nCoords   = size(roiCoords,1);
+    end
+    
+    % We assume the fg and the ROI coordinates are in the same
+    % coordinate frame.
+    nodes2voxels    = fefgGet(fg,'nodes 2 voxels',roiCoords);
+    
+    nFibers      = fefgGet(fg,'nFibers');
+    voxelsInFG   = fefgGet(fg,'voxels in fg',nodes2voxels);      
+
+    fibersInVox = cell(1,nCoords);
+    for thisFiber=1:nFibers
+      voxelsInFiber = voxelsInFG{thisFiber};   % A few voxels, in a list
+      
+      % Then add a row for each (fiber,node) pairs that pass through
+      % the voxels for this fiber.
+      for jj=1:length(voxelsInFiber)
+        thisVoxel = voxelsInFiber(jj);
+        fibersInVox{thisVoxel} = cat(1,fibersInVox{thisVoxel},thisFiber);
+      end
+    end
+    
+    % Now create find the unique fibers in each voxel
+    val = cell(length(fibersInVox),1);
+    for ivx = 1:length(fibersInVox)
+      val{ivx} = (unique(fibersInVox{ivx}));
+    end
+    fprintf('[%s] done computing the unique fibers in eahc voxel: %2.3fs.\n',mfilename, toc)
 
   case {'nodesinvoxels'}
     % nodesInVoxels = fefgGet(fg,'nodes in voxels',nodes2voxels);

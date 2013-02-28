@@ -354,6 +354,16 @@ function val = feGet(fe,param,varargin)
 % res = feGet(fe, 'res sig full voxfit',coords);
 % res = feGet(fe, 'res sig full voxfit',voxelIndex);
 %---------
+% Fiber density statistics.
+% Computes the fiber density (how many fibers in each voxel)
+% We compute the following values:
+% (1) The number of fibers in each voxel
+% (2) The number of unique fibers with non-zero weights
+% (3) The sum of the weights in eahc voxel
+% (4) The mean of the weights in eahc voxel
+% (5) The variance of the weigths in eahc voxel
+% pSig = feGet(fe,'fiberdensity');
+%---------
 % Given an VOI or a set of indices to voxels returns the indices of the matching voxels inside the big
 % volume, which ordinarily represents the full connectome.
 % voxelIndices = feGet(fe,'voxelsindices',coords)
@@ -937,6 +947,53 @@ switch param
       % voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);
       % val           = val(voxelRowsToKeep,:);
       val = val(feGet(fe,'voxel rows',feGet(fe,'voxelsindices',varargin)));
+    end
+       
+  case {'fiberdensity'}
+    % Fiber density statistics.
+    %
+    % Computes the fiber density (how many fibers in each voxel)
+    % 
+    % We compute the following values:   
+    % (1) The number of fibers in each voxel
+    % (2) The number of unique fibers with non-zero weights
+    % (3) The sum of the weights in eahc voxel
+    % (4) The mean of the weights in eahc voxel
+    % (5) The variance of the weigths in eahc voxel
+    %
+    % pSig = feGet(fe,'fiberdensity');
+    
+    % Get the unique fibers in each voxel
+    uniquefvx = fefgGet(feGet(fe,'fibers img'), ...
+                        'uniquefibersinvox',     ...
+                        feGet(fe,'roi coords'));
+                      
+    % extract the fber weights obtained in a LiFE fit
+    w = feGet(fe,'fiber weights');
+    
+    % Compute the fiber density in three wasy:
+    % (1) The number of fibers in each voxel
+    % (2) The number of unique fibers with non-zero weights
+    % (3) The sum of the weights in eahc voxel
+    % (4) The mean of the weights in eahc voxel
+    % (5) The variance of the weigths in eahc voxel
+    val = nan(length(uniquefvx),5);
+    for ivx = 1:length(uniquefvx)
+        
+      % Number of fibers in each voxel
+      val(ivx,1) = length(uniquefvx{ivx});
+      
+      % Number of fibers in ech voxel with non-zero weight
+      val(ivx,2) = length(uniquefvx{ivx}(w(uniquefvx{ivx}) > 0));
+  
+      % Sum of fiber weights in each voxel
+      val(ivx,3) = sum(w(uniquefvx{ivx}));
+         
+      % Mean of fiber weights in each voxel
+      val(ivx,4) = nanmean(w(uniquefvx{ivx}));
+      
+      % Var of fibers in each voxel
+      val(ivx,5) = nanvar(w(uniquefvx{ivx}));
     end
     
   case {'psigfibertest'}

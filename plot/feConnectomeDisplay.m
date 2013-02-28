@@ -74,7 +74,7 @@ set(gca,'color',[0 0 0])
 num_fibers = size(fibers,1);  
 %fiber_color = [.88 .5 .2];[.88 .9 .97];
 X = cell(num_fibers,1);Y = X; Z = X;  segs = X;
-fiberRad = .135;
+fiberRad = .4135;
 numNodes = zeros(num_fibers,1);
 
 parfor i_fiber = 1:num_fibers

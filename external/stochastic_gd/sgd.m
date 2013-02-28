@@ -152,35 +152,41 @@ end
 % prepare output
 w = w_best;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% JUNK:
+function [v,len] = unitlengthfast(v,dim)
 
-% VISUALIZE
-%     subplot(1,2,1); plot(esterr,'ro-');
-%     subplot(1,2,2); bar(w(round(linspace(1,length(w),500))));
-%     drawnow;
+% function [v,len] = unitlengthfast(v,dim)
+%
+% <v> is a vector (row or column) or a 2D matrix
+% <dim> (optional) is dimension along which vectors are oriented.
+%   if not supplied, assume that <v> is a row or column vector.
+%
+% unit-length normalize <v>.  aside from input flexibility,
+% the difference between this function and unitlength.m is that
+% we do not deal with NaNs (i.e. we assume <v> does not have NaNs),
+% and if a vector has 0 length, it becomes all NaNs.
+%
+% we also return <len> which is the original vector length of <v>.
+% when <dim> is not supplied, <len> is a scalar.  when <dim> is
+% supplied, <len> is the same dimensions as <v> except collapsed
+% along <dim>.
+%
+% note some weird cases:
+%   unitlengthfast([]) is [].
+%   unitlengthfast([0 0]) is [NaN NaN].
+%
+% example:
+% a = [3 0];
+% isequalwithequalnans(unitlengthfast(a),[1 0])
 
-
-%     case -1
-%       val = thresh*max(abs(grad));
-%       grad(grad > -val & grad < val) = 0;
-%       grad = unitlengthfast(grad);
-%       w = w - finalstepsize*grad;
-%       w(w<0) = 0;
-%
-%     switch fittype
-%     case 0
-%     case 1
-%       [d,ix] = sort(abs(grad),'descend');
-%
-%       ixcnt = 1;
-%       while 1
-%         delta = finalstepsize*sign(grad(ix(ixcnt)));
-%         if w(ix(ixcnt)) - delta >= 0
-%           w(ix(ixcnt)) = w(ix(ixcnt)) - delta;
-%           break;
-%         else
-%           ixcnt = ixcnt + 1;
-%         end
-%       end
-%     end
-%
+if nargin==1
+  len = sqrt(v(:).'*v(:));
+  v = v / len;
+else
+  if dim==1
+    len = sqrt(sum(v.^2,1));
+    v = v ./ repmat(len,[size(v,1) 1]);  % like this for speed.  maybe use the indexing trick to speed up even more??
+  else
+    len = sqrt(sum(v.^2,2));
+    v = v ./ repmat(len,[1 size(v,2)]);
+  end
+end

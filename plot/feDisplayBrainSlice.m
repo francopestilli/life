@@ -1,7 +1,7 @@
-function h = mctDisplayBrainSlice(nifti, slice, cmap, rescale,alpha)
+function h = feDisplayBrainSlice(nifti, slice, cmap, rescale,alpha)
 % Add a slice from a nifti image to a 3D plot
 %
-% h = mctDisplayBrainSlice(nifti, slice, [cmap], [rescale],alpha)
+% h = feDisplayBrainSlice(nifti, slice, [cmap], [rescale],alpha)
 %
 % Inputs:
 %
@@ -34,11 +34,9 @@ function h = mctDisplayBrainSlice(nifti, slice, cmap, rescale,alpha)
 %
 % Example:
 %
-% h = mctDisplayBrainSlice(nifti, [-20 0 0])
+% h = feDisplayBrainSlice(nifti, [-20 0 0 10])
 %
 % Franco (C) 2012 Stanford VISTA team.
-%
-% Modified from Jason's code
 
 %% Check arguments
 if ~exist('cmap','var') || isempty(cmap)
@@ -125,7 +123,7 @@ image = double(imresize(image,newDim));
 
 % Scale and clip the image values so that the lowest 25% of the values are
 % zeroed, the top 5% are maxed and the range is 0 to 255
-image = uint8(mrAnatHistogramClip(image,.25,.95,1).* 255);
+image = uint8(mrAnatHistogramClip(image,.05,.95,1).* 255);
 
 % Convert the scaler image to an RGB image based on the chosen colormap
 colorimg = ind2rgb(image,cmap);
