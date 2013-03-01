@@ -80,10 +80,10 @@ for i_lmax = 1:length(lmax)
       switch trackingType
         case {'deterministic','d'}
           connectomeFile = { ...
-            sprintf( 'run01_fliprot_aligned_trilin_csd_lmax%i_run01_fliprot_aligned_trilin_brainmask_run01_fliprot_aligned_trilin_wm_prob-500000.pdb',lmax(i_lmax))};
+            sprintf( 'run01_fliprot_aligned_trilin_csd_lmax%i_run01_fliprot_aligned_trilin_brainmask_run01_fliprot_aligned_trilin_wm_stream-500000.pdb',lmax(i_lmax))};
         case {'probabilistic','p'}
           connectomeFile = { ...
-            sprintf( 'run01_fliprot_aligned_trilin_csd_lmax%i_run01_fliprot_aligned_trilin_brainmask_run01_fliprot_aligned_trilin_wm_stream-500000.pdb',lmax(i_lmax))};
+            sprintf( 'run01_fliprot_aligned_trilin_csd_lmax%i_run01_fliprot_aligned_trilin_brainmask_run01_fliprot_aligned_trilin_wm_prob-500000.pdb',lmax(i_lmax))};
         case {'tensor','t'}
           connectomeFile = { ...
             sprintf( 'run01_fliprot_aligned_trilin_dwi_run01_fliprot_aligned_trilin_brainmask_run01_fliprot_aligned_trilin_wm_tensor-500000.pdb')};
