@@ -339,20 +339,24 @@ switch strrep(lower(param),' ','')
     % The cell is a Nx1 matrix of fiber counts. How many fibers in each
     % voxel.
     %
-    fprintf('[%s] Computing fiber density in each voxel..\n',mfilename)
+    fprintf('[%s] Computing fiber density in each voxel...\n',mfilename)
    
-    if (length(varargin) < 1), error('Requires the roiCoords.');
+    if (length(varargin) < 1), 
+      roiCoords = fefgGet(fg,'uniqueimagecoords');
+      fprintf('[%s] Computing white-matter volume ROI from fibers coordinates.\n',mfilename) 
+      fprintf('          Assuming fiber coordinates in IMG space.\n')
     else
       roiCoords = varargin{1};
-      nCoords   = size(roiCoords,1);
     end
+    
     if length(varargin) < 2
       % We assume the fg and the ROI coordinates are in the same
       % coordinate frame.
-      tic,nodes2voxels    = fefgGet(fg,'nodes 2 voxels',roiCoords);
+      tic,nodes2voxels= fefgGet(fg,'nodes 2 voxels',roiCoords);
     else nodes2voxels = varargin{2};
     end
     
+    nCoords      = size(roiCoords,1);
     nFibers      = fefgGet(fg,'nFibers');
     voxelsInFG   = fefgGet(fg,'voxels in fg',nodes2voxels);      
 
@@ -386,7 +390,7 @@ switch strrep(lower(param),' ','')
     % The return is a vector whose size is the number of voxels containing
     % the unique fibers in each voxel
     %
-    fprintf('[%s] Computing the unique fibers in eahc voxel...\n',mfilename)
+    fprintf('[%s] Computing the unique fibers in each voxel...\n',mfilename)
    tic
     if (length(varargin) < 1), error('Requires the roiCoords.');
     else

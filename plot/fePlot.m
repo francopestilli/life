@@ -51,16 +51,19 @@ plotType = mrvParamFormat(plotType);
 
 % Find the plot
 switch plotType
- case {'fiberdensitymap'}
-    slice = 30;
-   
+  case {'fiberdensitymap'}
+    % Select a slice of brain in sagittal vie.
+    % only Sagittal view is implemented
+    if isempty(varargin),  slice = 30;
+    else slice = varargin{1}; end
+    close(g)
+    
     % get the fiber density
     fd = (feGet(fe,'fiber density'));
    
-    g(1) = mrvNewGraphWin('Fiber density full connectome');
-    set(gcf,'color','w')
-    
-    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,1))',feGet(fe,'roiCoords'));
+    g(1) = mrvNewGraphWin(sprintf('%s_FiberDensityMapFull',upper(plotType)));
+    set(gcf,'color','w')   
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),fd(:,1)',feGet(fe,'roiCoords'));
     maxfd = nanmax(img(:)); % This will be used tonormalize the fiber density plots
     surf(((fliplr(img(:,:,slice)./maxfd)'*255)),...
       'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
@@ -74,7 +77,7 @@ switch plotType
       num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
 
     % Fiber density after life
-    g(2) = mrvNewGraphWin('Fiber density best fibers');
+    g(2) = mrvNewGraphWin(sprintf('%s_FiberDensityMapLiFE',feGet(fe,'name')));
     set(gcf,'color','w')
     
     img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,2))',feGet(fe,'roiCoords'));
@@ -88,10 +91,9 @@ switch plotType
     colorbar('ytick',[.25*size(cmap,1) .5*size(cmap,1) .75*size(cmap,1) size(cmap,1)],'yticklabel', ...
       {num2str(ceil(maxfd/8)) num2str(ceil(maxfd/4)) ...
       num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
-
-    
+   
     % Weigth density (sum of weights)
-    g(3) = mrvNewGraphWin('Weight density (sum of weights)');
+    g(3) = mrvNewGraphWin(sprintf('%s_SumOfWeightsMapLiFE',feGet(fe,'name')));
     set(gcf,'color','w')
     
     img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,3))',feGet(fe,'roiCoords'));
@@ -107,56 +109,12 @@ switch plotType
     colorbar('ytick',[0 .5*size(cmap,1) size(cmap,1)],'yticklabel', ...
       {num2str(minw)  num2str(maxw/2)  num2str(maxw)},'tickdir','out')
     
-    
-    % Weight density (mean of weights)
-    g(4) = mrvNewGraphWin('Weight density (mean of weights)');
-    set(gcf,'color','w')
-    
-    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,4))',feGet(fe,'roiCoords'));
-    maxw = nanmax(img(:)); % This will be used tonormalize the fiber density plots
-    minw = nanmin(img(:)); % This will be used tonormalize the fiber density plots
-    surf(fliplr(img(:,:,slice)./maxw)'*255,...
-      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
-    axis off; axis equal;    view(0,-90)
-    set(gca,'ylim',[70 100],'xlim',[40 65])
-    
-    cmap = colormap(jet(255));
-    colorbar('ytick',[0 .5*size(cmap,1) size(cmap,1)],'yticklabel', ...
-      {num2str(minw)  num2str(maxw/2)  num2str(maxw)},'tickdir','out')
-    
-    % Weight density (var of weights)
-    g(5) = mrvNewGraphWin('Weight density (variance of weights)');
-    set(gcf,'color','w')
-    
-    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,5))',feGet(fe,'roiCoords'));
-    maxw = nanmax(img(:)); % This will be used tonormalize the fiber density plots
-    minw = nanmin(img(:)); % This will be used tonormalize the fiber density plots
-    surf(fliplr(img(:,:,slice)./maxw)'*255,...
-      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
-    axis off; axis equal;
-    set(gca,'ylim',[70 100],'xlim',[40 65])
-    view(0,-90)
-    
-    cmap = colormap(jet(255));
-    colorbar('ytick',[0 .5*size(cmap,1) size(cmap,1)],'yticklabel', ...
-      {num2str(minw)  num2str(maxw/2)  num2str(maxw)},'tickdir','out');
-
-    hold on     
-    img = feReplaceImageValues(nan(feGet(fe,'map size')),feGet(fe,'meanvoxelsignal')'...
-      ,feGet(fe,'roiCoords'));
-     surf(fliplr(img(:,:,slice))',...
-      'facecolor','texture','faceAlpha',.5,'edgealpha',0,'CDataMapping','Direct');
-    axis off; axis equal;
-    set(gca,'ylim',[70 100],'xlim',[40 65])
-    view(0,-90)
-
-    
-    keyboard
   case {'fiberdensityhist'}
     % get the fiber density
     fd = feGet(fe,'fiber density');
-    close g
-    g(1) = mrvNewGraphWin('Fiber density');
+    close(g)
+
+    g(1) = mrvNewGraphWin(sprintf('%s_FiberDensityHistFull_&_LiFE',feGet(fe,'name')));
     set(gcf,'color','w')
     
     % Fiber density before life
@@ -182,7 +140,7 @@ switch plotType
       'box','off','tickDir','out','xscale','lin')
     
     % Weigth density (sum of weights)
-    g(2) = mrvNewGraphWin('Weight density (sum of weights)');
+    g(2) = mrvNewGraphWin(sprintf('%s_SumOfWeightsHistLiFE',feGet(fe,'name')));
     set(gcf,'color','w')
     edges = logspace(-7,0,100);
     centers = sqrt(edges(1:end-1).*edges(2:end));
@@ -198,7 +156,7 @@ switch plotType
       'box','off','tickDir','out','xscale','lin')
     
     % Weight density (mean of weights)
-    g(3) = mrvNewGraphWin('Weight density (mean of weights)');
+    g(3) = mrvNewGraphWin(sprintf('%s_MedianWeightsHistLiFE',feGet(fe,'name')));
     set(gcf,'color','w')
     edges = logspace(-7,0,100);
     centers = sqrt(edges(1:end-1).*edges(2:end));
@@ -214,11 +172,11 @@ switch plotType
       'box','off','tickDir','out','xscale','lin')
 
     % Weight density (var of weights)
-    g(4) = mrvNewGraphWin('Weight density (variance of weights)');
+    g(4) = mrvNewGraphWin(sprintf('%s_VarianceWeightsHistLiFE',feGet(fe,'name')));
     set(gcf,'color','w')
     edges = logspace(-7,0,100);
     centers = sqrt(edges(1:end-1).*edges(2:end));
-    y = histc(fd(:,4),edges)/size(fd,1)*100;
+    y = histc(fd(:,5),edges)/size(fd,1)*100;
     h = bar(y,'k');
     set(h,'edgecolor','k','linewidth',.01)
     ylabel('Percent white-matter volume')
@@ -231,8 +189,9 @@ switch plotType
     
   case {'rmseratiohistogram'}
     % Weigth density after life
-    g(3) = mrvNewGraphWin('RMSE ratio');
     set(gcf,'color','w')
+    R = (feGet(fe,'rmseratio'));
+ 
     edges = logspace(-.3,.6,100);
     centers = sqrt(edges(1:end-1).*edges(2:end));
     y = histc(R,edges)/length(R)*100;
