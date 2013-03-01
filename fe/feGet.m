@@ -990,7 +990,7 @@ switch param
       val(ivx,3) = sum(w(uniquefvx{ivx}));
          
       % Mean of fiber weights in each voxel
-      val(ivx,4) = nanmean(w(uniquefvx{ivx}));
+      val(ivx,4) = nanmedian(w(uniquefvx{ivx}));
       
       % Var of fibers in each voxel
       val(ivx,5) = nanvar(w(uniquefvx{ivx}));
