@@ -51,6 +51,107 @@ plotType = mrvParamFormat(plotType);
 
 % Find the plot
 switch plotType
+ case {'fiberdensitymap'}
+    slice = 30;
+   
+    % get the fiber density
+    fd = (feGet(fe,'fiber density'));
+   
+    g(1) = mrvNewGraphWin('Fiber density full connectome');
+    set(gcf,'color','w')
+    
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,1))',feGet(fe,'roiCoords'));
+    maxfd = nanmax(img(:)); % This will be used tonormalize the fiber density plots
+    surf(((fliplr(img(:,:,slice)./maxfd)'*255)),...
+      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    axis off; axis equal;
+    set(gca,'ylim',[70 100],'xlim',[40 65])
+    view(0,-90)
+    
+    cmap = colormap(jet(255));
+    colorbar('ytick',[.25*size(cmap,1) .5*size(cmap,1) .75*size(cmap,1) size(cmap,1)],'yticklabel', ...
+      {num2str(ceil(maxfd/8)) num2str(ceil(maxfd/4)) ...
+      num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
+
+    % Fiber density after life
+    g(2) = mrvNewGraphWin('Fiber density best fibers');
+    set(gcf,'color','w')
+    
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,2))',feGet(fe,'roiCoords'));
+    surf(fliplr(img(:,:,slice)./maxfd)'*255,...
+      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    axis off; axis equal;
+    set(gca,'ylim',[70 100],'xlim',[40 65])
+    view(0,-90)
+    
+    cmap = colormap(jet(255));
+    colorbar('ytick',[.25*size(cmap,1) .5*size(cmap,1) .75*size(cmap,1) size(cmap,1)],'yticklabel', ...
+      {num2str(ceil(maxfd/8)) num2str(ceil(maxfd/4)) ...
+      num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
+
+    
+    % Weigth density (sum of weights)
+    g(3) = mrvNewGraphWin('Weight density (sum of weights)');
+    set(gcf,'color','w')
+    
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,3))',feGet(fe,'roiCoords'));
+    maxw = nanmax(img(:)); % This will be used tonormalize the fiber density plots
+    minw = nanmin(img(:)); % This will be used tonormalize the fiber density plots
+    surf(fliplr(img(:,:,slice)./maxw)'*255,...
+      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    axis off; axis equal;
+    set(gca,'ylim',[70 100],'xlim',[40 65])
+    view(0,-90)
+    
+    cmap = colormap(jet(255));
+    colorbar('ytick',[0 .5*size(cmap,1) size(cmap,1)],'yticklabel', ...
+      {num2str(minw)  num2str(maxw/2)  num2str(maxw)},'tickdir','out')
+    
+    
+    % Weight density (mean of weights)
+    g(4) = mrvNewGraphWin('Weight density (mean of weights)');
+    set(gcf,'color','w')
+    
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,4))',feGet(fe,'roiCoords'));
+    maxw = nanmax(img(:)); % This will be used tonormalize the fiber density plots
+    minw = nanmin(img(:)); % This will be used tonormalize the fiber density plots
+    surf(fliplr(img(:,:,slice)./maxw)'*255,...
+      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    axis off; axis equal;    view(0,-90)
+    set(gca,'ylim',[70 100],'xlim',[40 65])
+    
+    cmap = colormap(jet(255));
+    colorbar('ytick',[0 .5*size(cmap,1) size(cmap,1)],'yticklabel', ...
+      {num2str(minw)  num2str(maxw/2)  num2str(maxw)},'tickdir','out')
+    
+    % Weight density (var of weights)
+    g(5) = mrvNewGraphWin('Weight density (variance of weights)');
+    set(gcf,'color','w')
+    
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,5))',feGet(fe,'roiCoords'));
+    maxw = nanmax(img(:)); % This will be used tonormalize the fiber density plots
+    minw = nanmin(img(:)); % This will be used tonormalize the fiber density plots
+    surf(fliplr(img(:,:,slice)./maxw)'*255,...
+      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    axis off; axis equal;
+    set(gca,'ylim',[70 100],'xlim',[40 65])
+    view(0,-90)
+    
+    cmap = colormap(jet(255));
+    colorbar('ytick',[0 .5*size(cmap,1) size(cmap,1)],'yticklabel', ...
+      {num2str(minw)  num2str(maxw/2)  num2str(maxw)},'tickdir','out');
+
+    hold on     
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),feGet(fe,'meanvoxelsignal')'...
+      ,feGet(fe,'roiCoords'));
+     surf(fliplr(img(:,:,slice))',...
+      'facecolor','texture','faceAlpha',.5,'edgealpha',0,'CDataMapping','Direct');
+    axis off; axis equal;
+    set(gca,'ylim',[70 100],'xlim',[40 65])
+    view(0,-90)
+
+    
+    keyboard
   case {'fiberdensityhist'}
     % get the fiber density
     fd = feGet(fe,'fiber density');
