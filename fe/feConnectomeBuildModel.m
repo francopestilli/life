@@ -65,7 +65,6 @@ tic
 % Indexes of actually used voxels, this can be less than the number of
 % voxels int he ROI in case some voxels have no fibers in them
 usedVoxels   = feGet(fe,'usedVoxels');
-% nVoxels = 10;   % FIX ME
 nVoxels      = length(usedVoxels);
 nBvecs       = feGet(fe,'nBvecs');
 vox_sparse_pSig = cell(nVoxels,1);

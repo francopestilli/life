@@ -1,4 +1,4 @@
-function stat = s_ms_test_connectomes_plots(stats,trackingType,lmax,diffusionModelParams,recompute)
+function stat = s_ms_test_connectomes_plots(stats,trackingType,dataType,lmax,diffusionModelParams,recompute)
 %
 % Load FE structeres obtained by preprocessing connectomesconstrained within a
 % region of interest and within the cortex and makes some basic plot of
@@ -18,6 +18,15 @@ if notDefined('stats')
   stats = {'vox rmse ratio','vox rmse','vox rmse data'};
 end
 if notDefined('dataType'), dataType='96dirs';end
+
+switch dataType
+  case {'96dirs'}
+      lmax = lmax(lmax<=12);
+  case {'150dirs'}
+      lmax = lmax(lmax<=16);
+  otherwise
+    keyboard
+end
 
 switch trackingType
   case {'t','tensor'}

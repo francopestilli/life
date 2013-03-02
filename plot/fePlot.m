@@ -61,7 +61,7 @@ switch plotType
     % get the fiber density
     fd = (feGet(fe,'fiber density'));
    
-    g(1) = mrvNewGraphWin(sprintf('%s_FiberDensityMapFull',upper(plotType)));
+    g(1) = mrvNewGraphWin(sprintf('%s_FiberDensityMapFull',feGet(fe,'name')));
     set(gcf,'color','w')   
     img = feReplaceImageValues(nan(feGet(fe,'map size')),fd(:,1)',feGet(fe,'roiCoords'));
     maxfd = nanmax(img(:)); % This will be used tonormalize the fiber density plots
