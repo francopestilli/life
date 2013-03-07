@@ -1,4 +1,4 @@
-function stat = s_ms_test_connectomes_plots(stats,trackingType,dataType,lmax,diffusionModelParams,recompute)
+function stat = s_ms_test_connectomes_plots(stats,trackingType,dataType,lmax,diffusionModelParams,recompute,feGetFunc)
 %
 % Load FE structeres obtained by preprocessing connectomesconstrained within a
 % region of interest and within the cortex and makes some basic plot of
@@ -18,7 +18,8 @@ if notDefined('stats')
   stats = {'vox rmse ratio','vox rmse','vox rmse data'};
 end
 if notDefined('dataType'), dataType='96dirs';end
-
+if notDefined('feGetFunc'), feGetFunc = 'feGetRep';end
+    
 switch dataType
   case {'96dirs'}
       lmax = lmax(lmax<=12);
@@ -132,7 +133,11 @@ for i_lmax = 1:length(lmax)
         
         % Compute some statistcs
         for is = 1:length(stats)
-          stat(i_bval,i_lmax,is,irep)   = nanmedian(feGetRep(fe,  stats{is}));
+            if ~strcmp(stats{is},'roi coords')
+                stat(i_bval,i_lmax,is,irep)   = nanmedian(eval(sprintf('%s(fe,  stats{is})',feGetFunc)));
+            else
+                stat(i_bval,i_lmax,is,irep)   = size(eval(sprintf('%s(fe,  stats{is})',feGetFunc)),1);
+            end
         end
       end % irep
     end   % i_bval
@@ -182,7 +187,7 @@ switch stats{ii}
   case {'vox rmse voxel wise'}
     ymin = 15;ymax = 45;
     ticks = [ymin (ymax+ymin)/2 ymax];
-    
+
   otherwise
     keyboard
 end
