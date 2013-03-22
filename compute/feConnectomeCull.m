@@ -1,10 +1,10 @@
-function [fe fefit fexval] = feConnectomeCull(fe,maxNumInter, lowerPrct, percentReduxRMSE)
+function [fe, o, fefitGood] = feConnectomeCull(fe,maxNumInter, fitType, percentReduxRMSE)
 %
 % Find the fibers in a connectome that explain most of the variance, by
 % iteratively finding the fibers with largest weights and fitting the life
 % model only to those.
 %
-%   [fe fefit fexval] = feCullConnectome(fe,maxNumInter, lowerPrct, percentReduxRMSE)
+%   [fe, o, fefit] = feCullConnectome(fe,maxNumInter, lowerPrct, percentReduxRMSE)
 % 
 % Inputs:
 %   fe            - An fe structure, see feCreate.m or v_lifeExample.m
@@ -28,63 +28,113 @@ function [fe fefit fexval] = feConnectomeCull(fe,maxNumInter, lowerPrct, percent
 %   fe         = feConnectomeInit(dwiFile,dtFile,fgFileName);
 %   fe         = feConnectomeCull(fe);
 % 
-% Franco (c) 2012 Stanford VISTA Team.
+% Franco (c) 2013 Stanford VISTA Team.
 
 % For large Conectomes this number might need to be increased, convergence
 % might require more interations.
 if notDefined('maxNumInter'), maxNumInter = 1000;end
 
-% This is the percent of fibers that are removed at each iteration. The
-% larger this number the faster the convergence, but the more likely to
-% delete important fibers and produce a reduced connectome with a larger
-% loss of R2.
-if notDefined('lowerPrct'), lowerPrct     = 10;end
-
 % The percent change in R2 from that of the orignal model. 
 % The smaller this number the faster the convergence, the more the fibers
 % kept in the connectome.
-if notDefined('percentReduxRMSE'), percentReduxRMSE = 2;end
+if notDefined('percentReduxRMSE'), percentReduxRMSE = 10;end
 
+% This is the minimum weight that we use to "keep" fibers.
+% We want to delete fibers that have some contribution to the signal.
+minWeight    = 0;
+
+% This is the RMSE of the conenctome model as it was passed in. When
+% culling fibers, hereafter, we do not want to increase above a certain
+% percent of this value.
+o.rmseOriginal  = median(feGetRep(fe,'vox rmse'));
+o.rmseThreshold = o.rmseOriginal + (percentReduxRMSE*o.rmseOriginal/100);
+
+% Initialize some outputs:
+o.removeFibers = nan(maxNumInter,1);
+o.rmse         = nan(maxNumInter,1);
+o.rmsexv       = nan(maxNumInter,1);
+o.r2           = nan(maxNumInter,1);
+o.r2xv         = nan(maxNumInter,1);
+o.rrmse        = nan(maxNumInter,1);
+o.numFibers    = nan(maxNumInter,1);
+
+% The following is the vector containing the indices 
+% to the fibers we KEEP from the origianl fiber group
+% after all the logical operations are applied.
+o.fibersToKeep = false(feGet(fe,'nfibers'),1); 
+
+% The following is a cell array which will old the relative indices of the
+% fibers into each sized-down version of the fibers.
+% Each entry of the cell arry holds the indices to the fibergroup in the
+% before the current operation was applied.
+o.fibersKept{1} = 1:length(o.fibersToKeep);
+
+fefit = fe.life.fit;
+lambda = length(feGet(fe,'dsigdemeaned'))*2;
+stopped = 0;
 % Fit the model and then reduced it by only accepting fibers that pass
 % the minWeights threshold.
 for iter = 1:maxNumInter
-  fefit  = feFitModel(feGet(fe,'Mfiber'),feGet(fe,'dsigdemeaned'),'sgdnn');  
-   
-  % Check whether we start loosing percent variance explained when
-  % crossvalidating
-  fexval = feXvalidate(feGet(fe,'Mfiber'),feGet(fe,'dsigdemeaned'),'sgdnn');
-  
-  % Start keeping trak of the quality of fit.
-  % When the fit quality decreases we will stop culling.
-  if (iter == 1)
-    originalRMSE = fexval.rmse.mean;  
-    currentRMSE  = fexval.rmse.mean;
-  else
-    currentRMSE  = fexval.rmse.mean;
-  end
-  
-  if currentRMSE > ((originalRMSE) + (originalRMSE*(percentReduxRMSE/100)))
-    break
-  end
-  fprintf('\n\n[%s] n iter: %i, Original RMSE: %2.3f, Current RMSE: %2.3f.\n\n',mfilename, iter,originalRMSE,currentRMSE)
-  
-  % Compute the cut-off for the fibers
-  minWeight    = prctile(fefit.weights,lowerPrct);
-  fibersToKeep = find(fefit.weights > minWeight);
-  
-  % Reduce the connectome.
-  fe = feConnectomeSelectFibers(fe,fibersToKeep);
-  
+    if iter > 1
+        % Re fit the model after eliminating the zero-weighted fascicles
+        fefitGood = fefit;
+        fefit     = feFitModel(feGet(fe,'Mfiber'),feGet(fe,'dsigdemeaned'),fitType,lambda);
+        fe        = feSet(fe,'fit', fefit);
+    end
+    
+    % Get the cross-validated RMSE
+    o.r2(iter)      = median(feGet(fe,'vox r2'));
+    o.r2xv(iter)    = median(feGetRep(fe,'vox r2'));
+    o.rmse(iter)    = median(feGet(fe,'vox rmse'));
+    o.rmsexv(iter)  = median(feGetRep(fe,'vox rmse'));
+    o.rrmse(iter)   = median(feGetRep(fe,'vox rmse ratio'));
+    fprintf('[%s] n iter: %i, Original RMSE: %2.3f, Current RMSE: %2.3f (RMSE Thr %2.3f).\n',mfilename, iter,o.rmseOriginal, o.rmse(iter),o.rmseThreshold)
+    if o.rmse(iter) > o.rmseThreshold
+        disp('Exiting RMSE increasing from initial one...')
+        stopped = 1;
+        break
+    end
+    
+    % Compute the cut-off for the fibers
+    weights      = feGet(fe,'fiber weights');
+    fibersToKeep = (weights > minWeight);
+
+    % Store the number of fibers removed
+    o.removeFibers(iter) = length(find(~fibersToKeep));
+    o.numFibers(iter)    = length(weights);
+    
+    % Select the indices fo the fibers that were deleted in the previous
+    % loop. The way we address these indices depends on the type of operation.
+    o.fibersKept{iter+1} = o.fibersKept{iter}(fibersToKeep);
+    if iter > 1
+        o.results(iter).r = fefit.results;
+    end
+    
+    fprintf('[%s] n iter: %i, %i current fibers, deleting %i fibers.\n',mfilename, iter,o.numFibers(iter),o.removeFibers(iter))
+    if (iter>51) && (all(o.removeFibers(iter-50:iter) == 0))
+        disp('Exiting the mode of the number of fibers removed in the last 10 iteration was 0...')
+        stopped = 1;
+        break
+    end
+    
+    % Reduce the connectome.
+    fe = feConnectomeSelectFibers(fe,find(fibersToKeep));
 end
 
-% Refit the model and save the fit 
-fefit  = feFitModel(feGet(fe,'Mfiber'),feGet(fe,'dsigdemeaned'),'sgdnn');  
-fexval = feXvalidate(feGet(fe,'Mfiber'),feGet(fe,'dsigdemeaned'),'sgdnn');
+% Save the indices of the fibers that survived all the operations.
+o.fibersToKeep( o.fibersKept{end} ) = true;
 
-% Remove any fit or cross-validation
-fe = feSet(fe,'fit', fefit);
-fe = feSet(fe,'xvalfit',fexval);
+if stopped
+    % Re fit the model after eliminating the zero-weighted fascicles
+    fe = feSet(fe,'fit', fefitGood);
+ else
+    fefit     = feFitModel(feGet(fe,'Mfiber'),feGet(fe,'dsigdemeaned'),'sgdl1nn',lambda);
+    fe        = feSet(fe,'fit', fefit);
+end
 
-fprintf('[%s] Done culling, in %i iterations.\n Original RMSE: %2.3f, Current RMSE: %2.3f.\n',mfilename, iter,originalRMSE,currentRMSE)
+% Make sure the size of the M matrix and the weights match
+assert(size(feGet(fe,'Mfiber'),2)==size(feGet(fe,'fiber weights'),1));
+
+fprintf('[%s] Done culling, in %i iterations. Original RMSE: %2.3f, Current RMSE: %2.3f.\n',mfilename, iter,o.rmseOriginal,o.rmse(iter))
 
 return

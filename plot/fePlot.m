@@ -51,6 +51,45 @@ plotType = mrvParamFormat(plotType);
 
 % Find the plot
 switch plotType
+  case {'wmvolume'}
+    % get the fiber density
+    mmpVx = feGet(fe,'xform img 2 acpc');
+    mmpVx = mmpVx(1:3,1:3);
+    mmpVx = diag(mmpVx);
+    vxNum = size(feGet(fe,'roi coords'),1);
+    connectomeVol = vxNum*prod(mmpVx);% in mm^3
+        
+    % Total WM volume in the original ROI
+    testVol = '/azure/scr1/frk/rois/life_right_occipital_example_large_no_cc_smaller.mat';
+    ROI = dtiReadRoi(testVol);
+    vxNum = size(unique(floor(mrAnatXformCoords(feGet(fe,'xform acpc 2 img'),ROI.coords)),'rows'),1);
+    totWMvol = vxNum*prod(mmpVx);% in mm^3
+
+    close(g)
+
+    g(1) = mrvNewGraphWin(sprintf('%s_percentWMVolume',feGet(fe,'name')));
+    set(gcf,'color','w')
+    
+    % Volume of the ROI
+    h = bar(connectomeVol/totWMvol*100,'r');
+    set(gca,'ylim',[60 120],'xlim',[.5 1.5])
+    ylabel('Percent white-matter volume')
+    title(sprintf('Percent volume: %2.2f',connectomeVol/totWMvol*100))
+    set(gca,  'ytick',[60 80 100 120], ...
+      'box','off','tickDir','out')
+    
+    g(2) = mrvNewGraphWin(sprintf('%s_WMVolume',feGet(fe,'name')));
+    set(gcf,'color','w')
+    
+    % Volume of the ROI
+    h = bar([totWMvol, connectomeVol],'r');
+    set(gca,'ylim',[0 46000],'xlim',[0 3])
+    ylabel('White-matter volume (mm^3)')
+    title(sprintf('Volume: total %6.0fmm^3, connectome %6.0fmm^3',totWMvol,connectomeVol))
+    set(gca,  'ytick',[0 46000/2 46000], ...
+        'xticklabel',{'Total WM','Connectome'}, ...
+        'box','off','tickDir','out')
+    
   case {'fiberdensitymap'}
     % Select a slice of brain in sagittal vie.
     % only Sagittal view is implemented
@@ -61,48 +100,49 @@ switch plotType
     % get the fiber density
     fd = (feGet(fe,'fiber density'));
    
-    g(1) = mrvNewGraphWin(sprintf('%s_FiberDensityMapFull',upper(plotType)));
+    g(1) = mrvNewGraphWin(sprintf('%s_FiberDensityMapFull',feGet(fe,'name')));
     set(gcf,'color','w')   
     img = feReplaceImageValues(nan(feGet(fe,'map size')),fd(:,1)',feGet(fe,'roiCoords'));
     maxfd = nanmax(img(:)); % This will be used tonormalize the fiber density plots
-    surf(((fliplr(img(:,:,slice)./maxfd)'*255)),...
+    surf(((fliplr(img(:,:,slice+10)./maxfd)'*255)),...
       'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
     axis off; axis equal;
-    set(gca,'ylim',[70 100],'xlim',[40 65])
+    set(gca,'ylim',[100 130],'xlim',[50 85])
     view(0,-90)
     
     cmap = colormap(jet(255));
     colorbar('ytick',[.25*size(cmap,1) .5*size(cmap,1) .75*size(cmap,1) size(cmap,1)],'yticklabel', ...
-      {num2str(ceil(maxfd/8)) num2str(ceil(maxfd/4)) ...
-      num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
-
+        {num2str(ceil(maxfd/8)) num2str(ceil(maxfd/4)) ...
+        num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
+    
     % Fiber density after life
     g(2) = mrvNewGraphWin(sprintf('%s_FiberDensityMapLiFE',feGet(fe,'name')));
     set(gcf,'color','w')
-    
     img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,2))',feGet(fe,'roiCoords'));
-    surf(fliplr(img(:,:,slice)./maxfd)'*255,...
-      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    surf(fliplr(img(:,:,slice+10)./maxfd)'*255,...
+        'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
     axis off; axis equal;
-    set(gca,'ylim',[70 100],'xlim',[40 65])
+    set(gca,'ylim',[100 130],'xlim',[50 85])
+    
+    %set(gca,'ylim',[70 100],'xlim',[40 65])
     view(0,-90)
     
     cmap = colormap(jet(255));
     colorbar('ytick',[.25*size(cmap,1) .5*size(cmap,1) .75*size(cmap,1) size(cmap,1)],'yticklabel', ...
-      {num2str(ceil(maxfd/8)) num2str(ceil(maxfd/4)) ...
-      num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
-   
+        {num2str(ceil(maxfd/8)) num2str(ceil(maxfd/4)) ...
+        num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
+    
     % Weigth density (sum of weights)
     g(3) = mrvNewGraphWin(sprintf('%s_SumOfWeightsMapLiFE',feGet(fe,'name')));
     set(gcf,'color','w')
-    
     img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,3))',feGet(fe,'roiCoords'));
     maxw = nanmax(img(:)); % This will be used tonormalize the fiber density plots
     minw = nanmin(img(:)); % This will be used tonormalize the fiber density plots
-    surf(fliplr(img(:,:,slice)./maxw)'*255,...
-      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    surf(fliplr(img(:,:,slice+10)./maxw)'*255,...
+        'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
     axis off; axis equal;
-    set(gca,'ylim',[70 100],'xlim',[40 65])
+    %set(gca,'ylim',[70 100],'xlim',[40 65])
+    set(gca,'ylim',[100 130],'xlim',[50 85])
     view(0,-90)
     
     cmap = colormap(jet(255));

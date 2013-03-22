@@ -7,14 +7,14 @@ function voxDSig = feComputeVoxelSignal(fe,voxIndex)
 % Franco (c) Stanford Vista Team 2012
 
 % Extract information regarding, voxels, signal and fibers.
-S0                = feGet(fe,'b0signalimage',voxIndex);     % non diffusion-weighted signal
+S0                = feGet(fe,'b0signalimage',   voxIndex);  % non diffusion-weighted signal
 bvecs             = feGet(fe,'bvecs');                      % bvecs
 bvals             = feGet(fe,'bvals');                      % bvals
-tot_fibers_num    = feGet(fe,'tot f num',      voxIndex);   % number of total fibers in the voxel
-unique_fibers_num = feGet(fe,'unique f num',     voxIndex); % number of unique fibers in the voxel
-tot_fiber_index   = cell2mat(feGet(fe,'totf', voxIndex));   % indexes to the total fibers in the voxels
+tot_fibers_num    = feGet(fe,'tot f num',       voxIndex);  % number of total fibers in the voxel
+unique_fibers_num = feGet(fe,'unique f num',    voxIndex);  % number of unique fibers in the voxel
+tot_fiber_index   = cell2mat(feGet(fe,'totf',   voxIndex)); % indexes to the total fibers in the voxels
 unique_fiber_index= cell2mat(feGet(fe,'uniquef',voxIndex)); % indexes to the unique fibers in the voxels
-voxTensors        = feGet(fe,'voxeltensors',voxIndex);      % Get the tensors for each node in each fiber 
+voxTensors        = feGet(fe,'voxeltensors',    voxIndex);  % Get the tensors for each node in each fiber 
                                                             % going through this voxel
 
 % Compute the predicted signal by each tensors of each node in this voxel.

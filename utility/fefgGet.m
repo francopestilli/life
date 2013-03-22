@@ -226,6 +226,16 @@ switch strrep(lower(param),' ','')
     val = floor(horzcat(fg.fibers{:})');
     val = unique(val,'rows');
   
+    case {'allimagecoords'}
+    %   coords = fefgGet(fgIMG,'all image coords');
+    %
+    % The fg input must be in IMG space.
+    %
+    % Returns all image coordinates of all the fibers as an Nx3
+    % matrix of integers.
+    % val = round(horzcat(fg.fibers{:})'); 
+    val = floor(horzcat(fg.fibers{:})');
+    
   case {'uniqueacpccoords'}
     %   coords = fefgGet(fg,'unique acpc coords');
     %

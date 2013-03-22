@@ -11,7 +11,7 @@ function s_ms_test_connectomes_display_fg(trackingType,lmax,bval,rep)
 % Franco (c) Stanford Vista Team 2013
 
 
-if notDefined('trackingType'),trackingType = 'deterministic';end
+if notDefined('trackingType'),trackingType = 'tensor';end
 if notDefined('lmax'),        lmax         = 16;end
 if notDefined('bval'),        bval         = 2000;end
 if notDefined('rep'),         rep          = 1;end

@@ -1,4 +1,4 @@
-function [w R2] = sgd(y,X,numtoselect,finalstepsize,convergencecriterion,checkerror,nonneg,alpha,lambda)
+function [w, R2] = sgd(y,X,numtoselect,finalstepsize,convergencecriterion,checkerror,nonneg,alpha,lambda)
 % 
 % This fucntion is working properly and can be used. But the HELP of this
 % function has not been updated yet. Blame Franco. F.P. 2012
@@ -54,9 +54,10 @@ if notDefined('numtoselect'), numtoselect = 0.1 * size(y,1); end
 if notDefined('checkerror'), checkerror=40; end
 if notDefined('finalstepsize'), finalstepsize=0.05; end
 if notDefined('nonneg'), nonneg = false; end
+if notDefined('coordDescent'), coordDescent = false; end
 
 % Set default values for ElasticNet (defaults to regular OLS):
-if notDefined('alpha'), alpha = 0; end 
+if notDefined('alpha'), alpha   = 0; end 
 if notDefined('lambda'), lambda = 0; end
 
 p = size(y,1);  % number of data points
@@ -64,7 +65,7 @@ q = size(X,2);  % number of parameters
 orig_ssq = full(sum((y).^2)); % Sum of Squres fo the data
 
 % initialize various variables used in the fitting: 
-w          = 0.025 .* rand(q,1); % the set of weights, between 0 and .1
+w          = 0 .* rand(q,1); % the set of weights, between 0 and .1
 w_best     = w;          % The best set of weights.
 est_ssq_best = inf;      % minimum estimation error found so far
 estbadcnt  = 0;          % number of times estimation error has gone up
@@ -89,6 +90,13 @@ while 1
   if iter ~= 1
     % Calculate the gradient (change in error over change in parameter): 
     grad = -((y0 - X0*w)' * X0)' + lambda * (alpha + 2*(1 - alpha)*w);
+    
+    % This computes the coordinate descent instead of the gradient descent.
+    if coordDescent
+        % Coordinate descent
+        m    = min(grad);
+        grad = (grad==m)*m;
+    end
     
     % Unit-length normalize the gradient
     grad = unitlengthfast(grad);

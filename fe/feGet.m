@@ -367,7 +367,10 @@ function val = feGet(fe,param,varargin)
 % Given an VOI or a set of indices to voxels returns the indices of the matching voxels inside the big
 % volume, which ordinarily represents the full connectome.
 % voxelIndices = feGet(fe,'voxelsindices',coords)
+%                IMPORTANT: Size(coords) must be Nx3;
 % voxelIndices = feGet(fe,'voxelsindices',voxelIndices)
+%                IMPORTANT: Indices MUST be a column vector for this
+%                code to work. Size(voxelIndices) = Nx1;
 %---------
 % Given an VOI finds the indices of the matching voxels inside the big
 % volume, which ordinarily represents the full connectome.
@@ -483,6 +486,12 @@ switch param
     % dwiFile = feGet(fe,'dwifile')
     val = fe.path.dwifile;
     
+  case 'dwifilerep'
+    %  Load the diffusion weighted data.
+    %
+    % dwiFile = feGet(fe,'dwifilerep')
+    val = fe.path.dwifilerep;
+ 
   case 'savedir'
     %  Directory where the LiFe structes are saved by defualt.
     %
@@ -531,7 +540,8 @@ switch param
     voxelIndices = feGet(fe,'voxelsindices',varargin);
     val = fe.life.diffusion_signal_img(voxelIndices,:) - repmat(mean(fe.life.diffusion_signal_img(voxelIndices,:), 2),1,nBvecs);
     keyboard
-    % THis seems to be worng
+    % THis seems to be wrong
+    
   case {'b0signalimage','b0vox'}
     % Get the diffusion signal at 0 diffusion weighting (B0) for this voxel
     %
@@ -565,7 +575,15 @@ switch param
     %
     % coords = feGet(fe,'roi coords')
     val = fe.roi.coords;
-    
+  
+  case {'roicoordssubset'}
+    % Return the coordinates of the VOI comprised in the connectome.
+    % Always in image space.
+    %
+    % coords = feGet(fe,'roi coords')
+    val = feGet(fe,'roi coords');
+    val = val(varargin{1},:);
+  
   case {'nroivoxels','nvoxels'}
     % Number of voxels in the connectome/VOI.
     %
@@ -725,9 +743,11 @@ switch param
     % val = feGet(fe,'n nodes');
     % val = feGet(fe,'n nodes',voxelsIndices);
     % val = feGet(fe,'n nodes',coords);
-    [val, ~] = cellfun(@size,fe.life.voxel2FNpair);
-    val      = val(feGet(fe,'voxelsindices',varargin));
-    
+    if ~isempty(fe.life, 'voxel2FNpair')
+        [val, ~] = cellfun(@size,fe.life.voxel2FNpair);
+        val      = val(feGet(fe,'voxelsindices',varargin));
+    end
+
   case {'numberofuniquefibersbyvoxel','uniquefnum'}
     % Return the total number of fibers for all the voxels or in a set of
     % voxels
@@ -1151,7 +1171,7 @@ switch param
     % R2 = feGet(fe,'explained variance')
     val = 100 * feGet(fe,'total r2');
     
-  case {'totalrmse'}
+  case {'rmsetotal','totalrmse'}
     % Root mean squared error of the LiFE fit to the whole data
     %
     % rmse = feGet(fe,'rmse')
@@ -1352,7 +1372,7 @@ switch param
     measured  = feGet(fe,'dsigdemeaned by voxel');
     predicted = feGet(fe,'pSig f vox');
     val       = sqrt(mean((measured - predicted).^2,1));
-    val       = val(feGet(fe,'return voxel indices',varargin));
+    val       = val(feGet(fe,'voxelsindices',varargin));
    
   case {'voxelrmsevoxelwise','voxrmsevoxelwise'}
     % A volume of RMSE values optained with the voxel-wise (voxelwise) fit.
@@ -1364,7 +1384,7 @@ switch param
     predicted = feGet(fe,'pSig f voxel wise by voxel');
    
     val       = sqrt(mean((measured - predicted).^2,1));
-    val       = val(feGet(fe,'return voxel indices',varargin));
+    val       = val(feGet(fe,'voxelsindices',varargin));
 
   case {'voxelrmsetest','voxrmsetest'}
     % A volume of RMSE values with a subset of fibers' weights set to 0.
@@ -1378,7 +1398,7 @@ switch param
     val       = sqrt(mean((measured - predicted).^2,1));
     
     if length(varargin) == 2
-      val       = val(feGet(fe,'return voxel indices',varargin));
+      val       = val(feGet(fe,'voxelsindices',varargin));
     end
     
   case {'residualsignalfibervoxel','resfibervox'}
@@ -1447,6 +1467,8 @@ switch param
     %
     % voxelIndices = feGet(fe,'voxelsindices',coords)
     % voxelIndices = feGet(fe,'voxelsindices',voxelIndices)
+    %                IMPORTANT: Indices MUST be a column vector for this
+    %                code to work.
     %
     % coords is a Nx3 set of coordinates in image space
     % voxelIndices is a vector of 1's and 0's, there is a one for each

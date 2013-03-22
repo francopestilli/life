@@ -79,9 +79,9 @@ for ir = 1:length(rois)
   % counterintuitive: they mark fibers that DO intersect the ROI and that are
   % exluded from the output FG."
   switch operation{ir}
-    case {'and'}
+    case {'and','AND'}
       currentFibIndices{ir+1} = currentFibIndices{ir}(keep);
-    case {'not'}
+    case {'not','NOT'}
       currentFibIndices{ir+1} = currentFibIndices{ir}(~keep);
     otherwise
       keyboard
@@ -101,6 +101,9 @@ fg.Q           = [];
 fg.params      = [];
 
 % Change the fibergroup name
-fg.name = fascicleFileName;
-
+if isstruct(fascicleFileName)
+    fg.name = fascicleFileName.name;
+else
+    fg.name = fascicleFileName;
+end
 return
