@@ -22,15 +22,15 @@ for irep = 1:length(rep)
     else
         keyboard
     end
-    %load(feFileToLoad);
+    load(feFileToLoad);
     
     fprintf('[%s] Culling LiFE structure...\n',mfilename);
-    %[fe, cullingInfo] = feConnectomeCull(fe,1000,'sgdnn');
+    [fe, cullingInfo] = feConnectomeCull(fe,1000,'sgdnn');
     
     feFileToSave = [feFileToLoad(1:end-4),'culledL2','.mat'];
     fprintf('[%s] Saving the culled LiFE structure...\n%s\n',mfilename,feFileToSave);
     feFileToSave = [feFileToLoad(1:end-4),'culledL2','.mat'];
-    %save(feFileToSave,'fe','cullingInfo');
+    save(feFileToSave,'fe','cullingInfo','-v7.3');
 end
 
 end
