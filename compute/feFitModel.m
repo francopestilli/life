@@ -1,4 +1,4 @@
-function [fit w R2] = feFitModel(M,dSig,fitMethod)
+function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)
 % Fit the LiFE model.
 %
 % Finds the weights for each fiber to best predict the directional
@@ -39,10 +39,11 @@ function [fit w R2] = feFitModel(M,dSig,fitMethod)
 % fit the model, by selecting the proper toolbox.
 switch fitMethod
   case {'lsqnonneg'}
+    fprintf('\nLiFE: Computing least-square minimization with LSQNONEG...\n')
     options      = optimset('lsqnonneg');
-    %options.TolX = '5*eps*norm(c,1)*length(c)';
     w = lsqnonneg(M,dSig,options);
-    
+    fprintf(' ...fit process completed in %2.3fs\n',toc)
+
   case {'sgd','sgdnn'}% stochastic gradient descend, or non-negative stochastic gradient descend
     tic
     % Stochastic gradient descent method.
@@ -53,15 +54,15 @@ switch fitMethod
     signalSiz = size(M,1);
     if signalSiz >= 1000000
       siz     = floor(signalSiz * .1); % size of the chuncks (number rows) taken at every iteration of the solver
-    elseif signalSiz > 5000 || signalSiz < 1000000
-      siz     = floor(signalSiz * .2); % size of the chunks (number rows) taken at every iteration of the solver
-    elseif signalSiz <= 5000
+    elseif signalSiz > 10000 || signalSiz < 1000000
+      siz     = floor(signalSiz * .5); % size of the chunks (number rows) taken at every iteration of the solver
+    elseif signalSiz <= 10000
       siz     = signalSiz; % size of the chuncks (number rows) taken at every iteration of the solver
     else
       keyboard
     end
-    stepSiz      = 0.04; % step in the direction of the gradient, the larger the more prone to local minima
-    stopCriteria = [.15 3 5]; % Stop signals:
+    stepSiz      = 0.0124; % step in the direction of the gradient, the larger the more prone to local minima
+    stopCriteria = [.1 5 1]; % Stop signals:
     % First, if total error has not decreased less than
     %        an XXX proportion of XXXX.
     % Second, number of small partial fits before
@@ -71,24 +72,77 @@ switch fitMethod
     %        It used to be:  percent improvement in R2
     %        that is considered a change in quality
     %        of fit, e.g., 1=1%.
-    n      = 50;       % Number of iteration after which to check for total error.
+    n      = 100;       % Number of iteration after which to check for total error.
     nonneg = strcmpi(fitMethod(end-2:end),'dnn');
     fprintf('\nLiFE: Computing least-square minimization with Stochastic Gradient Descent...\n')
-    [w R2] = sgd(dSig,M,siz, stepSiz, stopCriteria, n,nonneg);
-    
+    [w, R2] = sgd(dSig,M,siz,        stepSiz,      stopCriteria,        n,         nonneg);
+             %sgd(y,   X,numtoselect,finalstepsize,convergencecriterion,checkerror,nonneg,alpha,lambda)
     % Save out the Stochastic Gradient Descent parameters
     fit.params.stepSiz      = stepSiz;
     fit.params.stopCriteria = stopCriteria;
     fit.params.numInters    = n;
     
     % Save the state of the random generator so that the stochasit cfit can be recomputed.
-    defaultStream = RandStream.getDefaultStream;
+    defaultStream = RandStream.getGlobalStream; %RandStream.getDefaultStream;
     fit.randState = defaultStream.State;   
     
     % Save out some results 
     fit.results.R2        = R2;
     fit.results.nParams   = size(M,2);
     fit.results.nMeasures = size(M,1);
+    fprintf(' ...fit process completed in %2.3fs\n',toc)
+
+    case {'sgdl1','sgdl1nn'}% stochastic gradient descend, or non-negative stochastic gradient descend
+    tic
+    % Stochastic gradient descent method.
+    % it solves an L2 minimization problem with non-negative constrain.
+    %
+    % Basically it takes 'chuncks' of rows of the M matrix and solves those
+    % separately but contraining to obtain a consistent global solution.
+    signalSiz = size(M,1);
+    if signalSiz >= 1000000
+      siz     = floor(signalSiz * .1); % size of the chunks (number rows) taken at every iteration of the solver
+    elseif signalSiz > 10000 || signalSiz < 1000000
+      siz     = floor(signalSiz * .5); % size of the chunks (number rows) taken at every iteration of the solver
+    elseif signalSiz <= 10000
+      siz     = signalSiz; % size of the chunks (number rows) taken at every iteration of the solver
+    else
+      keyboard
+    end
+    stepSiz      = 0.0124; % step in the direction of the gradient, the larger the more prone to local minima
+    stopCriteria = [.1 5 1]; % Stop signals:
+    % First, if total error has not decreased less than
+    %        an XXX proportion of XXXX.
+    % Second, number of small partial fits before
+    %         evaluating the quality of the large fit.
+    % Third, Amount of R2 improvement judged to be
+    %        useful.
+    %        It used to be:  percent improvement in R2
+    %        that is considered a change in quality
+    %        of fit, e.g., 1=1%.
+    n      = 100;       % Number of iteration after which to check for total error.
+    nonneg = 1;
+    fprintf('\nLiFE: Computing least-square minimization (L1) with Stochastic Gradient Descent...\n')
+    %lambda = [length(dSig)*2.75];
+    [w, R2] = sgdL1(dSig,M,siz, stepSiz, stopCriteria, n,nonneg,[],lambda);
+    fprintf('Lambda: %2.2f | nFibers: %i | L1 penalty: %2.3f | L2 penalty: %2.3f\n',lambda, length(find(w>0)),sum(w),sum(w.^2))
+
+    % Save out the Stochastic Gradient Descent parameters
+    fit.params.stepSiz      = stepSiz;
+    fit.params.stopCriteria = stopCriteria;
+    fit.params.numInters    = n;
+    
+    % Save the state of the random generator so that the stochasit cfit can be recomputed.
+    defaultStream = RandStream.getGlobalStream; %RandStream.getDefaultStream;
+    fit.randState = defaultStream.State;   
+    
+    % Save out some results 
+    fit.results.R2        = R2;
+    fit.results.nParams   = size(M,2);
+    fit.results.nMeasures = size(M,1); 
+    fit.results.l2        = sum(w.^2);
+    fit.results.l1        = sum(w);
+    
     fprintf(' ...fit process completed in %2.3fs\n',toc)
 
   otherwise

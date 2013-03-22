@@ -416,12 +416,12 @@ switch param
     % rmse = feGetRep(fe,'totalrmseratiovoxelwise')
     val = feGetRep(fe,'total rmse voxelwise') ./ feGetRep(fe,'total rmse data');
 
-  case {'totalrmse'}
+  case {'totalrmse','rmsetotal'}
     % Root mean squared error of the LiFE fit to the whole data
     %
-    % rmse = feGetRep(fe,'rmse')
+    % rmse = feGetRep(fe,'rmsetotal')
     val = sqrt(mean((feGetRep(fe,'diffusion signal demeaned') - ...
-      feGet(fe,'psigfiber')).^2));
+                     feGet(fe,'psigfiber')).^2));
   
   case {'totalrmsevoxelwise'}
     % Root mean squared error of the LiFE fit to the whole data from a
@@ -554,6 +554,28 @@ switch param
     val       = (1 - (sum((measured - predicted).^2 ) ./ ...
       sum((measured - repmat(mean(measured), nBvecs,1)).^2 ) ));
     val       = val(feGet(fe,'return voxel indices',varargin));
+ 
+  case {'voxelss','ssvox','voxss','sumofsquaresbyvoxel'}
+    % Return a column vector of sum of squares error of the model 
+    % prediction in each voxel
+    %
+    % ssem = feGetRep(fe,'voxss');
+    % ssem = feGetRep(fe,'voxss',coords);
+    predicted = feGet(fe,'pSig f vox');    
+    measured  = feGetRep(fe,'dSig demeaned by voxel');
+    val       = sum((measured - predicted).^2 );
+    val       = val(feGet(fe,'return voxel indices',varargin));
+ 
+  case {'voxelssdata','ssvoxdata','voxssdata','sumofsquaresbyvoxeldata'}
+    % Return a column vector of sum of squares error of the data in
+    % each voxel
+    %
+    % ssed = feGetRep(fe,'voxssedata');
+    % ssed = feGetRep(fe,'voxssdata',coords);
+    measured1 = feGet(fe,'dSig demeaned by voxel');
+    measured2  = feGetRep(fe,'dSig demeaned by voxel');
+    val       = sum((measured2 - measured1).^2 );
+    val       = val(feGet(fe,'return voxel indices',varargin));
 
   case {'voxelr2data','r2voxdata','voxr2data','r2byvoxeldata'}
     % Return a column vector of the proportion of variance explained in
@@ -561,11 +583,11 @@ switch param
     %
     % R2byVox = feGetRep(fe,'voxr2data');
     % R2byVox = feGetRep(fe,'voxr2data',coords);
-    measured  = feGet(fe,'dSig demeaned by voxel');
+    measured1  = feGet(fe,'dSig demeaned by voxel');
     measured2 = feGetRep(fe,'dSig demeaned by voxel');
     nBvecs    = feGetRep(fe,'nBvecs');
-    val       = (1 - (sum((measured - measured2).^2 ) ./ ...
-      sum((measured - repmat(mean(measured), nBvecs,1)).^2 ) ));
+    val       = (1 - (sum((measured2 - measured1).^2 ) ./ ...
+      sum((measured2 - repmat(mean(measured2), nBvecs,1)).^2 ) ));
     val       = val(feGet(fe,'return voxel indices',varargin));
 
   case {'voxelr2zero','r2voxzero','voxr2zero','r2byvoxelzero'}
@@ -578,7 +600,17 @@ switch param
     predicted = feGet(fe,'pSig f vox');
     val       = (1 - (sum((measured - predicted).^2 ) ./ sum(measured.^2)));
     val       = val(feGet(fe,'return voxel indices',varargin));
-    
+     
+  case {'voxelr2pearson','r2voxpearson','voxr2corr','r2byvoxelpearson'}
+    % Return a column vector of the squre of the pearson correlation coefficient
+    %
+    % R2byVox = feGetRep(fe,'voxr2corr');
+    % R2byVox = feGetRep(fe,'voxr2corr',coords);
+    measured  = feGetRep(fe,'dSig demeaned by voxel');
+    predicted = feGet(fe,'pSig f vox');
+    val       = corrcoef(measured - predicted).^2;
+    val       = val(feGet(fe,'return voxel indices',varargin));
+
   case {'voxelr2zerodata','r2voxzerodata','voxr2zerodata','r2byvoxelzerodata'}
     % Return a column vector of the proportion of variance explained in
     % each voxel in dataset 1 given the data in data set 2. 

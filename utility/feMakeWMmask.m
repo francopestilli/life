@@ -7,7 +7,7 @@ function wmMask = feMakeWMmask(classFile,mdFile,wmMaskFileName,prctThr)
 % contain gray matter nor CSF and ventricles. White-matter voxels are
 % indicated by a 1 in the mask.
 %  
-%    wmMaskNifti = feMakeWMmask(classNifti,mdNifti,[wmMaskNiftiFname],[prctThr]);
+%    wmMaskNifti = feMakeWMmask(classNifti,mdNifti,[wmMaskNiftiFname],[prctThr],[tissueToUse]);
 % 
 % INPUTS:
 %     classFile - This is a 'classification' file. For example as generated
@@ -32,6 +32,16 @@ function wmMask = feMakeWMmask(classFile,mdFile,wmMaskFileName,prctThr)
 %                 classified as CSF and will not be part of the final WM mask.
 %                 The default value (98) seem to work to identify the
 %                 ventricles in the tested dataset.
+% tissueToUse   - This inputs controls the type of tissue that will be
+%                 kept in the final mask. It is a vector of 1's and 0's, 
+%                 of 1x6, in which each index corresponds to the Freesurfer
+%                 segemnted tssues:
+%                 - CSF = 1, first index into this vector.
+%                 - Skull = 2, second index in thi vector. (??)
+%                 - White matter is classified as the 3rd and 4th index 
+%                   left/right respectively
+%                 - Gray  matter is classified as the 5th and 6th index
+%                   left/right respectively
 %        
 % OUTPUTS:
 %    wmMask - This is a nifti structure containing the final white-matter
@@ -63,6 +73,7 @@ else
   classFile = niftiRead(classFile);
 end
 if notDefined('prctThr'), prctThr = 98;end
+if notDefined('tissueToUse'), tissueToUse = [0 0 0 1 1];end
 
 % For the mean-diffusivity file we expect either the path to a dt6File or
 % that to a nifti file with precomputed mean diffusivity
@@ -90,18 +101,18 @@ end
 % The gray  matter is classified as 5 and 6 (left/right)
 %
 % We set everything thatis NOT white-matter to 0.
-classFile.data(classFile.data == 1) = 0;
-classFile.data(classFile.data == 5) = 0;
-classFile.data(classFile.data == 6) = 0; % CSF
+classFile.data(classFile.data == 1) = tissueToUse(1); % CSF
+classFile.data(classFile.data == 5) = tissueToUse(2); % Left Cortex
+classFile.data(classFile.data == 6) = tissueToUse(3); % Right Cortex
 
 % We set the white-matter to 1
-classFile.data(classFile.data == 3) = 1;
-classFile.data(classFile.data == 4) = 1;
+classFile.data(classFile.data == 3) = tissueToUse(4); % Left White-matter
+classFile.data(classFile.data == 4) = tissueToUse(5); % Right White-matter
 % Check the the image: makeMontage3(classFile.data);
 
 % Downsample the white-matter mask just created to the resolution of the
 % mean-diffusivity image. The final WM mask will be generated at this reolution.
-wmMask       = mrAnatResampleToNifti(classFile, mdFile);
+wmMask = mrAnatResampleToNifti(classFile, mdFile);
 
 % Now let's remove from the mask the ventricles. To do so we remove voxels
 % that have high mean diffusivity.

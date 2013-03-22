@@ -1,4 +1,4 @@
-function feFileToLoad = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams)
+function [feFileToLoad feLoadName] = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams)
 %
 % Build a file name for one of the several connectomes preprocessed for the
 % LiFE manuscript.
@@ -38,14 +38,14 @@ switch rep
 end
 
 % Get the name of the connctome using lmax and the type of tractography
-switch trackingType
-  case {'deterministic','d'}
+switch lower(trackingType)
+  case {'deterministic','d','det'}
     connectomeFile = { ...
       sprintf( '0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_csd_lmax%i_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_brainmask_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_wm_stream-500000.pdb',   lmax), ...
       sprintf( '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax%i_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_stream-500000.pdb',lmax),...
       sprintf( '0005_01_DWI_2mm150dir_2x_b4000_aligned_trilin_csd_lmax%i_0005_01_DWI_2mm150dir_2x_b4000_aligned_trilin_brainmask_0005_01_DWI_2mm150dir_2x_b4000_aligned_trilin_wm_stream-500000.pdb',   lmax),...
       };
-  case {'probabilistic','p'}
+  case {'probabilistic','p','prob'}
     connectomeFile = { ...
       sprintf( '0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_csd_lmax%i_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_brainmask_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_wm_prob-500000.pdb',   lmax), ...
       sprintf( '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax%i_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb',lmax),...
