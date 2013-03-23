@@ -112,7 +112,7 @@ for iter = 1:maxNumInter
     
     fprintf('[%s] n iter: %i, %i current fibers, deleting %i fibers.\n',mfilename, iter,o.numFibers(iter),o.removeFibers(iter))
     if (iter>51) && (all(o.removeFibers(iter-50:iter) == 0))
-        disp('Exiting the mode of the number of fibers removed in the last 10 iteration was 0...')
+        disp('Exiting the mode of the number of fibers removed in the last 50 iteration was 0...')
         stopped = 1;
         break
     end
