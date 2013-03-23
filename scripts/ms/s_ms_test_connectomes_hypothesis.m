@@ -9,11 +9,13 @@ function s_ms_test_connectomes_hypothesis(feFileToLoad,trackingType,lmax,bval,re
 % with the LiFE mansucript.
 %
 % Franco (c) Stanford Vista Team 2013
-if notDefined('trackingType'),trackingType = 'prob';end
-if notDefined('lmax'),        lmax         = 6;end
-if notDefined('bval'),        bval         = 2000;end
-if notDefined('rep'),         rep          = [1,2,3];end
+if notDefined('trackingType'),trackingType = 'd';end
+if notDefined('lmax'),        lmax         = 2;end
+if notDefined('bval'),        bval         = 4000;end
+if notDefined('rep'),         rep          = [1];end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
+if notDefined('cullType'),   cullType='culledL2';end
+
 if notDefined('saveDir'), saveDir = fullfile('/home/frk/Dropbox','connectomes_figures');end
 % High-resolution Anatomy
 t1File = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/150dirs_b2000/t1/t1.nii.gz';
@@ -37,7 +39,9 @@ for irep = 1:length(rep)
     if notDefined('feFileToLoad')
         % Information on the path to the files to load.
         % This is where the inputs will be loaded from
-        [feFileToLoad, fname] = msBuildFeFileName(trackingType,lmax,bval,rep(irep),diffusionModelParams);
+        [feFileToLoad, fname] = msBuildFeFileName(trackingType,lmax,bval,rep(irep),diffusionModelParams,cullType);
+    else
+    fname = 'input';    
     end
     
     % Get the fe structure
@@ -58,7 +62,7 @@ for irep = 1:length(rep)
     
     % Remove all the voxels from the connectome except the ones where the
     % fascicle passes through. Fit the new model.
-    [feWithoutFas, feWithFas, ~] = feTestFascicle(fe,keepFascicles);
+    [feWithoutFas, feWithFas, ~] = feTestFascicle(fe,keepFascicles,0);
     
     % Make a plot of the R-squared
     WITH.r2(irep)       = median(feGetRep(feWithFas,   'vox  r2'));
@@ -125,6 +129,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function saveFig(h,figName)
 fprintf('[%s] saving figure... \n%s\n',mfilename,figName);
-eval( sprintf('print(%s, ''-djpeg'',''-r500'', ''%s'');', num2str(h),figName));
+eval( sprintf('print(%s, ''-depsc2'',''-tiff'', ''%s'');', num2str(h),figName));
 
 end

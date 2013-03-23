@@ -1,4 +1,4 @@
-function [feFileToLoad feLoadName] = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams)
+function [feFileToLoad, feLoadName] = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams,cullType)
 %
 % Build a file name for one of the several connectomes preprocessed for the
 % LiFE manuscript.
@@ -66,6 +66,6 @@ end
 cName        = [connectomeFile{bval}(1:57),'_',connectomeFile{bval}(end-16:end-4)];
 feLoadDir    = fullfile(loadDir,connectSubfolders,'fe_structures');
 feLoadName   = sprintf('%s_diffModAx%sRd%s_%s',cName,num2str(100*diffusionModelParams(1)),num2str(100*diffusionModelParams(2)));
-feFileToLoad = fullfile(feLoadDir,[feLoadName,feLoadName,'.mat']);
+feFileToLoad = fullfile(feLoadDir,[feLoadName,feLoadName,cullType,'.mat']);
 
 end

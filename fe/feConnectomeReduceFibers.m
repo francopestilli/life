@@ -20,13 +20,14 @@ if all(fibersToKeep==0)
     fe.life.Mfiber = sparse(size(fe.life.Mfiber,1),size(fe.life.Mfiber,2));
 else
     % Delete fibers' columns from the model
-    fe.life.Mfiber = fe.life.Mfiber(:,find(fibersToKeep));
+    fe.life.Mfiber = fe.life.Mfiber(:,fibersToKeep);
 end
 
 % Clear the fields that depend o the original fiber group. These are:
 % (1) The fit of the model.
 if isfield(fe.life,'fit') && ~isempty(fe.life.fit)
-    fe.life.fit = [];
+    fe.life.fit.weights         = fe.life.fit.weights(fibersToKeep);
+    fe.life.fit.results.nParams = sum(fibersToKeep);
 end
 if isfield(fe.life,'voxfit') && ~isempty(fe.life.voxfit)
     fe.life.voxfit = [];
