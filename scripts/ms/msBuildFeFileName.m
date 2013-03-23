@@ -7,6 +7,7 @@ function [feFileToLoad, feLoadName] = msBuildFeFileName(trackingType,lmax,bval,r
 
 % Build a file name for the directory to load the data
 loadDir = fullfile( msPaths('projectDir'), 'results' );
+if notDefined('cullType'), cullType='';end
 
 % Build a file name for the FE file.
 if ~any(lmax == [2,4,6,8,10,12,14,16])
