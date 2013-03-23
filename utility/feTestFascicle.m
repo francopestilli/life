@@ -1,6 +1,6 @@
-function [feWithoutFas, feWithFas, commonCoords] = feTestFascicle(fe,fascicleIndices,displayFibers)
+function [feWithoutFas, feWithFas, commonCoords] = feTestFascicle(fe,fascicleIndices,refitConnectome,displayFibers)
 %
-% [feWithoutFas, feWithFas, commonCoords] = feTestFascicle(fe,fascicleIndices,[displayFibers])
+% [feWithoutFas, feWithFas, commonCoords] = feTestFascicle(fe,fascicleIndices,[refitConnectome],[displayFibers])
 %
 % This file tests the hypothesis of the importance of a fascicle in a
 % volume of white matter.
@@ -8,6 +8,7 @@ function [feWithoutFas, feWithFas, commonCoords] = feTestFascicle(fe,fascicleInd
 % Franco (c) Stanford Vista Team 2013
 
 if notDefined('displayFibers'), displayFibers = 0;end
+if notDefined('refitConnectome'), refitConnectome=1;end
 
 % Remove the fibers of the fascicle from the fe.
 feWithoutFas = feConnectomeReduceFibers(fe, ~fascicleIndices );
@@ -31,11 +32,13 @@ commonCoords = ismember(allCoords, fasCoords,  'rows');
 feWithoutFas = feConnectomeReduceVoxels(feWithoutFas,find(commonCoords));
 feWithFas    = feConnectomeReduceVoxels(fe,          find(commonCoords));
 
-% Refit and install the fit.
-fprintf('\n[%s] Fitting connectome WITHOUT the fascicle.',mfilename)
-feWithoutFas = feSet(feWithoutFas,'fit', feFitModel(feGet(feWithoutFas,'Mfiber'),feGet(feWithoutFas,'dsigdemeaned'),'sgdnn'));
-fprintf('\n[%s] Fitting connectome WITH the fascicle.',mfilename)
-feWithFas    = feSet(feWithFas,   'fit', feFitModel(feGet(feWithFas,'Mfiber'),   feGet(feWithFas,'dsigdemeaned'),   'sgdnn'));
+if refitConnectome
+    % Refit and install the fit.
+    fprintf('\n[%s] Fitting connectome WITHOUT the fascicle.',mfilename)
+    feWithoutFas = feSet(feWithoutFas,'fit', feFitModel(feGet(feWithoutFas,'Mfiber'),feGet(feWithoutFas,'dsigdemeaned'),'sgdnn'));
+    fprintf('\n[%s] Fitting connectome WITH the fascicle.',mfilename)
+    feWithFas    = feSet(feWithFas,   'fit', feFitModel(feGet(feWithFas,'Mfiber'),   feGet(feWithFas,'dsigdemeaned'),   'sgdnn'));
+end
 
 % The following is test code to show where the coordinates of the facicle
 % that were removed land inside the connectoem. Also I show in gray hte

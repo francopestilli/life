@@ -14,23 +14,36 @@ for irep = 1:length(rep)
     % Information on the path to the files to load.
     % This is where the inputs will be loaded from
     feFileToLoad = msBuildFeFileName(trackingType,lmax,bval,rep(irep),diffusionModelParams);
+    % This is the file where the output connectome will be saved.
+    feFileToSave = [feFileToLoad(1:end-4),'culledL2','.mat'];
     
-    % Get the fe structure
-    fprintf('[%s] loading the LiFE structure...\n',mfilename);
-    if exist(feFileToLoad,'file')
-        fprintf('[%s] File exist OK.\n',mfilename)
+    % Nowif this connectome was culled already we skip it.
+    if exist(feFileToSave,'file')
+        fprintf('[%s] found culled connectome, skipping:\n%s',mfilename,feFileToSave);
     else
-        keyboard
+        % First thing first we save a small file with this file name, so
+        % that any parallel process will find this file and not compute the
+        % same process.
+        fe = [];cullingInfo = [];
+        save(feFileToSave,'fe','cullingInfo','-v7.3');
+        
+        % Then we load the fe structure
+        if exist(feFileToLoad,'file')
+            fprintf('[%s] loading the LiFE structure...\n',mfilename);
+            load(feFileToLoad);
+        else
+            fprintf('[%s] Cannot find the LiFE structure...\n',mfilename);
+            break
+        end
+        
+        % The we cull...
+        fprintf('[%s] Culling LiFE structure...\n',mfilename);
+        [fe, cullingInfo] = feConnectomeCull(fe,1000,'sgdnn');
+        
+        % And save the results on the same file. Overwriting...
+        fprintf('[%s] Saving the culled LiFE structure...\n%s\n',mfilename,feFileToSave);
+        save(feFileToSave,'fe','cullingInfo','-v7.3');
     end
-    load(feFileToLoad);
-    
-    fprintf('[%s] Culling LiFE structure...\n',mfilename);
-    [fe, cullingInfo] = feConnectomeCull(fe,1000,'sgdnn');
-    
-    feFileToSave = [feFileToLoad(1:end-4),'culledL2','.mat'];
-    fprintf('[%s] Saving the culled LiFE structure...\n%s\n',mfilename,feFileToSave);
-    feFileToSave = [feFileToLoad(1:end-4),'culledL2','.mat'];
-    save(feFileToSave,'fe','cullingInfo','-v7.3');
 end
 
 end
