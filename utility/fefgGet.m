@@ -401,7 +401,7 @@ switch strrep(lower(param),' ','')
     % the unique fibers in each voxel
     %
     fprintf('[%s] Computing the unique fibers in each voxel...\n',mfilename)
-   tic
+    tic
     if (length(varargin) < 1), error('Requires the roiCoords.');
     else
       roiCoords = varargin{1};
@@ -421,9 +421,11 @@ switch strrep(lower(param),' ','')
       
       % Then add a row for each (fiber,node) pairs that pass through
       % the voxels for this fiber.
-      for jj=1:length(voxelsInFiber)
-        thisVoxel = voxelsInFiber(jj);
-        fibersInVox{thisVoxel} = cat(1,fibersInVox{thisVoxel},thisFiber);
+      if ~isempty(voxelsInFiber)
+          for jj=1:length(voxelsInFiber)
+              thisVoxel = voxelsInFiber(jj);
+              fibersInVox{thisVoxel} = cat(1,fibersInVox{thisVoxel},thisFiber);
+          end
       end
     end
     
@@ -432,7 +434,7 @@ switch strrep(lower(param),' ','')
     for ivx = 1:length(fibersInVox)
       val{ivx} = (unique(fibersInVox{ivx}));
     end
-    fprintf('[%s] done computing the unique fibers in eahc voxel: %2.3fs.\n',mfilename, toc)
+    fprintf('[%s] done computing unique fibers in each voxel: %2.3fs.\n',mfilename, toc)
 
   case {'nodesinvoxels'}
     % nodesInVoxels = fefgGet(fg,'nodes in voxels',nodes2voxels);
@@ -608,7 +610,7 @@ switch strrep(lower(param),' ','')
       dt = dtiLoadDt6(varargin{1});
     end
     
-    % Get the dt6 tensors for each node in eahc fiber.
+    % Get the dt6 tensors for each node in each fiber.
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
     xform   = inv(dt.xformToAcpc);

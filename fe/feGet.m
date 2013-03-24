@@ -359,9 +359,9 @@ function val = feGet(fe,param,varargin)
 % We compute the following values:
 % (1) The number of fibers in each voxel
 % (2) The number of unique fibers with non-zero weights
-% (3) The sum of the weights in eahc voxel
-% (4) The mean of the weights in eahc voxel
-% (5) The variance of the weigths in eahc voxel
+% (3) The sum of the weights in each voxel
+% (4) The mean of the weights in each voxel
+% (5) The variance of the weigths in each voxel
 % pSig = feGet(fe,'fiberdensity');
 %---------
 % Given an VOI or a set of indices to voxels returns the indices of the matching voxels inside the big
@@ -968,7 +968,42 @@ switch param
       % val           = val(voxelRowsToKeep,:);
       val = val(feGet(fe,'voxel rows',feGet(fe,'voxelsindices',varargin)));
     end
-       
+    
+  case {'uniquefibersindicesinroi'}
+    % Find the unique fibers indices in the FE roi.
+    % Thisis necessary sometimes after changing the number of voxels in an
+    % FE structure, as it is performed by feConnectomeReduceVoxels.m
+    %
+    % FibInRoi = feGet(fe,'uniquefibersinroi');
+    
+    % Get all the unique fibers in each voxel
+    uniquefvx = fefgGet(feGet(fe,'fibers img'), ...
+                        'uniquefibersinvox',     ...
+                        feGet(fe,'roi coords'));
+    val = [];
+    for ivx = 1:length(uniquefvx)
+        val = [val; uniquefvx{ivx}];
+    end
+    val = unique(val);
+    
+  case {'weightsinroi'}
+    % Find the weights of the fibers in a specified volume.
+    %
+    % We compute the following values:   
+    % (1) The number of unique fibers in the volume
+    % (2) The weights for the fibers in the roi
+    %
+    % wFibInRoi = feGet(fe,'weightsinroi');
+    
+    % Get all the unique fibers in each voxel
+    FibInRoi = feGet(fe,'uniquefibersindicesinroi');
+   
+    % extract the fber weights obtained in a LiFE fit
+    w   = feGet(fe,'fiber weights');
+    
+    % Return only the ones for the fibers in this roi
+    val = w(unique( FibInRoi ));
+    
   case {'fiberdensity'}
     % Fiber density statistics.
     %
@@ -977,9 +1012,9 @@ switch param
     % We compute the following values:   
     % (1) The number of fibers in each voxel
     % (2) The number of unique fibers with non-zero weights
-    % (3) The sum of the weights in eahc voxel
-    % (4) The mean of the weights in eahc voxel
-    % (5) The variance of the weigths in eahc voxel
+    % (3) The sum of the weights in each voxel
+    % (4) The mean of the weights in each voxel
+    % (5) The variance of the weigths in each voxel
     %
     % pSig = feGet(fe,'fiberdensity');
     
@@ -990,13 +1025,14 @@ switch param
                       
     % extract the fber weights obtained in a LiFE fit
     w = feGet(fe,'fiber weights');
+    keyboard
     
     % Compute the fiber density in three wasy:
     % (1) The number of fibers in each voxel
     % (2) The number of unique fibers with non-zero weights
-    % (3) The sum of the weights in eahc voxel
-    % (4) The mean of the weights in eahc voxel
-    % (5) The variance of the weigths in eahc voxel
+    % (3) The sum of the weights in each voxel
+    % (4) The mean of the weights in each voxel
+    % (5) The variance of the weigths in each voxel
     val = nan(length(uniquefvx),5);
     for ivx = 1:length(uniquefvx)
         
@@ -1561,7 +1597,7 @@ switch param
   otherwise
     help('feGet')
     fprintf('[feGet] Unknown parameter << %s >>...\n',param);
-    return
+    keyboard
 end
 
 end % END MAIN FUNCTION

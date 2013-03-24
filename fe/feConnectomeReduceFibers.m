@@ -1,7 +1,7 @@
-function fe = feConnectomeReduceFibers(fe, fibersToKeep)
+function [fe, removedFibers] = feConnectomeReduceFibers(fe, fibersToKeep)
 % Deletes a set of fibers from the signal and the M matrix.
 %
-%   fe = feConnectomeDeleteFibers(fe,fibersToKeep)
+%   [fe, removedFibers] = feConnectomeDeleteFibers(fe,fibersToKeep)
 %
 % Inputs:
 %   - fe, an fe structure, see feCreate.m, and v_lifeExample.m
@@ -15,6 +15,9 @@ function fe = feConnectomeReduceFibers(fe, fibersToKeep)
 %   feConnectomeReduceFibers(fe, fibersToKeep)
 %
 % Franco (c) Stanford Vista Team 2012
+
+% Return the indices to the fibers removed from the connectome
+removedFibers = find(~fibersToKeep);
 
 if all(fibersToKeep==0)
     fe.life.Mfiber = sparse(size(fe.life.Mfiber,1),size(fe.life.Mfiber,2));
@@ -42,9 +45,15 @@ end
 
 % The actual fiber group.
 if all(fibersToKeep==0)
-    fe.fg = fgCreate('name',fe.fg.name);
+    fe = feSet(fe,'fg img',fgCreate('all fibers were deleted',fe.fg.name,'img'));
 else
-    fe.fg = fgExtract(feGet(fe,'fibers img'),find(fibersToKeep),'keep');
+    % feExtract requires indices to each fibers and does not accept logical
+    % inuts. Here we make sure we are passing indices not a logical vector.
+    if (length(unique(fibersToKeep)) == 2)
+        if   (all(unique(fibersToKeep) == [0, 1]'))
+            fibersToKeep = find(fibersToKeep);end
+    end
+    fe = feSet(fe,'fg img',fgExtract(feGet(fe,'fibers img'),fibersToKeep,'keep'));
 end
 
 return

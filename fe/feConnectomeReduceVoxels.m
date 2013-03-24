@@ -1,7 +1,7 @@
-function fe = feConnectomeReduceVoxels(fe,voxelsToKeep)
+function [fe, indicesFibersKept] = feConnectomeReduceVoxels(fe,voxelsToKeep)
 % Select the voxels to keep (extract) in a connectome matrix
 %
-%   fe = feConnectomeReduceVoxels(fe,voxelToKeep)
+%   [fe, indicesFibersKept] = feConnectomeReduceVoxels(fe,voxelToKeep)
 %
 % voxelsToKeep:  Is a binary list of voxels we preserve.
 %
@@ -18,7 +18,7 @@ function fe = feConnectomeReduceVoxels(fe,voxelsToKeep)
 %
 % Franco (c) Stanford Vista Team 2012
 
-% GEt the indices to each voxels' signal
+% Get the indices to each voxels' signal
 vxRows = feGet(fe,'voxelrows',voxelsToKeep);
 
 % Return only the mode and the signal for the voxels we want to keep
@@ -46,5 +46,25 @@ if isfield(fe,'rep')
     % Set the diffusion signal at 0 diffusion weighting (B0) for this voxel:
     fe.rep.diffusion_S0_img = fe.rep.diffusion_S0_img(voxelsToKeep); 
 end
+
+% Now that we have removed some voxels fom the model, we need to remove also
+% the fibers that do not go through the coordinates left in the roi of the model.
+% These fibers make no contribution to the signal in the voxels.
+%
+% Handling parallel processing
+poolwasopen=1; % if a matlabpool was open already we do not open nor close one
+if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+% Find the unique fibers in the new ROI.
+fibersToKeep = feGet(fe,'uniquefibersindicesinroi');
+
+% Find the indices of the fibers that were deleted
+indicesFibersKept = zeros(size(feGet(fe,'fiber weights')));
+indicesFibersKept(fibersToKeep) = 1;
+
+if ~poolwasopen, matlabpool close; end
+
+% Remove the fibers of the fascicle from the fe.
+fe = feConnectomeReduceFibers(fe, fibersToKeep );
+
 
 return
