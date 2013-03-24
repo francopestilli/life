@@ -19,7 +19,7 @@ for irep = 1:length(rep)
     
     % Nowif this connectome was culled already we skip it.
     if exist(feFileToSave,'file')
-        fprintf('[%s] found culled connectome, skipping:\n%s',mfilename,feFileToSave);
+        fprintf('[%s] found culled connectome, skipping:\n%s\n',mfilename,feFileToSave);
     else
         % First thing first we save a small file with this file name, so
         % that any parallel process will find this file and not compute the
@@ -29,10 +29,10 @@ for irep = 1:length(rep)
         
         % Then we load the fe structure
         if exist(feFileToLoad,'file')
-            fprintf('[%s] loading the LiFE structure...\n',mfilename);
+            fprintf('[%s] loading the LiFE structure...\n%s\n',mfilename,feFileToLoad);
             load(feFileToLoad);
         else
-            fprintf('[%s] Cannot find the LiFE structure...\n',mfilename);
+            fprintf('[%s] Cannot find the LiFE structure...\n%s\n',mfilename,feFileToLoad);
             break
         end
         
