@@ -16,10 +16,12 @@ if notDefined('rep'),         rep          = [1,2,3];end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
 if notDefined('cullType'),   cullType='culledL2';end
 if notDefined('saveDir'), saveDir = fullfile('/home/frk/Dropbox','connectomes_figures');end
-if notDefined('feFileToLoad'), feFileToLoad = 'load from disk';end
+if notDefined('feFileToLoad'), feFileToLoad = 'load from disk';
+else rep =1;
+end
 
 % Make some plots
-colors = {[.6 .45 .4],[.5 .4 .65],[.45 .6 .35]};
+colors = {[.9 .45 .25], [.5 .4 .65],[.45 .6 .35]};
 
 % Initalize the number the vectors that will contain the distribution fo
 % angles for the connectome.
@@ -56,10 +58,11 @@ end
 % Make figures and save them to file
 figName = sprintf('Elevation_%s',fname);
 fh = mrvNewGraphWin(figName);
-bar(elx,mean(ely./size(azy,2)),'FaceColor',colors{1},'EdgeColor','w');
+hb = bar(elx,mean(ely./size(azy,2),1),'FaceColor',colors{1},'EdgeColor',colors{1});
+set(get(hb,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5);
 hold on
-plot([elx;elx],[mean(ely./size(azy,2)); ...
-     mean(ely./size(azy,2))] +[-std(ely./size(azy,2)); std(ely./size(azy,2))], ...
+plot([elx;elx],[mean(ely./size(azy,2),1); ...
+     mean(ely./size(azy,2),1)] +[-std(ely./size(azy,2),[],1); std(ely./size(azy,2),[],1)], ...
      'r-','linewidth',3)
 ylabel('Probability of angle');
 xlabel('Elevation in Degrees');
@@ -70,10 +73,11 @@ saveFig(fh,fullfile(saveDir,figName));
 % Make a plot of the R-squared
 figName = sprintf('Azimuth_%s',fname);
 fh = mrvNewGraphWin(figName);
-bar(azx,mean(azy./size(azy,2)),'FaceColor',colors{1},'EdgeColor','w');
+hb = bar(azx,mean(azy./size(azy,2),1),'FaceColor',colors{1},'EdgeColor',colors{1});
+set(get(hb,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5);
 hold on
-plot([azx;azx],[mean(azy./size(azy,2)); ...
-     mean(azy./size(azy,2))] +[-std(azy./size(azy,2)); std(azy./size(azy,2))], ...
+plot([azx;azx],[mean(azy./size(azy,2),1); ...
+     mean(azy./size(azy,2),1)] +[-std(azy./size(azy,2),[],1); std(azy./size(azy,2),[],1)], ...
      'r-','linewidth',3)
 ylabel('Probability of angle');
 xlabel('Azimuth in Degrees');
