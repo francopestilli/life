@@ -96,12 +96,12 @@ for iter = 1:maxNumInter
     end
     
     % Compute the cut-off for the fibers
-    weights      = feGet(fe,'fiber weights');
-    fibersToKeep = (weights > minWeight);
+    o.weights{iter}      = feGet(fe,'fiber weights');
+    fibersToKeep = (o.weights{iter} > minWeight);
 
     % Store the number of fibers removed
     o.removeFibers(iter) = length(find(~fibersToKeep));
-    o.numFibers(iter)    = length(weights);
+    o.numFibers(iter)    = length(o.weights{iter});
     
     % Select the indices fo the fibers that were deleted in the previous
     % loop. The way we address these indices depends on the type of operation.

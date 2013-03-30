@@ -62,19 +62,19 @@ switch plotType
     % Total WM volume in the original ROI
     testVol = '/azure/scr1/frk/rois/life_right_occipital_example_large_no_cc_smaller.mat';
     ROI = dtiReadRoi(testVol);
-    vxNum = size(unique(floor(mrAnatXformCoords(feGet(fe,'xform acpc 2 img'),ROI.coords)),'rows'),1);
+    vxNum    = size(unique(floor(mrAnatXformCoords(feGet(fe,'xform acpc 2 img'),ROI.coords)),'rows'),1);
     totWMvol = vxNum*prod(mmpVx);% in mm^3
-
+    uData = connectomeVol/totWMvol*100;
     close(g)
 
     g(1) = mrvNewGraphWin(sprintf('%s_percentWMVolume',feGet(fe,'name')));
     set(gcf,'color','w')
     
     % Volume of the ROI
-    h = bar(connectomeVol/totWMvol*100,'r');
+    h = bar(uData,'r');
     set(gca,'ylim',[60 120],'xlim',[.5 1.5])
     ylabel('Percent white-matter volume')
-    title(sprintf('Percent volume: %2.2f',connectomeVol/totWMvol*100))
+    title(sprintf('Percent volume: %2.2f',uData))
     set(gca,  'ytick',[60 80 100 120], ...
       'box','off','tickDir','out')
     
@@ -160,15 +160,15 @@ switch plotType
     % Fiber density before life
     edges = logspace(.5,3.2,100);
     centers = sqrt(edges(1:end-1).*edges(2:end));
-    y = histc(fd(:,1),edges)/size(fd,1)*100;
-    h = bar(y,'r');
+    uData.full = histc(fd(:,1),edges)/size(fd,1)*100;
+    h = bar(uData.before,'r');
     set(h,'edgecolor','r','linewidth',.01)
     set(get(h,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5)
     
     % Fiber density after life
     hold on
-    y = histc(fd(:,2),edges)/size(fd,1)*100;
-    h = bar(y,'b');
+    uData.life = histc(fd(:,2),edges)/size(fd,1)*100;
+    h = bar(uData.life,'b');
     set(h,'edgecolor','b','linewidth',.01)
     set(get(h,'Children'),'FaceAlpha',.35,'EdgeAlpha',.35)
     set(gca,'ylim',[0 3],'xlim',[1 100])
