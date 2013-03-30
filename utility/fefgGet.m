@@ -707,9 +707,9 @@ switch strrep(lower(param),' ','')
   case {'md'}
     % Compute the Mean Diffusivity for all the fibers in the fiber group.
     % Requires a dt structure.
-    % fa = fefgGet(fg,'md',dt)
-    % fa = fefgGet(fg,'md',eigenvals)
-    % fa = fefgGet(fg,'md',dtFileName)
+    % md = fefgGet(fg,'md',dt)
+    % md = fefgGet(fg,'md',eigenvals)
+    % md = fefgGet(fg,'md',dtFileName)
 
     if (~isstruct(varargin{1}) || ischar(varargin{1})) && ~iscell(varargin{1})
       % A dti structue was passed.
@@ -731,9 +731,9 @@ switch strrep(lower(param),' ','')
   case {'ad'}
     % Compute the Axial Diffusivity for all the fibers in the fiber group.
     % Requires a dt structure.
-    % fa = fefgGet(fg,'ad',dt)
-    % fa = fefgGet(fg,'ad',eigenvals)
-    % fa = fefgGet(fg,'ad',dtFileName)
+    % ad = fefgGet(fg,'ad',dt)
+    % ad = fefgGet(fg,'ad',eigenvals)
+    % ad = fefgGet(fg,'ad',dtFileName)
 
     if (~isstruct(varargin{1}) || ischar(varargin{1})) && ~iscell(varargin{1}) 
       % A dti structue was passed.
@@ -755,9 +755,9 @@ switch strrep(lower(param),' ','')
   case {'rd'}
     % Compute the Radial Diffusivity for all the fibers in the fiber group.
     % Requires a dt structure.
-    % fa = fefgGet(fg,'rd',dt)
-    % fa = fefgGet(fg,'rd',eigenvals)
-    % fa = fefgGet(fg,'rd',dtFileName)
+    % rd = fefgGet(fg,'rd',dt)
+    % rd = fefgGet(fg,'rd',eigenvals)
+    % rd = fefgGet(fg,'rd',dtFileName)
 
     if (~isstruct(varargin{1}) || ischar(varargin{1})) && ~iscell(varargin{1}) 
       % A dti structue was passed.

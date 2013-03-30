@@ -743,7 +743,7 @@ switch param
     % val = feGet(fe,'n nodes');
     % val = feGet(fe,'n nodes',voxelsIndices);
     % val = feGet(fe,'n nodes',coords);
-    if ~isempty(fe.life, 'voxel2FNpair')
+    if ~isempty(fe.life.voxel2FNpair)
         [val, ~] = cellfun(@size,fe.life.voxel2FNpair);
         val      = val(feGet(fe,'voxelsindices',varargin));
     end

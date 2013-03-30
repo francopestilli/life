@@ -9,10 +9,10 @@ function s_ms_test_connectomes_hypothesis(feFileToLoad,trackingType,lmax,bval,re
 % with the LiFE mansucript.
 %
 % Franco (c) Stanford Vista Team 2013
-if notDefined('trackingType'),trackingType = 'd';end
-if notDefined('lmax'),        lmax         = 2;end
+if notDefined('trackingType'),trackingType = 'p';end
+if notDefined('lmax'),        lmax         = 8;end
 if notDefined('bval'),        bval         = 4000;end
-if notDefined('rep'),         rep          = [1];end
+if notDefined('rep'),         rep          = [1,2,3];end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
 if notDefined('cullType'),   cullType='culledL2';end
 
@@ -35,14 +35,20 @@ operation = {'and','not','and','not'};
 % Make some plots
 colors = {[.5 .4 .65],[.6 .45 .4],[.45 .6 .35]};
 
+% Check that the connectome were proprocessed before attempting to make a
+% plot.
+done = s_ms_check_processes([],trackingType,lmax,bval,cullType);
+
+if ~all(done), 
+    fprintf('\n[%s] Not all connectomes were proprocessed... not proceeding with plot.\n',mfilename);
+return
+end
+
 for irep = 1:length(rep)
-    if notDefined('feFileToLoad')
         % Information on the path to the files to load.
         % This is where the inputs will be loaded from
         [feFileToLoad, fname] = msBuildFeFileName(trackingType,lmax,bval,rep(irep),diffusionModelParams,cullType);
-    else
-    fname = 'input';    
-    end
+
     
     % Get the fe structure
     disp('loading the LiFE structure...')
@@ -98,7 +104,7 @@ hold on
 plot([1 1; 2 2]',100.*[WITH.r2sd,WITHOUT.r2sd],'r-','linewidth',16)
 ylabel('Percent variance expalined')
 set(gca,'xticklabel',{'With fascicle','Without fascicle'},'tickdir','out','box','off', ...
-    'ylim',[35 60],'FontSize',16)
+    'ylim',[35 70],'FontSize',16)
 saveFig(fh,fullfile(saveDir,figName))
  
 % Make a plot of the R-squared
@@ -109,7 +115,7 @@ hold on
 plot([1 1; 2 2]',[WITH.rmsesd,WITHOUT.rmsesd],'r-','linewidth',16)
 ylabel('rmse')
 set(gca,'xticklabel',{'With fascicle','Without fascicle'},'tickdir','out','box','off', ...
-    'ylim',[20 40],'FontSize',16)
+    'ylim',[20 50],'FontSize',16)
 saveFig(fh,fullfile(saveDir,figName))
 
 % Make a plot of the R-squared
@@ -121,7 +127,7 @@ plot([1 1; 2 2]',[WITH.rrmsesd,WITHOUT.rrmsesd],'r-','linewidth',16)
 plot([0 3],[1 1],'k-')
 ylabel('R_{rmse}')
 set(gca,'xticklabel',{'With fascicle','Without fascicle'},'tickdir','out','box','off', ...
-    'ylim',[0.75 1.25],'FontSize',16)
+    'ylim',[0.75 1.4],'FontSize',16)
 saveFig(fh,fullfile(saveDir,figName))
 
 end
@@ -129,6 +135,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function saveFig(h,figName)
 fprintf('[%s] saving figure... \n%s\n',mfilename,figName);
-eval( sprintf('print(%s, ''-depsc2'',''-tiff'', ''%s'');', num2str(h),figName));
+if ~exist( fileparts(figName), 'dir'), mkdir(fileparts(figName));end
+eval( sprintf('print(%s,  ''-cmyk'', ''-painters'',''-depsc2'',''-tiff'',''-r500'' , ''-noui'', ''%s'');', num2str(h),figName));
 
 end

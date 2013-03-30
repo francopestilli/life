@@ -9,7 +9,7 @@ function s_ms_connectomes_fiber_weigths(stats,trackingType,lmax,diffusionModelPa
 % Franco (C) 2012 Stanford VISTA team.
 
 if notDefined('trackingType'),trackingType = 'deterministic';end
-if notDefined('lmax'),        lmax=[2:2: 16];end
+if notDefined('lmax'),        lmax=[2:2:16];end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
 if notDefined('recompute'), recompute=1;end
 if notDefined('stats')
