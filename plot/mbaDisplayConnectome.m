@@ -37,10 +37,10 @@ if notDefined('plot2d') plot2d = 0;end
 % Low when many fibers are passed in, high otherwise.
 if notDefined('numSurfaceFaces'), numSurfaceFaces = 50; end
 if notDefined('fiberColor'),  
-    fiberColor = [.75,.85,.8];
+    fiberColor = [.84,.83,.99];
     colorType = 'single';
 end
-if notDefined('fiberRadius'),fiberRadius = .3;end
+if notDefined('fiberRadius'),fiberRadius = .5;end
 if notDefined('minNodesNum'), minNodesNum = 3; end
 
 % This is the number of edges eac surface has
@@ -70,13 +70,13 @@ end
 % We will plot only those
 showme  = find(numNodes >= minNodesNum);
 
-t = cell(length(showme));n=t;b=t;
+%t = cell(length(showme));n=t;b=t;
 parfor i_fiber = 1:length(showme)
     % Make a variable fiber radius:
     fr = fiberRadius + (fiberRadius/10) .* randn(size(fibers{showme(i_fiber)}));
     
     % Calculate the frame for tube representing the fiber.
-    [t{i_fiber},n{i_fiber},b{i_fiber}] = build3Dframe(fibers{showme(i_fiber)});
+    [t,n,b] = build3Dframe(fibers{showme(i_fiber)});
     
     % Build x,y,z coordinates for each node in the fibers and the
     % angle between them.
@@ -86,7 +86,7 @@ parfor i_fiber = 1:length(showme)
         numNodes(showme(i_fiber)),   ...
         surfaceCorners,              ...
         segs{showme(i_fiber)},       ...
-        t{i_fiber},n{i_fiber},b{i_fiber});
+        t,n,b);
 end
 clear t n b
 
@@ -111,13 +111,6 @@ switch colorType
         keyboard
 end
     
-
-% Open the figure.
-hold on;
-box off;axis off;
-set(gcf,'Color',[0 0 0]);
-set(gca,'color',[0 0 0])
-
 % Format the figure.
 lightHandle = formatFigure(gcf);
 
@@ -138,6 +131,9 @@ function lh = formatFigure(fig_handle)
 %
 
 % Format figure.
+box off;axis off;
+set(gcf,'Color',[0 0 0]);
+set(gca,'color',[0 0 0])
 hold off;
 set(fig_handle, ...
     'Units','normalized', ...
