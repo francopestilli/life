@@ -95,19 +95,22 @@ switch plotType
     % only Sagittal view is implemented
     if isempty(varargin),  slice = 30;
     else slice = varargin{1}; end
-    close(g)
+    if ~isempty(varargin) && length(varargin)==2
+        fd = varargin{2};
+    else
+        % get the fiber density
+        fd = (feGet(fe,'fiber density'));
+    end
     
-    % get the fiber density
-    fd = (feGet(fe,'fiber density'));
-   
+    close(g)
     g(1) = mrvNewGraphWin(sprintf('%s_FiberDensityMapFull',feGet(fe,'name')));
     set(gcf,'color','w')   
     img = feReplaceImageValues(nan(feGet(fe,'map size')),fd(:,1)',feGet(fe,'roiCoords'));
     maxfd = nanmax(img(:)); % This will be used tonormalize the fiber density plots
-    surf(((fliplr(img(:,:,slice+10)./maxfd)'*255)),...
+    surf(((fliplr(img(:,:,slice)./maxfd)'*255)),...
       'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
     axis off; axis equal;
-    set(gca,'ylim',[100 130],'xlim',[50 85])
+    set(gca,'ylim',[75 95],'xlim',[40 65])
     view(0,-90)
     
     cmap = colormap(jet(255));
@@ -119,10 +122,11 @@ switch plotType
     g(2) = mrvNewGraphWin(sprintf('%s_FiberDensityMapLiFE',feGet(fe,'name')));
     set(gcf,'color','w')
     img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,2))',feGet(fe,'roiCoords'));
-    surf(fliplr(img(:,:,slice+10)./maxfd)'*255,...
+    surf(fliplr(img(:,:,slice)./maxfd)'*255,...
         'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
     axis off; axis equal;
-    set(gca,'ylim',[100 130],'xlim',[50 85])
+    set(gca,'ylim',[75 95],'xlim',[40 65])
+    % set(gca,'ylim',[100 130],'xlim',[50 85])
     
     %set(gca,'ylim',[70 100],'xlim',[40 65])
     view(0,-90)
@@ -141,8 +145,9 @@ switch plotType
     surf(fliplr(img(:,:,slice+10)./maxw)'*255,...
         'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
     axis off; axis equal;
+    set(gca,'ylim',[75 95],'xlim',[40 65])
     %set(gca,'ylim',[70 100],'xlim',[40 65])
-    set(gca,'ylim',[100 130],'xlim',[50 85])
+    %set(gca,'ylim',[100 130],'xlim',[50 85])
     view(0,-90)
     
     cmap = colormap(jet(255));
@@ -159,9 +164,10 @@ switch plotType
     
     % Fiber density before life
     edges = logspace(.5,3.2,100);
+    linspace()
     centers = sqrt(edges(1:end-1).*edges(2:end));
     uData.full = histc(fd(:,1),edges)/size(fd,1)*100;
-    h = bar(uData.before,'r');
+    h = bar(uData.full,'r');
     set(h,'edgecolor','r','linewidth',.01)
     set(get(h,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5)
     

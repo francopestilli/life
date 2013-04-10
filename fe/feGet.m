@@ -1025,7 +1025,6 @@ switch param
                       
     % extract the fber weights obtained in a LiFE fit
     w = feGet(fe,'fiber weights');
-    keyboard
     
     % Compute the fiber density in three wasy:
     % (1) The number of fibers in each voxel

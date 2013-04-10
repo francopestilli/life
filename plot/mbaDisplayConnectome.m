@@ -1,6 +1,6 @@
-function [figureHandle, lightHandle] = mbaDisplayConnectome(fibers,figureHandle,fiberColor,colorType,cMap, fiberRadius,numSurfaceFaces)
+function [figureHandle, lightHandle, sHandle] = mbaDisplayConnectome(fibers,figureHandle,fiberColor,colorType,cMap, faceAlpha, fiberRadius,numSurfaceFaces)
 %
-%	function [figureHandle, lightHandle] = mbaDisplayConnectome(fibers,figureHandle,color,fiberRadius,numSurfaceFaces);
+%	function [figureHandle, lightHandle,sHandle] = mbaDisplayConnectome(fibers,figureHandle,color,fiberRadius,numSurfaceFaces);
 %
 % INPUTS:
 %     fibers         - A fiber group.
@@ -23,6 +23,7 @@ function [figureHandle, lightHandle] = mbaDisplayConnectome(fibers,figureHandle,
 % Written by Franco Pestilli (c) Stanford University, 2013.
 
 tic
+fprintf('[%s] Displaying connectome... ',mfilename);
 %% Handling parallel processing
 poolwasopen=1; % if a matlabpool was open already we do not open nor close one
 if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
@@ -33,6 +34,9 @@ if notDefined('figureHandle'), figureHandle = figure;end
 % Choose whether to plot simple lines or 3D lines.
 if notDefined('plot2d') plot2d = 0;end
 
+% Set the alpha for the surfaces.
+if notDefined('faceAlpha') faceAlpha = 1;end
+
 % Choose the resolution at which the fiber section s samples
 % Low when many fibers are passed in, high otherwise.
 if notDefined('numSurfaceFaces'), numSurfaceFaces = 50; end
@@ -40,6 +44,7 @@ if notDefined('fiberColor'),
     fiberColor = [.84,.83,.99];
     colorType = 'single';
 end
+
 if notDefined('fiberRadius'),fiberRadius = .5;end
 if notDefined('minNodesNum'), minNodesNum = 3; end
 
@@ -54,6 +59,12 @@ numFibers = length(fibers);
 X = cell(numFibers,1);
 Y = X; Z = X;  segs = X;
 numNodes = zeros(numFibers,1);
+
+% % % Trasform the color into a cell, one color per fiber
+% % if ~iscell(fiberColor)
+% %     
+% %     fiberColor = cell()
+% % end
 
 % We remove the first and last nodes from each fiber and colelct the number
 % of nodes per fiber:
@@ -95,16 +106,21 @@ clear t n b
 h=nan(length(X),1);  hold on
 switch colorType
     case {'single','uniform'}
+        if (length(faceAlpha) ==1)
+           faceAlpha = faceAlpha*ones(size(Z));
+        end
         for i_fiber = 1:length(X)
             % Make a surface for the fiber.
-            h(i_fiber) = surf(X{i_fiber},Y{i_fiber},Z{i_fiber}, 'facecolor',fiberColor,'edgecolor', 'none');
+            sHandle(i_fiber) = surf(X{i_fiber},Y{i_fiber},Z{i_fiber}, ...
+                'facecolor',fiberColor,'edgecolor', 'none', ...
+                'FaceAlpha',faceAlpha(i_fiber));
         end
  
     case {'map'}
         for i_fiber = 1:length(showme)
             % Make a surface for the fiber.
-            h(i_fiber) = surf(X{i_fiber},Y{i_fiber},Z{i_fiber}, repmat(fiberColor{showme(i_fiber)},1,size(Z{i_fiber},2)), ...
-                'edgecolor', 'none',  'AmbientStrength',0.9);
+            sHandle(i_fiber) = surf(X{i_fiber},Y{i_fiber},Z{i_fiber}, repmat(fiberColor{showme(i_fiber)},1,size(Z{i_fiber},2)), ...
+                'edgecolor', 'none',  'AmbientStrength',0.9,'FaceAlpha',repmat(faceAlpha{showme(i_fiber)},1,size(Z{i_fiber},2)));
         end
         colormap(cMap)
     otherwise
@@ -116,7 +132,7 @@ lightHandle = formatFigure(gcf);
 
 % Done
 t = toc;
-fprintf('[%s] done in  %2.3f seconds at %2.3f ms/fiber.\n',mfilename, t,(t/numFibers)*1000);
+fprintf('done in  %2.3f seconds at %2.3f ms/fiber.\n',t,(t/numFibers)*1000);
 
 end % end MAIN function
 
@@ -275,75 +291,5 @@ for i=1:N
 end
 
 end
-
-%%%%%%%%%%%%%%%
-% checkInputs %
-%%%%%%%%%%%%%%%
-function [fibers, fig_handle, collection_name, plot_indices, plot_3D,  plot_indices_type, ...
-          surfaceCorners, bundle_colors] = checkInputs(var,nvarsin)
-%
-%
-% Preprocess the inputs tot he main function and return the fibers and all the default
-% parameters.
-%
-
-% Check the number of inputs of the main function.
-if (nvarsin < 1 || nvarsin > 8)
-  error('[%s] Incorrect number of arguments (supplied: %i)\n',mfilename,nvarsin);
-end
-fiberRadius = 0.2;
-% % % Reorganize the fibers.
-% % %
-% % % Strip off first and last points from strand
-% % numFibers = length(var{1}.fibers);
-% % fibers    = cell(numFibers,1);
-% % parfor ll = 1:numFibers
-% %   fibers{ll,1} = var{1}.fibers{ll}';
-% %   %fibers{ll,2} = ll - 1;
-% %   %fibers{ll,4} = ll - 1;
-% %   %fibers{ll,3} = fiberRadius;
-% % end
-% % collection_name = var{1}.name;
-% % 
-% % % Figure handle passed in by fePlot
-% % if (nvarsin < 2), fig_handle = figure;
-% % else   fig_handle = var{2};
-% % end
-
-% Colors for each bundle of fibers.
-if (nvarsin < 3),  bundle_colors = [.88 .9 .97];
-else bundle_colors = var{3};
-end
-
-% Indexes of the fibers that make up a bundle and are plotted in the same color.
-if (nvarsin >= 4), plot_indices = var{4};
-else plot_indices = [];
-end
-
-% Name for the group of fibers plotted together, default is bundle,
-% but it can also be the name of a fiber group.
-if (nvarsin >= 5), plot_indices_type = var{5};
-else plot_indices_type = 'bundle';
-end
-
-% Choose whether to plot simple lines or 3D lines.
-if (nvarsin >= 6 && strcmp('line', var{6})), plot_3D = 0;
-else plot_3D = 1;
-end
-
-% Choose the resolution at which the fiber section s samples
-% Low when many fibers are passed in, high otherwise.
-if (nvarsin >= 7), tube_divs = var{7};
-else
-  if (size(fibers,1) <= 100),     tube_divs = 160;
-  elseif (size(fibers,1) <= 500), tube_divs = 20;
-  else tube_divs = 10;
-  end
-end
-
-% the number of corners in eahc tube.
-surfaceCorners = tube_divs + 1;
-
-end % end function
 
 

@@ -1,4 +1,4 @@
-function [fg keepFG] = feSegmentFascicleFromConnectome(fg, rois, operation, fascicleFileName)
+function [fg, keepFG] = feSegmentFascicleFromConnectome(fg, rois, operation, fascicleFileName)
 %
 % Segment a fascicle from a connectome by applying a series of 'AND' and
 % 'NOT' operations between the connectome and a set of ROIs.

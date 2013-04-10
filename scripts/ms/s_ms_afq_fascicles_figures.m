@@ -1,6 +1,22 @@
-function s_ms_afq_test_fascicle_load_fiberdentisty_to_mesh_afq
-% Example of how to make a fider density map fr om a faccile, and render it
-% on a a surface.
+function s_ms_afq_fascicles_figures
+%
+% Uses AFQ to segment a series of connectomes. 
+%
+% Then it extract one fascicle from a whole-brain tractography
+% We use the left arcuate as an example.
+% - Build and fit a LiFE model out of the fascicle.
+% - adds a second fiber group, one that crosses, to the fiber group
+% - builds/fits life again
+% - Shows the improvement in fit across the ROI
+%
+% Franco (c) Stanford Vista Team 2012
+
+% Note: 
+% modify val = dtiGetValFromFibers(dt6_OR_scalarImage, fiberGroup, xform, [valName='fa'], [interpMethod='trilin'], [uniqueVox=0])
+%
+% To get the rRMSE values and R2 values for each node in a fiber.
+% Use modify feConnectomeDisplay by looking at AFQ_RenderFibers to color
+% the fiber group given a specific map.
 
 addpath(genpath('~/git/AFQ'));
 
@@ -9,9 +25,8 @@ proportionFibers = 1;
 % PARAMETERS
 diffusionModelParams = [1,0];       % The parameters of the tensor model AD, RD
 maxVolDist           = 1;           % Max distance in mm from the ROI edges.
-sdCutoff             = [4 3.32 3.32];     % One per conenctome, generally smaller for smaller lmax values
+sdCutoff             = [3.32 3.32 3.32 3.32];     % One per conenctome, generally smaller for smaller lmax values
 clobber              = [0 0 0 0 0]; % Owerwrite all the files.
-
 plotFG  =0; % Shows he fiber group for the arcuate.
 % DIRECTORY TO LOAD FILES FROM:
 % DWI data
@@ -31,12 +46,9 @@ fas_structuresDir    =  'fas_arcuate_cst_test';
 roi_saveDir          =  'roi_arcuate';
 arcuateRoiFileName   =  'arcuate_roi_lmax12_prob';  
 
-% Prepare the path for the nifti to the0 segemntation file
-cortex = '/biac2/wandell2/data/anatomy/pestilli/t1_class_twovalued.nii.gz';
-thresh = 0.0000125; % Threshold for the overlay image
-crange = [.0000125 .25]; % Color range of the overlay image
-smoothingKernel      = [3 3 3];
-lmax = {'Tensor','ProbLmax6','ProbLmax12'};
+% Handling parallel processing
+poolwasopen=1; % if a matlabpool was open already we do not open nor close one
+if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
 
 % Select the dwi file
 bval  = [2000];
@@ -51,7 +63,7 @@ if thisbval == 1000
   dwiFileRepeat = fullfile(dataRootPath,'raw','0011_01_DWI_2mm150dir_2x_b1000_aligned_trilin.nii.gz');
   connectomeFile= { '0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_csd_lmax6_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_brainmask_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_wm_prob-500000.pdb'};
   t1File      = fullfile(dataRootPath,'t1','t1.nii.gz');
-
+  
 elseif thisbval == 2000
   dataRootPath  = fullfile('/biac2/wandell2/data/diffusion/pestilli/20110922_1125');
   subfolders    = fullfile('150dirs_b2000_1');
@@ -59,9 +71,13 @@ elseif thisbval == 2000
   dtFile        = fullfile(baseDir,'dt6.mat');
   dwiFile       = fullfile(dataRootPath,'raw','0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
   dwiFileRepeat = fullfile(dataRootPath,'raw','0007_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
-  connectomeFile= {'0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_dwi_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_tensor-500000.pdb', ...
-                   '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax6_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb', ...
-                   '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax12_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};
+  connectomeFile= { ...
+%     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_dwi_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_tensor-500000.pdb'%, ...
+     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax6_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};%, ...
+%     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax10_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'%, ...
+%     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax14_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb', ...
+%     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax16_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};%, ...
+%     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax2_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_stream-500000.pdb'
   t1File      = fullfile(dataRootPath,'t1','t1.nii.gz');
   
 elseif thisbval == 4000
@@ -76,6 +92,8 @@ elseif thisbval == 4000
 else
   keyboard
 end
+
+lmax = {'ProbLmax6'};
 
 for irep = 1:length(connectSubfolders)
   for ii = 1:length(connectomeFile)
@@ -161,120 +179,145 @@ for irep = 1:length(connectSubfolders)
     
     % oad the nifti T1 anatomy:
     anat = niftiRead(t1File);
-         
-    figName = sprintf('left_fascicles_ARC_sagittal_MESH_%s',lmax{ii});
-    fg = fascicles(19);
-    fgMakeFiberDensityNifti(fg, figName, t1File, smoothingKernel);
-
-    % Render the cortical surface colored by the arcuate endpoint density
-    AFQ_RenderCorticalSurface(cortex, 'overlay' , figName, 'crange', crange, 'thresh', thresh,'cmap','autumn');
-
-    % Work on the figure
-    set(gcf,'color','k')
-    axis off
-    view(-90,0);
-    saveFig(gcf,fullfile(fig_saveDir,figName))
-
+     
     % Arcuate and corticospinal tract 
-    figName = sprintf('left_fascicles_SLF_sagittal_MESH_%s',lmax{ii});
-    fg = fascicles(16);
-    fgMakeFiberDensityNifti(fg, figName, t1File, smoothingKernel);
-    
-    % Render the cortical surface colored by the arcuate endpoint density
-    AFQ_RenderCorticalSurface(cortex, 'overlay' , figName, 'crange', crange, 'thresh', thresh,'cmap','autumn');
-   
-    set(gcf,'color','k')
-    axis off
-    view(90,0); 
+    figName = sprintf('left_fascicles_ARC_sagittal_%s',lmax{ii});
+    fg = fascicles(19);
+    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+    fg.fibers = fg.fibers(subsampleindx);
+    [figH1, lightH] = mbaDisplayConnectome(fg.fibers,figure);
+    hold on
+    sliceH = feDisplayBrainSlice(anat, [-15 0 0]);    
+    view(-90,0);
+    set(gca,'ylim',[-70 55],'xlim',[-75 0],'zlim',[-25 85])
+    delete(lightH)
     lightH = camlight('right');drawnow;
     saveFig(gcf,fullfile(fig_saveDir,figName))
+        
+%    % The following is an attept to plot the arcuate with the FA map
+    figName = sprintf('left_fascicles_ARC_sagittal_FA_map_%s',lmax{ii});
+    fg = fascicles(19);
+     % Eigenvalues are necessary for all the computations.
+    % Here we precompute them then we pass them in for different values:
+    sprintf('\nComputing eigenvalues for %s...\n',fg.name)
+    eigenvals = fefgGet(fg,'eigenvals',dtFile);
+    fa = fefgGet(fg, 'fa', eigenvals);
+    
+    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+    fg.fibers = fg.fibers(subsampleindx);
+    faDisp = fa(subsampleindx);
+    [figH1, lightH] = mbaDisplayConnectome(fg.fibers,figure,faDisp,'map',hot(60));
+    hold on
+    sliceH = feDisplayBrainSlice(anat, [-40 0 0]);    
+    view(90,0);
+    set(gca,'ylim',[-70 55],'xlim',[-75 0],'zlim',[-25 85])
+    delete(lightH)
+    lightH = camlight('right');drawnow;
+    saveFig(gcf,fullfile(fig_saveDir,figName))
+    
+    % Arcuate and corticospinal tract 
+    figName = sprintf('left_fascicles_ARC_CST_sagittal_FA_map_%s',lmax{ii});
+    sprintf('\nComputing eigenvalues for %s...\n',fg.name)
+    fgCST = fascicles(3);
+    eigenvals = fefgGet(fgCST,'eigenvals',dtFile);
+    faCST = fefgGet(fgCST, 'fa', eigenvals);
+    
+    fibers = {};
+    fibers(1:length(fg.fibers)) = fg.fibers;
+    fibers(length(fg.fibers)+1:length(fg.fibers)+length(fgCST.fibers)) = fgCST.fibers;
+     
+    faAll(1:length(fa)) = fa;
+    faAll(length(fa)+1:length(fa)+length(faCST)) = faCST;
+
+    [figH1, lightH] = mbaDisplayConnectome(fibers,figure,faAll,'map',hot(60));
+    hold on
+    sliceH = feDisplayBrainSlice(anat, [-40 0 0]);
+    
+    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+    fg.fibers = fg.fibers(subsampleindx);
+    [figH2, lightH2] = mbaDisplayConnectome(fg.fibers,gcf,[.8 .6 .2],'single');
+    view(90,0);
+    set(gca,'ylim',[-70 55],'xlim',[-75 0],'zlim',[-25 85])
+    delete(lightH)
+    delete(lightH2)
+    lightH = camlight('right');drawnow;
+    saveFig(gcf,fullfile(fig_saveDir,figName))
+    
+    % Arcuate and corticospinal tract 
+    figName = sprintf('left_fascicles_ARC_CST_sagittal_%s',lmax{ii});
+    fg = fascicles(19);
+    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+    fg.fibers = fg.fibers(subsampleindx);
+    [figH1, lightH] = mbaDisplayConnectome(fg.fibers,figure);
+    hold on
+    sliceH = feDisplayBrainSlice(anat, [-15 0 0]);
+    
+    fg = fascicles(3);
+    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+    fg.fibers = fg.fibers(subsampleindx);
+    [figH2, lightH2] = mbaDisplayConnectome(fg.fibers,gcf,[.8 .6 .2],'single');
+    view(-90,0);
+    set(gca,'ylim',[-70 55],'xlim',[-75 0],'zlim',[-25 85])
+    delete(lightH)
+    delete(lightH2)
+    lightH = camlight('right');drawnow;
+    saveFig(gcf,fullfile(fig_saveDir,figName))
+
+    % Now plot coronal view:  
+    figName = sprintf('left_fascicles_ARC_CST_coronal_%s',lmax{ii});
+    view(0,0);
+    hold on
+    sliceH = feDisplayBrainSlice(anat, [0 -10 0]);
+    set(gca,'ylim',[-70 55],'xlim',[-75 0],'zlim',[-25 85])
+    delete(lightH)
+    lightH = camlight('right');drawnow; 
+    saveFig(gcf,fullfile(fig_saveDir,figName))
+
+   % Superior-longitudinal fasciculum and corticospinal tract
+    figName = sprintf('right_fascicles_SLF_sagital_%s',lmax{ii});
+        
+    fg = fascicles(16);
+    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+    fg.fibers = fg.fibers(subsampleindx);
+
+    [figH, lightH] = mbaDisplayConnectome(fg.fibers,figure);
+    hold on
+    sliceH = feDisplayBrainSlice(anat, [15 0 0]);    
+    view(90,0);
+    set(gca,'ylim',[-70 55],'xlim',[0 75],'zlim',[-25 85])
+    delete(lightH)
+    lightH = camlight('right');drawnow;    
+    saveFig(gcf,fullfile(fig_saveDir,figName))
+  
+    % Superior-longitudinal fasciculum and right arcuate
+    figName = sprintf('right_fascicles_ARC_SLF_sagital_%s',lmax{ii});
+    fg = fascicles(16);
+    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+    fg.fibers = fg.fibers(subsampleindx);
+
+    [figH, lightH] = mbaDisplayConnectome(fg.fibers,figure);
+    hold on
+    sliceH = feDisplayBrainSlice(anat, [15 0 0]);
+      
+    fg = fascicles(20);
+    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+    fg.fibers = fg.fibers(subsampleindx);
+
+    [figH, lightH2] = mbaDisplayConnectome(fg.fibers,gcf,[.8 .6 .2],'single');
+    view(90,0);  
+    set(gca,'ylim',[-70 55],'xlim',[0 75],'zlim',[-25 85])
+    delete(lightH)
+    delete(lightH2)
+    lightH = camlight('right');drawnow; 
+    saveFig(gcf,fullfile(fig_saveDir,figName))
+
     close all
 
   end
 end % Repeated tracking
 end % b-value
 
-% clx
-% 
-% %cd  /azure/scr1/frk/150dirs_b1000_b2000_b4000/results/life_mrtrix_rep1/fe_arcuate_cst_test
-% cd /azure/scr1/frk/150dirs_b1000_b2000_b4000/results/life_mrtrix_rep1/fe_arcuate_importance/
-% 
-% 
-% fiberDensityName = 'SLF_left_fiberDensity_tensor_best_fibers';
-% 
-% % Load the fe structure:
-% %load arcuateCstUnionFE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax12_m_prob-500000_diffModAx100Rd0_arcuateCstUnionFE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax12_m_prob-500000_diffModAx100Rd0_.mat
-% % load  FE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_dwi_0005_0_tensor-500000_diffModAx100Rd0_lSlf_sd300_lSlfFE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_dwi_0005_0_tensor-500000_diffModAx100Rd0_lSlf_sd300_lSlf.mat
-% %load  FE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_dwi_0005_0_tensor-500000_diffModAx100Rd0_rSlf_sd300_rSlfFE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_dwi_0005_0_tensor-500000_diffModAx100Rd0_rSlf_sd300_rSlf.mat
-% 
-% %fdNii = fgMakeFiberDensityNifti(fg, mapName, anatomyFile, smoothingKernel)
-% 
-% % Render the cortical surface colored by the arcuate endpoint density 
-% [p msh]= AFQ_RenderCorticalSurface(cortex, 'overlay' , fiberDensityName, 'crange', crange, 'thresh', thresh,'cmap','autumn');
-% 
-% % Work on the figure
-% set(gcf,'color','k')
-% axis off
-% view(-90,0); %camlight
-% eval( sprintf('print(%s, ''-djpeg'',''-r500'', ''%s'');', num2str(gcf),sprintf('~/Dropbox/%s',fiberDensityName)));
-% 
-% % Make a figure of the fascicle on a brain slice
-% fg = feGet(fe,'fibers acpc');
-% w  = feGet(fe,'fiber weights');
-% fg.fibers = fg.fibers(w > 0.002);
-% 
-% feConnectomeDisplay( feSplitLoopFibers( fg ),figure,[.6 .23 .4],[],[],.1);
-% view(-90,0); 
-% hold on
-% t1 = '/biac2/wandell2/data/anatomy/pestilli/t1.nii.gz';
-% mctDisplayBrainSlice(niftiRead( t1 ),[-10 0 0])
-% camlight
-% eval( sprintf('print(%s, ''-djpeg'',''-r500'', ''%s'');', num2str(gcf),sprintf('~/Dropbox/%s_fascicle_on_brain',fiberDensityName)));
-% 
-% 
-% fiberDensityName = 'SLF_left_fiberDensity_probabilistic_best_fibers';
-% 
-% % Load the fe structure:
-% %load arcuateCstUnionFE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax2__stream-500000_diffModAx100Rd0_arcuateCstUnionFE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax2__stream-500000_diffModAx100Rd0_.mat
-% %load FE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8__m_prob-500000_diffModAx100Rd0_lSlf_sd300_lSlfFE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8__m_prob-500000_diffModAx100Rd0_lSlf_sd300_lSlf.mat
-% load FE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8__m_prob-500000_diffModAx100Rd0_rSlf_sd300_rSlfFE_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8__m_prob-500000_diffModAx100Rd0_rSlf_sd300_rSlf.mat
-% 
-% 
-% % Make a map of the fiber density form the fascicle.
-% feMakeFiberDensityNifti(fe, fiberDensityName, 11,1);
-% 
-% % Render the cortical surface colored by the arcuate endpoint density 
-% p = AFQ_RenderCorticalSurface(cortex, 'overlay' , fiberDensityName, 'crange', crange, 'thresh', thresh,'cmap','autumn');
-% 
-% % Work on the figure
-% set(gcf,'color','k')
-% axis off
-% view(-90,0); %camlight
-% %set(gcf,'Position',[0 0 .45 .95],'Color',[0 0 0]);  drawnow
-% eval( sprintf('print(%s, ''-djpeg'',''-r500'', ''%s'');', num2str(gcf),sprintf('~/Dropbox/%s',fiberDensityName)));
-% 
-% % Make a figure of the fascicle on a brain slice
-% fg = feGet(fe,'fibers acpc');
-% w  = feGet(fe,'fiber weights');
-% fg.fibers = fg.fibers(w > 0.002);
-% 
-% feConnectomeDisplay( feSplitLoopFibers( fg ),figure,[.6 .23 .4],[],[],.1);
-% view(-90,0); 
-% hold on
-% t1 = '/biac2/wandell2/data/anatomy/pestilli/t1.nii.gz';
-% mctDisplayBrainSlice(niftiRead( t1 ),[-10 0 0])
-% camlight
-% eval( sprintf('print(%s, ''-djpeg'',''-r500'', ''%s'');', num2str(gcf),sprintf('~/Dropbox/%s_fascicle_on_brain',fiberDensityName)));
-% 
-% % % make a histogram with fibers before and after life.
-% %fdNiiall  = feMakeFiberDensityNifti(fe, fiberDensityName, 0,0);
-% %fdPreLife = fdNiiall.data(fdNiiall.data(:) ~= 0);
-% 
-% % % Make a map of the fiber density form the fascicle.
-% %fdNiiBest = feMakeFiberDensityNifti(fe, fiberDensityName, 0,1);
-% %fdPostLife = fdNiiBest.data(fdNiiBest.data(:) ~= 0);
-end
-
+end % End main function
 
 %-----------------------%
 function fold = checkFolders(foldersToCheck)
@@ -287,7 +330,6 @@ for ff = 1:length(foldersToCheck)
 end
 end
 
-
 %------------------------%
 function saveFig(h,figName)
 fprintf('[%s] saving figure... \n%s\n',mfilename,figName);
@@ -297,59 +339,3 @@ eval( sprintf('print(%s,  ''-djpeg'',''-r500'' , ''-noui'', ''%s'');', num2str(h
 
 end
 
-
-% -----------------------% 
-function fdNii = fgMakeFiberDensityNifti(fg, mapName, anatomyFile, smoothingKernel)
-% 
-% This function will extract the fiber group from an fe structure 
-% and write a nifti image of fiber density in each voxel.
-%
-%   fdNii = feMakeFiberDensityNifti(fe)
-%
-% INPUTS:
-%   fe              - An fe structure.
-%   smoothingKernel - 3D smoothing kernel to apply to the fiber endpoint
-%                     image. If set to 0 no smoothing will be applied.
-%   mapName         - Full path and file name to save output image
-%   best            - Allows to show all the fibers (1) or only the ones that
-%                     have non-zero weight (0). Default is to show all the
-%                     fibers (0).
-%
-% OUTPUT:
-%   fdNifti -  nifti file containing the fiber density map
-%
-% Franco (c) Stanford Vista Team, 2013 
-
-% The 3D smoothing kernel to apply to the nifti image so that the density
-% will look more uniform
-if ~exist('smoothingKernel','var') || isempty(smoothingKernel),
-  smoothingKernel = [3 3 3];
-end
-
-% Build a file name if it was not passed in.
-if ~exist('mapName','var') || isempty(mapName),
-  mapName = [fg.name,'_fiberDensity'];
-end
- 
-% Load the high-res anatomical file and to build a nifti image that is 
-% coregistered with the segmentation and surface files.
-fdNii       = niftiRead(anatomyFile);
-fdNii.fname = mapName;
-
-% Create an image of fiber density where each voxel counts the number of
-% fiber endpoints
-fdNii.data = dtiComputeFiberDensityNoGUI(fg, ...
-                                 fdNii.qto_xyz,    ...
-                                 size(fdNii.data), ...
-                                 0,1,1);
-clear fg
-
-if all(smoothingKernel) > 0
-  % Smooth the image with a guassian kernel
-  fdNii.data = smooth3(fdNii.data,'gaussian',smoothingKernel);
-end
-
-% Write the nifti image
-niftiWrite(fdNii);
-
-end

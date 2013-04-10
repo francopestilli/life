@@ -27,7 +27,7 @@ end
 
 % Build a file name if it was not passed in.
 if ~exist('mapName','var') || isempty(mapName),
-  mapName = [feGet(fe,'name'),'_fiberDesnity'];
+  mapName = [feGet(fe,'name'),'_fiberDensity'];
 end
 
 % Extract all the fibers
