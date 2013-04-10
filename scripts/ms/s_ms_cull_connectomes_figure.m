@@ -1,4 +1,4 @@
-function feFileToSave = s_ms_cull_connectomes_figure(connectomeType,rep)
+function feFileToSave = s_ms_cull_connectomes_figure(connectomeType,rep,percentileCutoff)
 %
 % feFileToSave = s_ms_cull_connectomes(connectomeType,rep)
 %
@@ -15,7 +15,7 @@ for irep = 1:length(rep)
     % This is where the inputs will be loaded from
     feFileToLoad = msBuildFeFileName(trackingType,lmax,bval,rep(irep),diffusionModelParams);
     % This is the file where the output connectome will be saved.
-    feFileToSave = [feFileToLoad(1:end-4),'culledL2_example','.mat'];
+    feFileToSave = [feFileToLoad(1:end-4),sprintf('culledL2_example%ithP.mat',percentileCutoff)];
     
     % Nowif this connectome was culled already we skip it.
     if exist(feFileToSave,'file')
@@ -25,6 +25,7 @@ for irep = 1:length(rep)
         % that any parallel process will find this file and not compute the
         % same process.
         fe = [];cullingInfo = [];
+        fprintf('[%s] saving file:\n%s\n',mfilename,feFileToSave)
         save(feFileToSave,'fe','cullingInfo','-v7.3');
         
         % Then we load the fe structure
@@ -38,7 +39,7 @@ for irep = 1:length(rep)
         
         % The we cull...
         fprintf('[%s] Culling LiFE structure...\n',mfilename);
-        [fe, cullingInfo] = feConnectomeCullExample(fe,30,'sgdnn');
+        [fe, cullingInfo] = feConnectomeCullExample(fe,30,'sgdnn',percentileCutoff);
         
         % And save the results on the same file. Overwriting...
         fprintf('[%s] Saving the culled LiFE structure...\n%s\n',mfilename,feFileToSave);

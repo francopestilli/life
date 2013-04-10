@@ -11,7 +11,7 @@ function s_ms_test_connectomes_entropy_test(trackingType,lmax,diffusionModelPara
 %
 % See also:
 %
-% Franco (C) 2012 Stanford VISTA team.
+% Written by Franco Pestilli (c) 2012 Stanford University, VISTA team.
 
 if notDefined('trackingType'),trackingType = 'probabilistic';end
 if notDefined('lmax'),        lmax=[6];end

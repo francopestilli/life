@@ -22,7 +22,7 @@ function s_ms_afq_test_arcuate_cst_NEW
 diffusionModelParams = [1,0];       % The parameters of the tensor model AD, RD
 maxVolDist           = 1;           % Max distance in mm from the ROI edges.
 sdCutoff             = [3.32 4.7];     % One per conenctome, generally smaller for smaller lmax values
-clobber              = [1 1 1 1 1]; % Owerwrite all the files.
+clobber              = [0 0 0 0 0]; % Owerwrite all the files.
 plotFG  =0; % Shows he fiber group for the arcuate.
 % DIRECTORY TO LOAD FILES FROM:
 % DWI data
@@ -64,7 +64,7 @@ elseif thisbval == 2000
   dtFile        = fullfile(baseDir,'dt6.mat');
   dwiFile       = fullfile(dataRootPath,'raw','0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
   dwiFileRepeat = fullfile(dataRootPath,'raw','0007_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
-  connectomeFile= {'0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax12_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};
+  connectomeFile= {'0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax2_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};
   t1File      = fullfile(dataRootPath,'t1','t1.nii.gz');
   
 elseif thisbval == 4000
@@ -295,6 +295,54 @@ for irep = 1:length(connectSubfolders)
 end % Repeated tracking
 keyboard
 
+% Compute a test of the diference in rmse
+% (1) Get the differece in rmse observed empiriclly
+EmpiricalDiff = WITHOUT.rmse(1) - WITH.rmse(1);
+
+% (2) Compute the Null distribution by:
+% (2.1) Combine all the rmse from both WITH and WITHOUT.
+% (2.2) Compute 10,000 distributions of rmse one for WITH one for WITHOUT
+%       with the same numerosity of the initial samples
+% (2.3) Compute the difference between the medians of these 10,000
+%       distributions.
+NullSet     = [WITHOUT.rmseall{1} WITH.rmseall{1}];
+sizeWith    = length(WITH.rmseall{1});
+sizeWithout = length(WITHOUT.rmseall{1});
+
+nboots = 100000;
+nullDistribution = nan(nboots,1);
+parfor ibt = 1:nboots
+    % Y = RANDSAMPLE(POPULATION,K)
+    BootWith    = median(randsample(NullSet,sizeWith));
+    BootWithout = median(randsample(NullSet,sizeWithout));   
+    nullDistribution(ibt) = BootWithout - BootWith;
+end
+
+% Plot the null distribution and the empirical difference
+figName = sprintf('Test_Arcuate_CST_BOOT_test_rmse_%s',cName);
+fh = mrvNewGraphWin(figName);
+[y,x] = hist(nullDistribution,100);
+y = y./sum(y);
+bar(x,y,'k')
+hold on
+plot([EmpiricalDiff,EmpiricalDiff],[0 max(y)],'r-','linewidth',2)
+set(gca,'tickdir','out','box','off', 'ylim',[0 max(y)],'FontSize',16)
+ylabel('Likelihood')
+xlabel('Difference in rmse')
+
+% (3) Compute the probability that the empirical difference (1) was
+%     observed by chance given th data, by looking at the percentile of the
+%     empirical difference in the Nul distribution (2).
+if max(nullDistribution)<EmpiricalDiff
+    p = 100*1/nboots;
+else
+    p = sum(nullDistribution(sort(nullDistribution)>EmpiricalDiff));
+end
+title(sprintf('The probability of obtaining the difference by chance is less then %2.3f%%',p), ...
+    'FontSize',16)
+saveFig(fh,fullfile(fig_saveDir,figName))
+
+
 % MAke aplot across repeated tracking
 % Now make averages and std or the rmse, Rrmse, r2 values for plotting
 WITH.rmsem   = mean(WITH.rmse);
@@ -309,7 +357,7 @@ WITHOUT.rrmsesd = [WITHOUT.rrmsem-std(WITHOUT.rrmse); WITHOUT.rrmsem+std(WITHOUT
 
 % Make a plot of the R-squared
 figName = sprintf('Test_Arcuate_CST_Addition_rmse_%s',cName);
-fh = mrvNewGraphWin('Test ARC/CST addition');
+fh = mrvNewGraphWin(figName);
 bar([WITH.rmsem,WITHOUT.rmsem],'FaceColor',colors{1})
 hold on
 plot([1 1; 2 2]',[WITH.rmsesd,WITHOUT.rmsesd],'r-','linewidth',16)
@@ -320,7 +368,7 @@ saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Make a plot of the R-squared
 figName = sprintf('Test_Arcuate_CST_Addition_%s',cName);
-fh = mrvNewGraphWin('Test ARCT/CST addition');
+fh = mrvNewGraphWin(figName);
 bar([WITH.rrmsem,WITHOUT.rrmsem],'FaceColor',colors{1})
 hold on
 plot([1 1; 2 2]',[WITH.rrmsesd,WITHOUT.rrmsesd],'r-','linewidth',16)
@@ -332,7 +380,7 @@ saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Make a scatter plto:
 figName = sprintf('Test_Arcuate_CST_Addition_rmse_SCATTER_%s',cName);
-fh = mrvNewGraphWin('Test ARCT/CST addition SCATTER');
+fh = mrvNewGraphWin(figName);
 hold on
 plot([0 80],[0 80],'k-',[median(WITHOUT.rmse),median(WITHOUT.rmse)],[0 80],'k--',[0 80],[median(WITH.rmse),median(WITH.rmse)],'k--')
 
@@ -347,7 +395,7 @@ saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Make a scatter plto:
 figName = sprintf('Test_Arcuate_CST_Addition_SCATTER_%s',cName);
-fh = mrvNewGraphWin('Test ARCT/CST addition SCATTER');
+fh = mrvNewGraphWin(figName);
 plot([1 1],[.5 3],'k--',[.5 3],[1 1],'k--',[.5 3],[.5 3],'k-')
 hold on
 for  ii = 1:length(WITHOUT.rmseall)
@@ -359,6 +407,7 @@ ylabel('R_{rmse} WITH cortico-spinal tract')
 xlabel('R_{rmse} WITHOUT cortico-spinal tract')
 saveFig(fh,fullfile(fig_saveDir,figName))
 
+keyboard
 end
 
 end % End main function
