@@ -719,7 +719,25 @@ switch param
     rmseModel = feGetRep(fe,'vox rmse');
     val       = rmseModel ./ rmseData;
     val       = val(feGet(fe,'return voxel indices',varargin));
-
+  
+  case {'prmseratio','proportionrmseratio'}      
+    % The probability of a ratio-value in the volume.
+    % Default across 25 log-distributed bins between [.5,2]
+    %
+    % rmseRatio = feGetRep(fe,'p rmse ratio')    
+    %
+    % % Change the bins over whih the proportions are computed:
+    % bins      = logspace(log10(.25),log10(4),50)
+    % rmseRatio = feGetRep(fe,'p rmse ratio',bins)
+    if isempty(varargin)
+        bins = logspace(log10(.5),log10(2),25);
+    end
+    % Extract the rmse ratio in each voxel
+    Rrmse  = feGetRep(fe,'vox rmse ratio');
+    % Compute the number of occurrences for a range of values.
+    [val(1,:),val(2,:)]  = hist(Rrmse,bins);
+    val(1,:)             = val(1,:)./sum(val(1,:));
+    
   case {'voxelrmseratiovoxelwise','voxrmseratiovoxelwise'}
     % A volume with the ratio of the RMSE of model/data
     %
