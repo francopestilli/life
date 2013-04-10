@@ -36,7 +36,7 @@ function [fe, o, fefitGood] = feConnectomeCullExample(fe,maxNumInter, fitType, p
 
 % For large Conectomes this number might need to be increased, convergence
 % might require more interations.
-if notDefined('maxNumInter'), maxNumInter = 200;end
+if notDefined('maxNumInter'), maxNumInter = 1000;end
 
 % The percent change in R2 from that of the orignal model. 
 % The smaller this number the faster the convergence, the more the fibers

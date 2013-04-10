@@ -50,7 +50,7 @@ for irep = 1:length(rep)
     
     % Remove one fiber at the time and compute the variance explained with
     % and withtu that fiber
-    for ifib = 1:100%feGet(fe,'nfibers')
+    for ifib = 1:feGet(fe,'nfibers')
         fasIndex       = false(feGet(fe,'nfibers'),1);
         fasIndex(ifib) = 1;
         

@@ -88,7 +88,8 @@ for iter = 1:maxNumInter
     o.rmse(iter)    = median(feGet(fe,'vox rmse'));
     o.rmsexv(iter)  = median(feGetRep(fe,'vox rmse'));
     o.rrmse(iter)   = median(feGetRep(fe,'vox rmse ratio'));
-    fprintf('[%s] n iter: %i, Original RMSE: %2.3f, Current RMSE: %2.3f (RMSE Thr %2.3f).\n',mfilename, iter,o.rmseOriginal, o.rmse(iter),o.rmseThreshold)
+    fprintf('[%s] n iter: %i, Original RMSE: %2.3f, Current RMSE: %2.3f (RMSE Thr %2.3f).\n', ...
+        mfilename, iter,o.rmseOriginal, o.rmse(iter),o.rmseThreshold)
     if o.rmse(iter) > o.rmseThreshold
         disp('Exiting RMSE increasing from initial one...')
         stopped = 1;
@@ -110,14 +111,15 @@ for iter = 1:maxNumInter
         o.results(iter).r = fefit.results;
     end
     
-    fprintf('[%s] n iter: %i, %i current fibers, deleting %i fibers.\n',mfilename, iter,o.numFibers(iter),o.removeFibers(iter))
+    fprintf('[%s] n iter: %i, %i current fibers, deleting %i fibers.\n', ...
+        mfilename, iter,o.numFibers(iter),o.removeFibers(iter))
     if (iter>51) && (all(o.removeFibers(iter-50:iter) == 0))
         disp('Exiting the mode of the number of fibers removed in the last 50 iteration was 0...')
         stopped = 1;
         break
     end
     
-    % Reduce the connectome.
+    % Reduce the connectome. Meaning remove the fibers that we do not want.
     fe = feConnectomeSelectFibers(fe,find(fibersToKeep));
 end
 

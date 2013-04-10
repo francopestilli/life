@@ -85,7 +85,7 @@ for irep = 1:length(rep)
         saveFig(fhRmseMap,fullfile(saveDir,figNameRmseMap),1);
     end
 
-    % Compute likelihood of Rrmse'
+    % Compute probability of Rrmse'
     clear x 
     [y(irep,:),x] = hist(Rrmse,nBins);
     nSum = sum(y(irep,:));
