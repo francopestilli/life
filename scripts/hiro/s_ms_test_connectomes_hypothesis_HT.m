@@ -46,7 +46,7 @@ end
 fg = feGet(fe,'fibers acpc');
 
 % Perform a series of and and not operations to segement the Fascicle
-[~, keepFascicles] = feSegmentFascicleFromConnectome(fg, rois, roiOperation, 'prob connectome');
+[~, keepFascicles] = feSegmentFascicleFromConnectome(fg, rois, roiOperations, 'prob connectome');
 
 % Remove all the voxels from the connectome except the ones where the
 % fascicle passes through. Fit the new model.
