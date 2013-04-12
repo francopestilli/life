@@ -15,7 +15,7 @@ for irep = 1:length(rep)
     % This is where the inputs will be loaded from
     feFileToLoad = msBuildFeFileName(trackingType,lmax,bval,rep(irep),diffusionModelParams);
     % This is the file where the output connectome will be saved.
-    feFileToSave = [feFileToLoad(1:end-4),'culledL2','.mat'];
+    feFileToSave = [feFileToLoad(1:end-4),'culledL2new','.mat'];
     
     % Nowif this connectome was culled already we skip it.
     if exist(feFileToSave,'file')
@@ -38,7 +38,7 @@ for irep = 1:length(rep)
         
         % The we cull...
         fprintf('[%s] Culling LiFE structure...\n',mfilename);
-        [fe, cullingInfo] = feConnectomeCull(fe,1000,'sgdnn');
+        [fe, cullingInfo] = feConnectomeCullNew(fe,1000,'sgdnn');
         
         % And save the results on the same file. Overwriting...
         fprintf('[%s] Saving the culled LiFE structure...\n%s\n',mfilename,feFileToSave);
