@@ -36,7 +36,7 @@ else
     
     % The we cull...
     fprintf('[%s] Culling LiFE structure...\n',mfilename);
-    [fe, cullingInfo] = feConnectomeCull(fe);
+    [fe, cullingInfo] = feConnectomeCullNew(fe,1000,'sgdnn');
     
     % And save the results on the same file. Overwriting...
     fprintf('[%s] Saving the culled LiFE structure...\n%s\n',mfilename,feFileToSave);
