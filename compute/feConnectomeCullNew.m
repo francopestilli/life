@@ -1,21 +1,23 @@
-function [fe, o, fefitGood] = feConnectomeCullNew(fe,maxNumInter, fitType, redux)
+function [fe, o, fefitGood] = feConnectomeCullNew(fe,maxNumInter, redux)
 %
 % Find the fibers in a connectome that explain most of the variance, by
 % iteratively finding the fibers with largest weights and fitting the life
 % model only to those.
 %
-%   [fe, o, fefit] = feCullConnectome(fe,maxNumInter, lowerPrct, percentReduxRMSE)
+%   [fe, o, fefit] = feCullConnectome(fe,maxNumInter, redux)
 % 
 % Inputs:
-%   fe            - An fe structure, see feCreate.m or v_lifeExample.m
+%   fe          - An fe structure, see feCreate.m or v_lifeExample.m
 %   maxNumInter - The number of times the fit and fiber selection
 %                   processes are repeated.
-%   lowerPrct     - The lower percentile for accepting a weight. On each
-%                   iteration only fibers above this percentile are
-%                   accepted.
-%   percentReduxRMSE   - The max percent in R2 reduction that we allow.
-%                   When the cross validated R2 get smaller than tis
-%                   percent of the original R2, we stop culling.
+%   redux       - Is a structure containing information for the stopping criteria.
+%                 redux.percentRmseIncrease = 0.65; % Max percent increase
+%                                                   % in RMSE from the min(RMSE)
+%                 redux.percentile = [20 10 5 2.5 1.25]; % The percentile reduction 
+%                                                        % during the culling 
+%                 redux.proportionFibers    = [0.1, 0.3, 0.5, 0.7, 0.8]; 
+%                                             % Proportion of fiber reduction 
+%                                             % at eachpercentile
 %
 % Outputs: 
 %   fe            - The fe structure with  the culled fibers.
@@ -82,7 +84,15 @@ stopped = 0;
 % Fit the model and then reduced it by only accepting fibers that pass
 % the minWeights threshold.
 for iter = 1:maxNumInter
-    if iter == 4, o.rmseThreshold = mean(o.rmsexv(iter-3:iter-1))+redux.percentRmseIncrease*mean(o.rmsexv(iter-3:iter-1))/100;end
+    
+    % Now let's find out how wll we are doign with the fit
+    % We find the best fit so far:
+    [~,imin] = min(o.rmseThreshold);
+    
+    % We stop if the last fit was worse then the best fit plus a fudge
+    % percent of it.
+    o.rmseThreshold = o.rmsexv(imin) + redux.percentRmseIncrease*o.rmsexv(imin)/100;
+    
     if iter > 1
         % Re fit the model after eliminating the zero-weighted fascicles
         fefit     = feFitModel(feGet(fe,'Mfiber'),feGet(fe,'dsigdemeaned'),'sgdnn');

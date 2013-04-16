@@ -13,7 +13,15 @@ if notDefined('feFileToLoad') || ~exist(feFileToLoad,'file')
     error('[%s] Please pass a full-path to an FE structure', mfilename)
 end
 
-feFileToSave = [feFileToLoad(1:end-4),'culledL2_runAvrg0p65_prctnew','.mat'];
+% Culling parameters
+redux.percentRmseIncrease = 1; % Percent increase in RMSE from the min(RMSE)
+redux.percentile = [32 16 4 2 1]; % The percentile reduction we perform
+                                  % at different stages during the culling
+redux.proportionFibers = [0.1, 0.3, 0.5, 0.7, 0.9]; % The proportion of fiber
+                                                    % reduction in which we allow
+                                                    % for each percentile
+
+feFileToSave = [feFileToLoad(1:end-4),sprintf('culled_%i',100*redux.percentRmseIncrease),'.mat'];
 
 % Now if this connectome was culled already we skip it.
 if exist(feFileToSave,'file')
@@ -34,8 +42,10 @@ else
     end
     
     % The we cull...
-    fprintf('[%s] Culling LiFE structure...\n',mfilename);
-    [fe, cullingInfo] = feConnectomeCullNew(fe,1000,'sgdnn');
+    fprintf('[%s] Culling LiFE structure...\n',mfilename);    
+    
+
+    [fe, cullingInfo] = feConnectomeCullNew(fe,1000,redux);
     
     % And save the results on the same file. Overwriting...
     fprintf('[%s] Saving the culled LiFE structure...\n%s\n',mfilename,feFileToSave);
