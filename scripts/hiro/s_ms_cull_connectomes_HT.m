@@ -9,11 +9,11 @@ function feFileToSave = s_ms_cull_connectomes_HT(feFileToLoad)
 %
 % Written by Franco Pestilli (c) Stanford University 2013 
 
-if notDefined('feFileToLoad') || exist(feFileToLoad,'file')
+if notDefined('feFileToLoad') || ~exist(feFileToLoad,'file')
     error('[%s] Please pass a full-path to an FE structure', mfilename)
 end
 
-feFileToSave = [feFileToLoad(1:end-4),'culledL2','.mat'];
+feFileToSave = [feFileToLoad(1:end-4),'culledL2_runAvrg0p65_prctnew','.mat'];
 
 % Now if this connectome was culled already we skip it.
 if exist(feFileToSave,'file')
@@ -30,8 +30,7 @@ else
         fprintf('[%s] loading the LiFE structure...\n%s\n',mfilename,feFileToLoad);
         load(feFileToLoad);
     else
-        fprintf('[%s] Cannot find the LiFE structure...\n%s\n',mfilename,feFileToLoad);
-        break
+        error('[%s] Cannot find the LiFE structure...\n%s\n',mfilename,feFileToLoad);
     end
     
     % The we cull...

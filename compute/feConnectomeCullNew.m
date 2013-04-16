@@ -36,9 +36,9 @@ if notDefined('maxNumInter'), maxNumInter = 100;end
 
 % The percent of fibers to remove at each iteration.
 if notDefined('redux')
-    redux.percentRmseIncrease = -2;     % The max percent increase in RMSE from the initial
-    redux.percentile = [32 16 8 1]; % The percentile reduction we perform 
-    redux.proportionFibers = [0.4, 0.5, 0.6, 0.7]; % The proportion of fiber reduction in which we allow fro each percentile
+    redux.percentRmseIncrease = 0.65;     % The max percent increase in RMSE from the initial
+    redux.percentile = [20 10 5 2.5 1.25]; % The percentile reduction we perform 
+    redux.proportionFibers = [0.1, 0.3, 0.5, 0.7, 0.8]; % The proportion of fiber reduction in which we allow fro each percentile
 end
 
 % This is the minimum weight that we use to "keep" fibers.
@@ -82,6 +82,7 @@ stopped = 0;
 % Fit the model and then reduced it by only accepting fibers that pass
 % the minWeights threshold.
 for iter = 1:maxNumInter
+    if iter == 4, o.rmseThreshold = mean(o.rmsexv(iter-3:iter-1))+redux.percentRmseIncrease*mean(o.rmsexv(iter-3:iter-1))/100;end
     if iter > 1
         % Re fit the model after eliminating the zero-weighted fascicles
         fefit     = feFitModel(feGet(fe,'Mfiber'),feGet(fe,'dsigdemeaned'),'sgdnn');
@@ -98,11 +99,16 @@ for iter = 1:maxNumInter
     o.numFibers(iter)    = length(o.weights{iter});
     fprintf('[%s] n iter: %i, Original RMSE: %2.3f, Current RMSE: %2.3f (RMSE Thr %2.3f).\n', ...
         mfilename, iter,o.rmseOriginal, o.rmse(iter),o.rmseThreshold)
-    
+      
+    % Compute the number of zero-weight fibers and the cut-off for the fibers
+    fibersToKeepW  = (o.weights{iter} > minWeight);
+
     % Check whether in the last fit we hit the threshold and increased the
     % rmse. If we did we want to stop, we will keep the fit from the
     % previous iteration not the oen just performed. See below.
-    if (o.rmse(iter) > o.rmseThreshold) && iter > 1
+    if  (isempty(find(~fibersToKeepW, 1))) && ...
+        (o.rmse(iter) > o.rmseThreshold) && ...
+        (iter > 1)
         fprintf('[%s] Exiting becuase the RMSE is increasing from initial one...\n',mfilename)
         stopped = 1;
         break  
@@ -124,7 +130,7 @@ for iter = 1:maxNumInter
     % The percent reduction that we apply depends on how many fibers we
     % have already removed. At the beginning of the process we reduce many
     % fibers, as we go along the process we reduce less and less.
-    fascicleReduction = 1-o.numFibers(iter)/o.numFibers(1);
+    fascicleReduction =  1 - o.numFibers(iter)/o.numFibers(1);
     if fascicleReduction < redux.proportionFibers(1)
         whichRedux = 1;
     elseif fascicleReduction < redux.proportionFibers(2)
@@ -134,20 +140,17 @@ for iter = 1:maxNumInter
     elseif fascicleReduction < redux.proportionFibers(4)
         whichRedux = 4;        
     end
-    fprintf('[%s] PC REDUX fibers to remove: %2.2f%%, actual %2.2f%%, percentile %2.2f\n', ...
+    fprintf('[%s] Proportion removed fibers: %2.2f, actual %2.2f, percentile %2.2f\n', ...
             mfilename,redux.proportionFibers(whichRedux), fascicleReduction, ...
             redux.percentile(whichRedux))
     percentileIndex = floor(o.numFibers(iter)*redux.percentile(whichRedux)/100);
     fibersToKeepPC  = indx(percentileIndex:end);
-    ftk = false(size(indx));
+    ftk             = false(size(indx));
     ftk(fibersToKeepPC) = true;
     fibersToKeepPC      = ftk; 
     clear ftk
 
-    % (2) Compute the number of zero-weight fibers
-    %  Compute the cut-off for the fibers
-    fibersToKeepW  = (o.weights{iter} > minWeight);
-
+ 
     % (3) Select the method that returns the largest percentile
     if sum(fibersToKeepPC) < sum(fibersToKeepW)
         fibersToKeep = fibersToKeepPC;
@@ -166,9 +169,7 @@ for iter = 1:maxNumInter
     % Select the indices fo the fibers that were deleted in the previous
     % loop. The way we address these indices depends on the type of operation.
     o.fibersKept{iter+1} = o.fibersKept{iter}(fibersToKeep);
-    if iter > 1
-        o.results(iter).r = fefit.results;
-    end
+    if iter > 1, o.results(iter).r = fefit.results;end
     
     fprintf('[%s] n iter: %i, %i current fibers, deleting %i fibers.\n', ...
         mfilename, iter,o.numFibers(iter),o.removeFibers(iter))
