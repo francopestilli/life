@@ -2,8 +2,10 @@ function [feFileToLoad, feLoadName] = msBuildFeFileName(trackingType,lmax,bval,r
 %
 % Build a file name for one of the several connectomes preprocessed for the
 % LiFE manuscript.
-%
-% Franco (c) Stanford Vista Team 2013
+%  
+%  [feFileToLoad, feLoadName] = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams,cullType)
+% 
+% Written by Franco Pestilli (c) Stanford Vista Team 2013
 
 % Build a file name for the directory to load the data
 loadDir = fullfile( msPaths('projectDir'), 'results' );

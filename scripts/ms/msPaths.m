@@ -36,7 +36,10 @@ switch pathType
     
   case {'data'}
     p = fullfile('/azure/scr1/frk');
-  
+    
+  case {'bwrois','wernickerois','brocarois'}
+    p = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/results/life_mrtrix_rep1/roi_broca_wernicke';
+        
   otherwise
     error('[%s] Cannot find requested pathType (%s).',mfilename,pathType);
 end

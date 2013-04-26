@@ -47,6 +47,12 @@ end
 % We want to delete fibers that have some contribution to the signal.
 minWeight    = 0;
 
+% Now check that the model was fit already otherwise fit it:
+% Re fit the model after eliminating the zero-weighted fascicles
+if ~(isfield(fe.life,'fit')) || ~(isempty(fe.life.fit))
+   fe        = feSet(fe,'fit', feFitModel(feGet(fe,'Mfiber'),feGet(fe,'dsigdemeaned'),'sgdnn'));
+end
+
 % This is the RMSE of the conenctome model as it was passed in. When
 % culling fibers, hereafter, we do not want to increase above a certain
 % percent of this value.
@@ -79,6 +85,7 @@ else
 end
 o.weights{1}   = feGet(fe,'fiber weights');
 o.numFibers(1) = feGet(fe,'nfibers');
+o.rmsexv(1)    = median(feGetRep(fe,'vox rmse'));
 stopped = 0;
 
 % Fit the model and then reduced it by only accepting fibers that pass
@@ -87,7 +94,7 @@ for iter = 1:maxNumInter
     
     % Now let's find out how wll we are doign with the fit
     % We find the best fit so far:
-    [~,imin] = min(o.rmseThreshold);
+    [~,imin] = nanmin(o.rmsexv);
     
     % We stop if the last fit was worse then the best fit plus a fudge
     % percent of it.
