@@ -14,7 +14,7 @@ if notDefined('feFileToLoad') || ~exist(feFileToLoad,'file')
 end
 
 % Culling parameters
-redux.percentRmseIncrease = 1; % Percent increase in RMSE from the min(RMSE)
+redux.percentRmseIncrease = 2; % Percent increase in RMSE from the min(RMSE)
 redux.percentile = [32 16 4 2 1]; % The percentile reduction we perform
                                   % at different stages during the culling
 redux.proportionFibers = [0.1, 0.3, 0.5, 0.7, 0.9]; % The proportion of fiber
