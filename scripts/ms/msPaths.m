@@ -39,7 +39,9 @@ switch pathType
     
   case {'bwrois','wernickerois','brocarois'}
     p = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/results/life_mrtrix_rep1/roi_broca_wernicke';
-        
+  case {'bwroisjw','wernickeroiswinawer','brocaroisjw'}
+    p = '/azure/scr1/frk/JW_96dirs_b2000_1p5iso/results/life_mrtrix_rep1/broca_wernicke_roi';
+     
   otherwise
     error('[%s] Cannot find requested pathType (%s).',mfilename,pathType);
 end

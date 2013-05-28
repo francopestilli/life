@@ -68,14 +68,14 @@ end
 % this connection.
 connectivity.wall = feGet(feWithFas,'fiber weights');
 connectivity.wfas = connectivity.wall(newFascicleIndices);
+connectivity.wnfas = connectivity.wall(~newFascicleIndices);
 
-% Compute the percent variance epalained by the weights of the
-% fascicle.
-connectivity.varexp = 100*sum(connectivity.wfas)/sum(connectivity.wall);
-
-% Compute the ratio of the mean weight of the fibers in the fascicle and
-% the the mean weight of all the fibers in the same volume of white-matter.
-connectivity.wratio = median(connectivity.wfas)/median(connectivity.wall);
+% Compute some measures of strength of the connection represented by the
+% fascicle, by comparing the fascicle weights with the weights of all the
+% rest of the fascicles going through the same voxels.
+connectivity.strength(1) =    sum(connectivity.wfas) /  sum(connectivity.wnfas);
+connectivity.strength(2) =   mean(log10(connectivity.wfas)) / mean(log10(connectivity.wnfas));
+connectivity.strength(3) = median(log10(connectivity.wfas))/median(log10(connectivity.wnfas));
 
 % The following is test code to show where the coordinates of the facicle
 % that were removed land inside the connectoem. Also I show in gray hte

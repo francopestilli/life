@@ -5,7 +5,7 @@ function feFileToSave = s_ms_cull_connectomes_figure_plot(connectomeType,rep)
 % Loads a connectome and culls it down to the minimum number of fibers.
 %
 % Written by Franco Pestilli (c) Stanford University 2013 
-if notDefined('rep'), rep = [1,2,3];end
+if notDefined('rep'), rep = [1,2];end
 
 if notDefined('fig_saveDir'), 
     fig_saveDir = fullfile('/home/frk/Dropbox','connectome_culling_figures');
@@ -14,7 +14,7 @@ end
 fontSiz = 16;
 numBins = 60;
 %numIterToanalyze = 25;
-iterToanalyze = [1 2 4 6 8 10 12 14 16 18 20 22 24];
+iterToanalyze = [1 2 4 6 8 10 12 14 16 18 20 22 24 26 28];
 
 % We have three reps of each conenctome.
 for irep = 1:length(rep)
@@ -24,7 +24,7 @@ for irep = 1:length(rep)
     % This is where the inputs will be loaded from
     feFileToLoad = msBuildFeFileName(trackingType,lmax,bval,rep(irep),diffusionModelParams);
     % This is the file where the output connectome will be saved.
-    feFileToLoad = [feFileToLoad(1:end-4),'culledL2_example12thP','.mat'];
+    feFileToLoad = [feFileToLoad(1:end-4),'culledL2_example15thP','.mat'];
     
     % Nowif this connectome was culled already we skip it.
     if exist(feFileToLoad,'file')
@@ -47,6 +47,7 @@ end
 % Root mean square error
 figName = 'culling_cross_validated_rmse';
 fh = mrvNewGraphWin(figName);
+rmse(:,1) = mean(rmse(:,2:5),2);
 m_rmse  = mean(rmse,1);
 x =1:length(m_rmse);
 err_rmse = [m_rmse; m_rmse] + [-2*std(rmse); 2*std(rmse)];
@@ -67,6 +68,7 @@ saveFig(fh,fullfile(fig_saveDir,figName))
 figName = 'culling_cross_validated_Rrmse';
 fh = mrvNewGraphWin(figName);
 x =1:length(m_rmse);
+rrmse(:,1) = mean(rrmse(:,2:5),2);
 m_rrmse  = mean(rrmse,1);
 err_rrmse = [m_rrmse; m_rrmse] + [-2*std(rrmse); 2*std(rrmse)];
 plot([x;x],err_rrmse,'r-','linewidth',3)
@@ -123,7 +125,7 @@ set(gca,'tickdir','out','box','off','FontSize',fontSiz,'xtick',iterToanalyze)
 saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Histograms of the weights across iterations:
-maxWeight = 0.16;
+maxWeight = 0.32;
 xh = linspace(0,maxWeight,numBins);
 for iter= 1:length(iterToanalyze)
     for irep =1:length(rep)
@@ -137,33 +139,30 @@ for iter= 1:length(iterToanalyze)
 end
 
 % Make a histogram of the weigths for eahc iteration
-colors = {[.65 .65 .65],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35],...
-          [.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.35 .35 .35], ...
-          [.35 .35 .35],[.35 .35 .35],[.35 .35 .35],[.65 .65 .65],[.65 .65 .65],[.65 .65 .65], ...
-          [.65 .65 .65],[.65 .65 .65],[.65 .65 .65]};
+colors = {[.35 .35 .35]};
 for iter= 1:length(iterToanalyze)
     figName = sprintf('weights_across_culling_iter%i',iterToanalyze(iter));
     fh = mrvNewGraphWin(figName);
-    if iterToanalyze(iter) > 12 && iterToanalyze(iter) < 16
-        ylims =  [0,0.14];
-        yticks = [0,0.07,0.14];
-    elseif iterToanalyze(iter) >= 16
-            ylims =  [0,0.07];
-        yticks = [0,0.035,0.07];
+    if iterToanalyze(iter) >= 8 && iterToanalyze(iter) < 15
+        ylims =  [0,0.32];
+        yticks = [0,0.16,0.32];
+    elseif iterToanalyze(iter) >= 15
+            ylims =  [0,0.16];
+        yticks = [0,0.08,0.16];
     else
-        ylims =  [0,0.28];
-        yticks = [0,0.07,0.14,0.21,.28];
+        ylims =  [0,0.64];
+        yticks = [0,0.32,.64];
     end
     
-    title(sprintf('RMSE: %2.3f',cullingHist(1).rmsexv(iterToanalyze(iter))))
+    title(sprintf('RMSE: %2.3f',mean(rmse(:,iterToanalyze(iter)),1)))
     set(gca,'tickdir','out','box','off','FontSize',fontSiz, ...
         'xlim',[0,maxWeight/2],'xtick',[0,maxWeight/4,maxWeight/2],...
         'ylim',ylims,'ytick',yticks,...
         'PlotBoxAspectRatio',[.5 1 1])
     hold on
-    bar(xh,my{iter},'edgecolor',colors{iterToanalyze(iter)},'facecolor',colors{iterToanalyze(iter)})
+    bar(xh,my{iter},'edgecolor',colors{1},'facecolor',colors{1})
     plot([xh;xh],[my{iter};my{iter}] + [-sdy{iter};sdy{iter}],'r-','linewidth',2)
-    ylabel('Likelihood')
+    ylabel('Probability')
     xlabel('Fascicle contribution')
     saveFig(fh,fullfile(fig_saveDir,figName))
 end

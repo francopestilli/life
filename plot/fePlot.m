@@ -1,4 +1,3 @@
-
 function [uData, g] = fePlot(fe,plotType,varargin)
 % Gateway routine for plotting from the fascicle evaluation (fe) struct
 %
@@ -51,6 +50,20 @@ plotType = mrvParamFormat(plotType);
 
 % Find the plot
 switch plotType
+  case {'2dhistogram'}
+      % Makes a 2D density map.
+      uData.x  = feGetRep(fe,varargin{1});
+      uData.y  = feGetRep(fe,varargin{2});
+      uData.ax.min   = min([uData.x,uData.y]);
+      uData.ax.max   = max([uData.x,uData.y]);
+      uData.ax.res   = 100;
+      uData.ax.bins  = linspace(uData.ax.min,uData.ax.max,uData.ax.res);
+      ymap = hist3([uData.x;uData.y]',{uData.ax.bins, uData.ax.bins});
+      uData.sh = imagesc(flipud(ymap));
+      colormap(flipud(hot)); 
+      view(0,90);
+      axis('square')
+      
   case {'wmvolume'}
     % get the fiber density
     mmpVx = feGet(fe,'xform img 2 acpc');

@@ -9,7 +9,7 @@ function s_ms_afq_test_arcuate_cst_NEW
 % - builds/fits life again
 % - Shows the improvement in fit across the ROI
 %
-% Franco (c) Stanford Vista Team 2012
+% Written by Franco Pestilli (c) Stanford Vista Team 2013
 
 % Note: 
 % modify val = dtiGetValFromFibers(dt6_OR_scalarImage, fiberGroup, xform, [valName='fa'], [interpMethod='trilin'], [uniqueVox=0])
