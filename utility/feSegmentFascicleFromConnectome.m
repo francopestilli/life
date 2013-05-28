@@ -79,7 +79,7 @@ for ir = 1:length(rois)
   % counterintuitive: they mark fibers that DO intersect the ROI and that are
   % exluded from the output FG."
   switch operation{ir}
-    case {'and','AND'}
+    case {'and','AND','and both endpoints'}
       currentFibIndices{ir+1} = currentFibIndices{ir}(keep);
     case {'not','NOT'}
       currentFibIndices{ir+1} = currentFibIndices{ir}(~keep);

@@ -1,4 +1,4 @@
-function s_ms_fs_test_broca_wernicke_connection(hemisphere)
+function s_ms_fs_test_broca_wernicke_connection_JW(hemisphere)
 %
 % This script shows the basic workflow for a test of the conenctvity
 % between two cortical areas.
@@ -29,11 +29,10 @@ function s_ms_fs_test_broca_wernicke_connection(hemisphere)
 
 % Paramters for the hemisphere, rois and white-matter volume
 if notDefined('hemisphere'), hemisphere = 'rh';end
-roiDir     = msPaths('bwrois');
+roiDir     = msPaths('bwroisjw');
 bwRoiName  = fullfile(roiDir,sprintf('%s_bankssts_parsopercularis_parstriangularis',hemisphere));
 bwRoiOperation = {'and both endpoints'};
-vRoiName       = sprintf('%s_wm_roi_box_small',hemisphere);
-saveDir = '~/Dropbox/';
+vRoiName       = sprintf('%s_jw_whole_brain_wm_small',hemisphere);
 
 % Parameters for the connectome and the tracking (these are used to decide
 % which whole-brain connectome to load)
@@ -45,6 +44,7 @@ rep  = 1;
 % Paremters for saving/loading the FE structure
 feSaveName = sprintf('%s_FE',vRoiName);
 feSaveDir  = roiDir;
+if notDefined('fig_saveDir'), fig_saveDir = fullfile('/home/frk/Dropbox','jw_broca_wernicke_connectivity');end
 
 if ~exist(fullfile(feSaveDir,[feSaveName,'_culled.mat']),'file')
     if ~exist(fullfile(feSaveDir,[feSaveName,feSaveName,'.mat']),'file')
@@ -68,12 +68,12 @@ if ~exist(fullfile(feSaveDir,[feSaveName,'_culled.mat']),'file')
         clear vRoi
         
         % (5) Build the life model for the clipped connectome
-        dataRootPath  = fullfile('/biac2/wandell2/data/diffusion/pestilli/20110922_1125');
-        subfolders    = fullfile('150dirs_b2000_1');
+        dataRootPath  = fullfile('/biac2/wandell2/data/diffusion/winawer/20120410_2202/');
+        subfolders    = fullfile('96dirs_b2000_1point5iso_1/');
         baseDir       = fullfile(dataRootPath,subfolders);
         dtFile        = fullfile(baseDir,'dt6.mat');
-        dwiFile       = fullfile(dataRootPath,'raw','0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
-        dwiFileRepeat = fullfile(dataRootPath,'raw','0007_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
+        dwiFile       = fullfile(dataRootPath,'preprocessed','run01_fliprot_aligned_trilin.nii.gz');
+        dwiFileRepeat = fullfile(dataRootPath,'preprocessed','run02_fliprot_aligned_trilin.nii.gz');
         t1File        = fullfile(dataRootPath,'t1','t1.nii.gz');
         diffusionModelParams = [1,0];
         fe = feConnectomeInit(dwiFile,dtFile,fg,feSaveName,feSaveDir,dwiFileRepeat,t1File,diffusionModelParams);
@@ -98,6 +98,17 @@ fg = feGet(fe,'fibers acpc');
 bwRoi      = dtiReadRoi(bwRoiName);
 [fas, keepFascicles] = feSegmentFascicleFromConnectome(fg, {bwRoi}, bwRoiOperation, 'prob connectome');
 
+% (7.5) Clean the fiber groups to eliminate all the short fibers connecting
+%       The same ROi to itself.
+maxLenStd = 2;
+[fas2, keep] = mbaRemoveFiberLengthOutliers(fas,maxLenStd,'both');
+%mbaDisplayConnectome(mbaFiberSplitLoops(fas2.fibers))
+%drawnow
+
+% Address the kept fibers from the fascicle into the FE structure
+fasIdx         = find(keepFascicles);
+keepFascicles(fasIdx(~keep)) =  0;
+
 % (8) Find them and test the connection. This means test the increase in
 %     RMSE in the vROI with and without the fascicles touching the 
 %     cortical ROI.
@@ -107,19 +118,19 @@ bwRoi      = dtiReadRoi(bwRoiName);
 [feWithoutFas, feWithFas, connectivity] = feTestFascicle(fe,keepFascicles,0);
 
 % Make a plot of the R-squared
-WITH.r2       = median(feGetRep(feWithFas,   'vox  r2'));
-WITH.rmse     = median(feGetRep(feWithFas,   'vox  rmse'));
-WITH.rrmse    = median(feGetRep(feWithFas,   'vox  rmse ratio'));
-WITH.rmseall  = (feGetRep(feWithFas,   'vox  rmse'));
+WITH.r2       = median(feGetRep(feWithFas, 'vox  r2'));
+WITH.rmse     = median(feGetRep(feWithFas, 'vox  rmse'));
+WITH.rrmse    = median(feGetRep(feWithFas, 'vox  rmse'));
+WITH.rmseall  = (feGetRep(feWithFas,      'vox  rmse'));
 
 WITHOUT.r2    = median(feGetRep(feWithoutFas,'vox  r2'));
 WITHOUT.rmse  = median(feGetRep(feWithoutFas,'vox  rmse'));
-WITHOUT.rrmse = median(feGetRep(feWithoutFas,'vox  rmse ratio'));
-WITHOUT.rmseall  = (feGetRep(feWithoutFas,'vox  rmse'));
+WITHOUT.rmse = median(feGetRep(feWithoutFas,'vox  rmse'));
+WITHOUT.rmseall  = (feGetRep(feWithoutFas,  'vox  rmse'));
 
 % Compute a test of the diference in rmse
 % (a) Get the differece in rmse observed empiriclly
-EmpiricalDiff = WITHOUT.rmse - WITH.rmse;
+EmpiricalDiff = (WITHOUT.rmse) - (WITH.rmse);
 
 % (b) Compute the Null distribution by:
 % (b.1) Combine all the rmse from both WITH and WITHOUT.
@@ -127,10 +138,13 @@ EmpiricalDiff = WITHOUT.rmse - WITH.rmse;
 %       with the same numerosity of the initial samples
 % (b.3) Compute the difference between the medians of these 10,000
 %       distributions.
-NullSet     = [WITHOUT.rmseall WITH.rmseall];
+NullSet     = [(WITHOUT.rmseall) (WITH.rmseall)];
 sizeWith    = length(WITH.rmseall);
 sizeWithout = length(WITHOUT.rmseall);
-    
+
+% Make plots of the distributions
+plotNullSetDistributions(WITH,WITHOUT,NullSet,fig_saveDir)
+
 fprintf('[%s] Bootstrapping ...\n',mfilename)
 nboots = 100000;
 nullDistribution = nan(nboots,1);
@@ -142,7 +156,7 @@ parfor ibt = 1:nboots
 end
 
 % Plot the null distribution and the empirical difference
-figName = sprintf('Test_Broca_Wernicke_rmse_%s_lmax%i',vRoiName,lmax);
+figName = sprintf('JW_Test_Broca_Wernicke_rRmse_%s_lmax%i',vRoiName,lmax);
 fh = mrvNewGraphWin(figName);
 [y,x] = hist(nullDistribution,100);
 y = y./sum(y);
@@ -150,8 +164,8 @@ bar(x,y,'k')
 hold on
 plot([EmpiricalDiff,EmpiricalDiff],[0 max(y)],'r-','linewidth',2)
 set(gca,'tickdir','out','box','off', 'ylim',[0 max(y)],'FontSize',16)
-ylabel('Probability')
-xlabel('Difference in rmse')
+ylabel('Probability','FontSize',16)
+xlabel('Difference in log_{10}(R_{rmse})','FontSize',16)
 
 % (c) Compute the probability that the empirical difference (1) was
 %     observed by chance given th data, by looking at the percentile of the
@@ -162,32 +176,99 @@ else
     p = sum(nullDistribution(sort(nullDistribution)>EmpiricalDiff));
 end
 dprime = EmpiricalDiff/std(nullDistribution);
-title(sprintf('The probability of obtaining the difference by chance is less then %2.6f%%\nStrength of connectivity %2.3f',p,dprime), ...
+% Compute a sign test which takes cae of the fact that our observations
+% were paired (for each voxel we had an error with and without the
+% connection)
+pst = signtest((WITH.rmseall) - (WITHOUT.rmseall));
+title(sprintf('The probability of obtaining the difference by chance is less than:\n %2.6f%% (bootstrap test)\n%2.12f%% (sign test)\nConnectivity confidence %2.3f',p,pst, dprime), ...
     'FontSize',16)
-saveFig(fh,fullfile(saveDir,figName))
+saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Make a scatter plto:
-figName = sprintf('Test_Broca_Wernicke_rmse_SCATTER_%s_lmax%i',vRoiName,lmax);
+figName = sprintf('JW_Test_Broca_Wernicke_rRmse_SCATTER_%s_lmax%i',vRoiName,lmax);
 fh = mrvNewGraphWin(figName);
 hold on
-plot([0 80],[0 80],'k-',[median(WITHOUT.rmse),median(WITHOUT.rmse)],[0 80],'k--', ...
-     [0 80],[median(WITH.rmse),median(WITH.rmse)],'k--')
+plot([.5 4],[.5 4],'k-',[(WITHOUT.rmseall),(WITHOUT.rmseall)],[.5 4],'k--', ...
+     [.5 4],[median(WITH.rmse),median(WITH.rmse)],'k--')
 plot(WITHOUT.rmseall,WITH.rmseall,'o','color',[.3 .88 .7],'markerfacecolor',[.3 .88 .7]);
 axis square
-set(gca,'tickdir','out','box','off','xlim',[0 80],'ylim',[0 80],'FontSize',16)
-ylabel('rmse WITH Connection')
-xlabel('rmse WITHOUT Connection')
-saveFig(fh,fullfile(saveDir,figName))
+set(gca,'tickdir','out','box','off',...
+    'ytick',[.5 1 2 4], ...
+    'yticklabel',{'0.5' '1' '2' '4'},...
+    'xtick',[.5 1 2 4], ...
+    'xticklabel',{'0.5' '1' '2' '4'},...
+    'ylim',[0.5 4],'ylim',[0.5 4],'yscale','log','xscale','log','FontSize',16)
+ylabel('R_{rmse} WITH Connection','FontSize',16)
+xlabel('R_{rmse} WITHOUT Connection','FontSize',16)
+saveFig(fh,fullfile(fig_saveDir,figName))
 
 end % Main Function
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%----------------------------------%
+function plotNullSetDistributions(WITH,WITHOUT,NullSet,fig_saveDir)
+
+% Make a nice plot of the nullset
+figName = sprintf('NullSet_%s',mfilename);
+fh = mrvNewGraphWin(figName);
+[y,x] = hist(NullSet,100);
+bar(x,y/sum(y),'FaceColor','k','EdgeColor','k');
+set(gca,'tickdir','out','box','off','FontSize',16, ...
+    'xlim',[0 100]);
+drawnow
+%set(gca,'xticklabel',round(100*10.^get(gca,'xtick'))/100)
+ylabel('Probability','FontSize',16);
+xlabel('rmse','FontSize',16);
+saveFig(fh,fullfile(fig_saveDir,figName));
+
+figName = sprintf('NullSetTwoDist_%s',mfilename);
+fh = mrvNewGraphWin(figName);
+[yw,xw] = hist((WITH.rmseall),100);
+bb = bar(xw,yw/sum(yw),'FaceColor','k','EdgeColor','k');
+set(get(bb,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5);
+hold on
+[yw,xw] = hist((WITHOUT.rmseall), xw);
+bb = bar(xw,yw/sum(yw),'FaceColor','r','EdgeColor','r');
+set(get(bb,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5);
+set(gca,'tickdir','out','box','off','FontSize',16, ...
+    'xlim',[0 100]);
+drawnow
+%set(gca,'xticklabel',round(100*10.^get(gca,'xtick'))/100)
+ylabel('Probability','FontSize',16);
+xlabel('rmse','FontSize',16);
+saveFig(fh,fullfile(fig_saveDir,figName));
+
+figName = sprintf('NullSetWith_%s',mfilename);
+fh = mrvNewGraphWin(figName);
+[yw,xw] = hist((WITH.rmseall),100);
+bb = bar(xw,yw/sum(yw),'FaceColor','k','EdgeColor','k');
+set(gca,'tickdir','out','box','off','FontSize',16, ...
+    'xlim',[0 100]);
+drawnow
+set(gca,'xticklabel',round(100*10.^get(gca,'xtick'))/100)
+ylabel('Probability','FontSize',16);
+xlabel('R_{rmse}','FontSize',16);
+saveFig(fh,fullfile(fig_saveDir,figName));
+
+figName = sprintf('NullSetWithout_%s',mfilename);
+fh = mrvNewGraphWin(figName);
+[yw,xw] = hist((WITHOUT.rmseall),100);
+bb = bar(xw,yw/sum(yw),'FaceColor','r','EdgeColor','r');
+set(gca,'tickdir','out','box','off','FontSize',16, ...
+    'xlim',[0 100]);
+drawnow
+%set(gca,'xticklabel',round(100*10.^get(gca,'xtick'))/100)
+ylabel('Probability','FontSize',16);
+xlabel('R_{rmse}','FontSize',16);
+saveFig(fh,fullfile(fig_saveDir,figName));
+end
+
+%---------------------------------------%
 function saveFig(h,figName)
+if ~exist(fileparts(figName),'dir'),mkdir(fileparts(figName));end
 
 printCommand = sprintf('print(%s, ''-cmyk'', ''-painters'',''-depsc2'',''-tiff'',''-r500'' , ''-noui'', ''%s'')', num2str(h),figName);
 fprintf('[%s] saving figure... \n%s\n',mfilename,figName);
 
 % do the printing here:
 eval(printCommand);
-
 end

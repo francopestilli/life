@@ -2,6 +2,8 @@ function [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibe
 %
 % This function creates whole-brain white-matter connectome.
 %
+% [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibersFolder,[lmax],[nSeeds],[wmMask])
+%
 % Inputs:
 %  - dt6Dir - directory containing the dt6.mt file.
 %  - fibersFolder - folder to use to save all the fibers computed.
@@ -9,7 +11,7 @@ function [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibe
 %  - nSeeds - number of seeds to use for mrtrix, this determines the final
 %             number of fibers.
 %
-% Franco (c) Stanford VISTA Team 2012
+% Written by Franco Pestilli (c) Stanford University, VISTA Team 2012
 
 if notDefined('trackingAlgorithm'), trackingAlgorithm = {'tensor'};end
 if notDefined('dtFile'),            dtFile = ...
@@ -33,7 +35,6 @@ for il = 1:length(lmax)
   % This first step initializes all the files necessary for mrtrix.
   % This can take a long time.
   files           = mrtrix_init(dtFile, lmax(il),fibersFolder,wmMask);
-
   
   % MRTRIX - We run this first because it is fast.
   for ii = 1:length(trackingAlgorithm)
@@ -54,7 +55,7 @@ function algo = switchAlgo(algo)
 % 
 % 1=prob, 2=stream, 3=tensor.
 %
-% Franco
+% Written by Franco Pestilli (c) Stanford University, VISTA Team 2012
 
 if isnumeric(algo) % from index to string
   switch algo

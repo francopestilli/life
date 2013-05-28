@@ -1,4 +1,4 @@
-function s_ms_afq_test_arcuate_cst_NEW
+function s_ms_afq_test_cst_crossing_arcuate
 %
 % Uses AFQ to segment a series of connectomes. 
 %
@@ -8,6 +8,11 @@ function s_ms_afq_test_arcuate_cst_NEW
 % - adds a second fiber group, one that crosses, to the fiber group
 % - builds/fits life again
 % - Shows the improvement in fit across the ROI
+%
+% This functiont ests that by adding the CST to the arcuate improves the
+% cross-validate prediction. A twin function s_ms_afq_test_arcuate_crossing_cst.m
+% tests the alternative hypothesis that by adding the Arcuate to the CST
+% improves the corss-validated prediction.
 %
 % Written by Franco Pestilli (c) Stanford Vista Team 2013
 
@@ -23,7 +28,7 @@ diffusionModelParams = [1,0];       % The parameters of the tensor model AD, RD
 maxVolDist           = 1;           % Max distance in mm from the ROI edges.
 sdCutoff             = [3.32 4.7];     % One per conenctome, generally smaller for smaller lmax values
 clobber              = [0 0 0 0 0]; % Owerwrite all the files.
-plotFG  =0; % Shows he fiber group for the arcuate.
+plotFG  = 0; % Shows he fiber group for the arcuate.
 % DIRECTORY TO LOAD FILES FROM:
 % DWI data
 projectDir  = '/azure/scr1/frk/150dirs_b1000_b2000_b4000';
@@ -54,7 +59,7 @@ if thisbval == 1000
   dtFile        = fullfile(baseDir,'dt6.mat');
   dwiFile       = fullfile(dataRootPath,'raw','0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin.nii.gz');
   dwiFileRepeat = fullfile(dataRootPath,'raw','0011_01_DWI_2mm150dir_2x_b1000_aligned_trilin.nii.gz');
-  connectomeFile= { '0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_csd_lmax6_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_brainmask_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_wm_prob-500000.pdb'};
+  connectomeFile= { '0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_csd_lmax8_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_brainmask_0009_01_DWI_2mm150dir_2x_b1000_aligned_trilin_wm_prob-500000.pdb'};
   t1File      = fullfile(dataRootPath,'t1','t1.nii.gz');
   
 elseif thisbval == 2000
@@ -64,7 +69,7 @@ elseif thisbval == 2000
   dtFile        = fullfile(baseDir,'dt6.mat');
   dwiFile       = fullfile(dataRootPath,'raw','0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
   dwiFileRepeat = fullfile(dataRootPath,'raw','0007_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
-  connectomeFile= {'0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax2_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};
+  connectomeFile= {'0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};
   t1File      = fullfile(dataRootPath,'t1','t1.nii.gz');
   
 elseif thisbval == 4000
@@ -293,7 +298,6 @@ for irep = 1:length(connectSubfolders)
 
   end
 end % Repeated tracking
-keyboard
 
 % Compute a test of the diference in rmse
 % (1) Get the differece in rmse observed empiriclly
@@ -308,6 +312,9 @@ EmpiricalDiff = WITHOUT.rmse(1) - WITH.rmse(1);
 NullSet     = [WITHOUT.rmseall{1} WITH.rmseall{1}];
 sizeWith    = length(WITH.rmseall{1});
 sizeWithout = length(WITHOUT.rmseall{1});
+
+% Make plots of the null set distributions
+plotNullSetDistributions(WITH,WITHOUT,NullSet,fig_saveDir)
 
 nboots = 100000;
 nullDistribution = nan(nboots,1);
@@ -327,8 +334,8 @@ bar(x,y,'k')
 hold on
 plot([EmpiricalDiff,EmpiricalDiff],[0 max(y)],'r-','linewidth',2)
 set(gca,'tickdir','out','box','off', 'ylim',[0 max(y)],'FontSize',16)
-ylabel('Likelihood')
-xlabel('Difference in rmse')
+ylabel('Probability')
+xlabel('Difference in median rmse')
 
 % (3) Compute the probability that the empirical difference (1) was
 %     observed by chance given th data, by looking at the percentile of the
@@ -338,12 +345,38 @@ if max(nullDistribution)<EmpiricalDiff
 else
     p = sum(nullDistribution(sort(nullDistribution)>EmpiricalDiff));
 end
-title(sprintf('The probability of obtaining the difference by chance is less then %2.3f%%',p), ...
+
+% Effect size:
+d = EmpiricalDiff/std(nullDistribution);
+% Compute a sign test which takes cae of the fact that our observations
+% were paired (for each voxel we had an error with and without the
+% connection)
+pst = signtest((WITH.rmseall{1}) - (WITHOUT.rmseall{1}));
+title(sprintf('The probability of obtaining the difference by chance is less than:\n %2.6f%% (bootstrap test)\n%2.12f%% (sign test)\nConnectivity confidence %2.3f',p,pst, d), ...
     'FontSize',16)
 saveFig(fh,fullfile(fig_saveDir,figName))
 
+% Plot the sign test distribuion
+figName = sprintf('Test_CST_in_Arcuate_signTest_%s',cName);
+fh = mrvNewGraphWin(figName);
+clear y x
+for ii = 1:2
+[y(ii,:),x] = hist((WITHOUT.rmseall{ii}) - (WITH.rmseall{ii}),[-50:50]);
+y(ii,:) = y(ii,:)/sum(y(ii,:),2);
+end
+plot(x,mean(y,1),'ko-','MarkerFaceColor','k','MarkerEdgeColor','w')
+hold on
+plot([x; x],([mean(y,1); mean(y,1)] + [-std(y,[],1); std(y,[],1)]),'r-','linewidth',3)
+plot([0 0],[.0001 1],'k--')
+set(gca,'yscale','log','tickdir','out','box','off','xlim',[-20 50],'FontSize',16, ...
+    'yticklabel',[0.0001 0.001 0.01 0.1 1]);
+ylabel('Probability','FontSize',16)
+xlabel('Difference in rmse','FontSize',16)
+title(sprintf('The probability of obtaining the difference by chance is less than:\n %2.6f%% (bootstrap test)\n%2.12f%% (sign test)\nConnectivity confidence %2.3f',p,pst, d), ...
+    'FontSize',16)
+saveFig(fh,fullfile(fig_saveDir,figName))
 
-% MAke aplot across repeated tracking
+% Make aplot across repeated tracking
 % Now make averages and std or the rmse, Rrmse, r2 values for plotting
 WITH.rmsem   = mean(WITH.rmse);
 WITH.rmsesd  = [WITH.rmsem-std(WITH.rmse); WITH.rmsem+std(WITH.rmse)];
@@ -356,7 +389,7 @@ WITHOUT.rrmsem  = mean(WITHOUT.rrmse);
 WITHOUT.rrmsesd = [WITHOUT.rrmsem-std(WITHOUT.rrmse); WITHOUT.rrmsem+std(WITHOUT.rrmse)];
 
 % Make a plot of the R-squared
-figName = sprintf('Test_Arcuate_CST_Addition_rmse_%s',cName);
+figName = sprintf('Test_CST_in_Arcuate_rmse_%s',cName);
 fh = mrvNewGraphWin(figName);
 bar([WITH.rmsem,WITHOUT.rmsem],'FaceColor',colors{1})
 hold on
@@ -367,7 +400,7 @@ set(gca,'xticklabel',{'Arcuate and CST','Arcuate alone'},'tickdir','out','box','
 saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Make a plot of the R-squared
-figName = sprintf('Test_Arcuate_CST_Addition_%s',cName);
+figName = sprintf('Test_CST_in_Arcuate_rRmse_%s',cName);
 fh = mrvNewGraphWin(figName);
 bar([WITH.rrmsem,WITHOUT.rrmsem],'FaceColor',colors{1})
 hold on
@@ -379,38 +412,96 @@ set(gca,'xticklabel',{'Arcuate and CST','Arcuate alone'},'tickdir','out','box','
 saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Make a scatter plto:
-figName = sprintf('Test_Arcuate_CST_Addition_rmse_SCATTER_%s',cName);
+figName = sprintf('Test_CST_in_Arcuate_rmse_SCATTER_%s',cName);
 fh = mrvNewGraphWin(figName);
 hold on
-plot([0 80],[0 80],'k-',[median(WITHOUT.rmse),median(WITHOUT.rmse)],[0 80],'k--',[0 80],[median(WITH.rmse),median(WITH.rmse)],'k--')
+plot([0 100],[0 100],'k-',[median(WITHOUT.rmse),median(WITHOUT.rmse)],[0 100],'k--',[0 100],[median(WITH.rmse),median(WITH.rmse)],'k--')
 
-for ii = 1:length(WITHOUT.rmseall)
+for ii = 1%:length(WITHOUT.rmseall)
 plot(WITHOUT.rmseall{ii},WITH.rmseall{ii},'o','color',colors{ii},'markerfacecolor',colors{ii});
 end
+axis equal
 axis square
-set(gca,'tickdir','out','box','off','xlim',[0 80],'ylim',[0 80],'FontSize',16)
+set(gca,'tickdir','out','box','off','xlim',[0 100],'ylim',[0 100],'FontSize',16)
 ylabel('rmse WITH cortico-spinal tract')
 xlabel('rmse WITHOUT cortico-spinal tract')
 saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Make a scatter plto:
-figName = sprintf('Test_Arcuate_CST_Addition_SCATTER_%s',cName);
+figName = sprintf('Test_CST_in_Arcuate_rRmse_SCATTER_%s',cName);
 fh = mrvNewGraphWin(figName);
-plot([1 1],[.5 3],'k--',[.5 3],[1 1],'k--',[.5 3],[.5 3],'k-')
+plot([1 1],[.5 4],'k--',[.5 4],[1 1],'k--',[.5 4],[.5 4],'k-')
 hold on
-for  ii = 1:length(WITHOUT.rmseall)
+for  ii = 1%:length(WITHOUT.rmseall)
 plot(WITHOUT.rrmseall{ii},WITH.rrmseall{ii},'ro','color',colors{ii},'markerfacecolor',colors{ii})
 end
+axis equal
 axis square
-set(gca,'tickdir','out','box','off','ylim',[0.5 3],'FontSize',16)
+set(gca,'tickdir','out','box','off',...
+    'ytick',[.5 1 2 4], ...
+    'yticklabel',{'0.5' '1' '2' '4'},...
+    'xtick',[.5 1 2 4], ...
+    'xticklabel',{'0.5' '1' '2' '4'},...
+    'ylim',[0.5 4],'ylim',[0.5 4],'yscale','log','xscale','log','FontSize',16)
 ylabel('R_{rmse} WITH cortico-spinal tract')
 xlabel('R_{rmse} WITHOUT cortico-spinal tract')
 saveFig(fh,fullfile(fig_saveDir,figName))
 
-keyboard
 end
-
+keyboard
 end % End main function
+
+%----------------------------------%
+function plotNullSetDistributions(WITH,WITHOUT,NullSet,fig_saveDir)
+% Make a nice plot of the nullset
+figName = sprintf('NullSet_%s',mfilename);
+fh = mrvNewGraphWin(figName);
+[y,x] = hist([WITH.rmseall{1} WITHOUT.rmseall{1}],0:100);
+bar(x,y/sum(y),'FaceColor','k','EdgeColor','k');
+set(gca,'tickdir','out','box','off','FontSize',16,'ylim',[0 .08],'xlim',[0 100],'dataaspectratio',[1 .0025 1]);
+ylabel('Probability','FontSize',16);
+xlabel('rmse','FontSize',16);
+saveFig(fh,fullfile(fig_saveDir,figName));
+
+figName = sprintf('NullSetTwoDist_%s',mfilename);
+fh = mrvNewGraphWin(figName);
+[yw,xw] = hist(WITH.rmseall{1},0:100);
+bb = bar(xw,yw/sum(yw),'FaceColor','k','EdgeColor','k');
+set(get(bb,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5);
+hold on
+plot([median(WITH.rmseall{1}) median(WITH.rmseall{1})],[0 .08],'r-')
+[yw,xw] = hist(WITHOUT.rmseall{1},0:100);
+bb = bar(xw,yw/sum(yw),'FaceColor','r','EdgeColor','r');
+set(get(bb,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5);
+plot([median(WITHOUT.rmseall{1}) median(WITHOUT.rmseall{1})],[0 .08],'r-')
+set(gca,'tickdir','out','box','off','FontSize',16,'ylim',[0 .08],'xlim',[0 100],'dataaspectratio',[1 .0025 1]);
+ylabel('Probability','FontSize',16);
+xlabel('rmse','FontSize',16);
+saveFig(fh,fullfile(fig_saveDir,figName));
+
+figName = sprintf('NullSetWith_%s',mfilename);
+fh = mrvNewGraphWin(figName);
+[yw,xw] = hist(WITH.rmseall{1},0:100);
+bb = bar(xw,yw/sum(yw),'FaceColor','k','EdgeColor','k');
+set(gca,'tickdir','out','box','off','FontSize',16,'ylim',[0 .08],'xlim',[0 100],'dataaspectratio',[1 .0025 1]);
+hold on
+plot([median(WITH.rmseall{1}) median(WITH.rmseall{1})],[0 .08],'r-')
+ylabel('Probability','FontSize',16);
+xlabel('rmse','FontSize',16);
+saveFig(fh,fullfile(fig_saveDir,figName));
+
+figName = sprintf('NullSetWithout_%s',mfilename);
+fh = mrvNewGraphWin(figName);
+[yw,xw] = hist(WITHOUT.rmseall{1},0:100);
+bb = bar(xw,yw/sum(yw),'FaceColor','r','EdgeColor','r');
+set(gca,'tickdir','out','box','off','FontSize',16,'ylim',[0 .08],'xlim',[0 100],'dataaspectratio',[1 .0025 1]);
+hold on
+plot([median(WITHOUT.rmseall{1}) median(WITHOUT.rmseall{1})],[0 .08],'r-')
+ylabel('Probability','FontSize',16);
+xlabel('rmse','FontSize',16);
+saveFig(fh,fullfile(fig_saveDir,figName));
+
+end
 
 %-----------------------%
 function fold = checkFolders(foldersToCheck)

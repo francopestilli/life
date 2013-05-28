@@ -1,4 +1,4 @@
-function s_ms_fs_test_broca_wernicke_connection(hemisphere)
+function s_ms_fs_test_broca_wernicke_connection_FP(hemisphere)
 %
 % This script shows the basic workflow for a test of the conenctvity
 % between two cortical areas.
@@ -68,12 +68,12 @@ if ~exist(fullfile(feSaveDir,[feSaveName,'_culled.mat']),'file')
         clear vRoi
         
         % (5) Build the life model for the clipped connectome
-        dataRootPath  = fullfile('/biac2/wandell2/data/diffusion/pestilli/20110922_1125');
-        subfolders    = fullfile('150dirs_b2000_1');
+        dataRootPath  = fullfile('/biac2/wandell2/data/diffusion/pestilli/20120718_2975');
+        subfolders    = fullfile('96dirs_b2000_1point5iso_1/');
         baseDir       = fullfile(dataRootPath,subfolders);
         dtFile        = fullfile(baseDir,'dt6.mat');
-        dwiFile       = fullfile(dataRootPath,'raw','0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
-        dwiFileRepeat = fullfile(dataRootPath,'raw','0007_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
+        dwiFile       = fullfile(dataRootPath,'preprocessed','run01_fliprot_aligned_trilin.nii.gz');
+        dwiFileRepeat = fullfile(dataRootPath,'preprocessed','run02_fliprot_aligned_trilin.nii.gz');
         t1File        = fullfile(dataRootPath,'t1','t1.nii.gz');
         diffusionModelParams = [1,0];
         fe = feConnectomeInit(dwiFile,dtFile,fg,feSaveName,feSaveDir,dwiFileRepeat,t1File,diffusionModelParams);
@@ -189,5 +189,5 @@ fprintf('[%s] saving figure... \n%s\n',mfilename,figName);
 
 % do the printing here:
 eval(printCommand);
-
 end
+

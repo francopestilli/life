@@ -69,16 +69,29 @@ for irep = 1:length(rep)
     [fas, keepFascicles] = feSegmentFascicleFromConnectome(fg, rois, operation, 'prob connectome');
     
     if displayFascicles && (irep == 1)
+                figName = sprintf('Test_ILF_SUBTRACTION_Connectome_alphaOne_rep%i_%s_lmax%i',irep,fname,lmax(i_lmax));
+        [~, lightHandle, sHcc] = mbaDisplayConnectome(fg.fibers,figure,[.8 .2 .1] ,'single',[],.8);
+        set(gcf,'color','w')
+        drawnow
+        saveFig(gcf,fullfile(saveDir,figName),0)  
+                      
         weights = feGet(fe,'fiber weights');
-        figName = sprintf('Test_ILF_SUBTRACTION_Connectome_rep%i_%s_lmax%i',irep,fname,lmax(i_lmax));
-        [~, lightHandle, sHcc] = mbaDisplayConnectome(fg.fibers,figure,[.8 .2 .1] ,'single',[],0.005+weights);
+
+        figName = sprintf('Test_ILF_SUBTRACTION_Connectome_AlphaWeighted_rep%i_%s_lmax%i',irep,fname,lmax(i_lmax));
+        [~, lightHandle, sHcc] = mbaDisplayConnectome(fg.fibers,figure,[.8 .2 .1] ,'single',[],0.0065+weights);
+        set(gcf,'color','w')
+        drawnow
+        saveFig(gcf,fullfile(saveDir,figName),0) 
+        
+        figName = sprintf('Test_ILF_SUBTRACTION_Connectome_ILF_rep%i_%s_lmax%i',irep,fname,lmax(i_lmax));
+        [~, lightHandle, sHcc] = mbaDisplayConnectome(fg.fibers,figure,[.8 .2 .1] ,'single',[],0.0065+weights);
         delete(lightHandle)
         [~, lightHandle, sHfas] = mbaDisplayConnectome(fas.fibers,gcf,[] ,'single',[],.7);
         delete(lightHandle)
         lightHandle = camlight('right');
         set(gcf,'color','w')
         drawnow
-        saveFig(gcf,fullfile(saveDir,figName),0)
+        saveFig(gcf,fullfile(saveDir,figName),0)     
         close all
     end
     
@@ -209,9 +222,9 @@ if ~exist( fileparts(figName), 'dir'), mkdir(fileparts(figName));end
     fprintf('[%s] saving figure... \n%s\n',mfilename,figName);
 
 if ~eps
-    eval(sprintf('print(%s, ''-djpeg90'', ''-opengl'', ''%s'')', num2str(h),figName));
+     eval(sprintf('print(%s, ''-djpeg90'', ''-opengl'', ''%s'')', num2str(h),figName));
 else
-    eval(sprintf('print(%s, ''-cmyk'', ''-painters'',''-depsc2'',''-tiff'',''-r500'' , ''-noui'', ''%s'')', num2str(h),figName));
+     eval(sprintf('print(%s, ''-cmyk'', ''-painters'',''-depsc2'',''-tiff'',''-r500'' , ''-noui'', ''%s'')', num2str(h),figName));
 end
 
 end

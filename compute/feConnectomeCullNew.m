@@ -34,7 +34,7 @@ function [fe, o, fefitGood] = feConnectomeCullNew(fe,maxNumInter, redux)
 
 % For large Conectomes this number might need to be increased, convergence
 % might require more interations.
-if notDefined('maxNumInter'), maxNumInter = 100;end
+if notDefined('maxNumInter'), maxNumInter = 500;end
 
 % The percent of fibers to remove at each iteration.
 if notDefined('redux')

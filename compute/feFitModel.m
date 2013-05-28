@@ -43,7 +43,7 @@ switch fitMethod
     options      = optimset('lsqnonneg');
     w = lsqnonneg(M,dSig,options);
     fprintf(' ...fit process completed in %2.3fs\n',toc)
-
+    R2=[];
   case {'sgd','sgdnn'}% stochastic gradient descend, or non-negative stochastic gradient descend
     tic
     % Stochastic gradient descent method.
