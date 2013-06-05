@@ -19,8 +19,9 @@ dtFile        = '/biac2/wandell2/data/diffusion/pestilli/20110922_1125/dt6.mat';
 dwiFile       = '/biac2/wandell2/data/diffusion/pestilli/20110922_1125/raw/0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz';
 dwiFileRepeat = '/biac2/wandell2/data/diffusion/pestilli/20110922_1125/raw/0009_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz';
 t1File        = '/biac2/wandell2/data/diffusion/pestilli/20110922_1125/t1/t1.nii.gz';
-savedir       = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/life_mrtrix_rep1/results/lh';
-   
+savedir       = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/life_mrtrix_rep1/results/hemisphere';
+feFileName = fullfile(savedir,sprintf('fe_culled_FP_150_B2000_Lmax8-%s',hemisphere))
+
 %% Initialize the Connectome
 fe = feConnectomeInit(dwiFile,dtFile,fgFileName,feFileName,savedir,dwiFileRepeat,t1File);
 
