@@ -1,4 +1,4 @@
-function s_ms_test_connectomes_display_dwi(trackingType,lmax,bval,rep)
+function s_ms_test_connectomes_display_dwi(trackingType,lmax,bval,rep,volume)
 %
 % s_ms_test_connectomes_display_dwi(trackingType,lmax,bval,rep)
 %
@@ -17,42 +17,45 @@ if notDefined('rep'),         rep          = 1;end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
 if notDefined('saveDir'), saveDir = fullfile('/home/frk/Dropbox','connectomes_figures');end
 dirs = 100;
-volume = [0 0 -3 dirs];
+if notDefined('volume')
+volume = [0 -20 0 dirs];
+end
 
-xlim = [0 50];
-ylim = [-100 -60];
+xlim = [-80   0];
+ylim = [-100 80];
 
 % High-resolution Anatomy
 t1File = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/150dirs_b2000/t1/t1.nii.gz';
+t1     = niftiRead(t1File);
 
 % Information on the path to the files to load.
 % This is where the inputs will be loaded from
-feFileToLoad = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams);
+% feFileToLoad = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams);
+feFileToLoad = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/results/life_mrtrix_rep1/fe_hemispheres/fe_culled_FP_150_B2000_LMAX8_left.mat';
 
 % Get the fe structure
+disp('Loading the FE structure...')
 load(feFileToLoad);
+
+% Get the xform and the coordinates
+xform  = feGet(fe,'xform img 2 acpc');
+coords = feGet(fe,'roicoords')+1; % This is weird, it appears that i need to add 1 to all the coordinates
 
 % Get the signal into an image.
 dSig    = feGet(fe,'dsigdemeanedvox');
-dSigImg = feValues2volume(dSig,feGet(fe,'roicoords'),feGet(fe,'volumesize')-[0 0 0 10]);
+dSigImg = feValues2volume(dSig,coords,feGet(fe,'volumesize')-[0 0 0 10]);
 
 % Create the nifti structure
-niM  = niftiCreate('data',dSigImg, ...
-    'qto_xyz',feGet(fe,'xform img 2 acpc'), ...
-    'fname','dwi_measured_signal', ...
-    'data_type',class(dSigImg));
+niM  = niftiCreate('data',dSigImg(:,:,:,volume(end)), ...
+                   'qto_xyz',xform, ...
+                   'fname','dwi_measured_signal', ...
+                   'data_type',class(dSigImg));
 
-% Resample at the resolution of the T1.
-%niM = mrAnatResampleToNifti(niM,t1File);
-
-% Dispaly the good fibers 
-fh = mrvNewGraphWin('Measured DW signal');
-feDisplayBrainSlice( niM, volume);
-view(0,90)
-axis equal
-hold on
-set(gca,'xlim',[0 50],'ylim',[-100 -60])
-set(fh,'Position',[0 0 .45 .95],'Color',[0 0 0]);
+% Measured signal 
+fh = mrvNewGraphWin('Measured Diffusion signal');
+sh = mbaDisplayOverlay(t1, niM, volume(1:3), [], 'jet');
+set(gca,'xlim',xlim,'ylim',ylim)
+set(fh, 'Position',[0 0 .45 .95],'Color',[0 0 0]);
 drawnow
 
 saveFig(fh,fullfile(saveDir,sprintf('dwi_measured_signal_dir%i_%s_lmax%i_bval%i_rep%i_diffMode%i_%i',dirs,trackingType,lmax,bval,rep, ...
@@ -60,24 +63,17 @@ saveFig(fh,fullfile(saveDir,sprintf('dwi_measured_signal_dir%i_%s_lmax%i_bval%i_
 
 % Get the signal into an image.
 dSig    = feGetRep(fe,'dsigdemeanedvox');
-dSigImg = feValues2volume(dSig,feGet(fe,'roicoords'),feGet(fe,'volumesize')-[0 0 0 10]);
+dSigImg = feValues2volume(dSig,coords,feGet(fe,'volumesize')-[0 0 0 10]);
 
 % Create the nifti structure
-niM  = niftiCreate('data',dSigImg, ...
-    'qto_xyz',feGet(fe,'xform img 2 acpc'), ...
+niM  = niftiCreate('data',dSigImg(:,:,:,volume(end)), ...
+    'qto_xyz',xform, ...
     'fname','dwi_measured_signal', ...
     'data_type',class(dSigImg));
 
-% Resample at the resolution of the T1.
-%niM = mrAnatResampleToNifti(niM,t1File);
-
-% Dispaly the good fibers 
 fh = mrvNewGraphWin('Measured DW signal 2');
-feDisplayBrainSlice( niM, volume);
-view(0,90)
-axis equal
-hold on
-set(gca,'xlim',[0 50],'ylim',[-100 -60])
+sh = mbaDisplayOverlay(t1, niM, volume(1:3), [], 'jet');
+set(gca,'xlim',xlim,'ylim',ylim)
 set(fh,'Position',[0 0 .45 .95],'Color',[0 0 0]);
 drawnow
 
@@ -87,24 +83,18 @@ saveFig(fh,fullfile(saveDir,sprintf('dwi_measured_signal_2_dir%i_%s_lmax%i_bval%
 %% Predicted signal
 % Get the signal into an image.
 pSig    = feGet(fe,'psigfvox');
-pSigImg = feValues2volume(pSig,feGet(fe,'roicoords'),feGet(fe,'volumesize')-[0 0 0 10]);
-keyboard
+pSigImg = feValues2volume(pSig,coords,feGet(fe,'volumesize')-[0 0 0 10]);
+
 % Create the nifti structure
-niP  = niftiCreate('data',pSigImg, ...
-    'qto_xyz',feGet(fe,'xform img 2 acpc'), ...
+niP  = niftiCreate('data',pSigImg(:,:,:,volume(end)), ...
+    'qto_xyz',xform, ...
     'fname','dwi_predicted_signal', ...
     'data_type',class(pSigImg));
 
-% Resample at the resolution of the T1.
-%niP = mrAnatResampleToNifti(niP,t1File);
-
 % Dispaly the good fibers 
 fh = mrvNewGraphWin('Predicted DW signal');
-feDisplayBrainSlice( niP, volume);
-view(0,90)
-axis equal
-hold on
-set(gca,'xlim',[0 50],'ylim',[-100 -60])
+sh = mbaDisplayOverlay(t1, niP, volume(1:3),[],'jet');
+set(gca,'xlim',xlim,'ylim',ylim)
 set(fh,'Position',[0 0 .45 .95],'Color',[0 0 0]);
 drawnow
 
@@ -113,29 +103,48 @@ saveFig(fh,fullfile(saveDir,sprintf('dwi_predicted_signal_dir%i_%s_lmax%i_bval%i
 
 %% Error signal
 % Get the signal into an image.
-eSig    = feGet(fe,'voxrmse');%'resfibervox')';
-eSigImg = feValues2volume(eSig,feGet(fe,'roicoords'),feGet(fe,'volumesize')-[0 0 0 10]);
+eSig    = feGetRep(fe,'voxrmse');%'resfibervox')';
+volSiz = feGet(fe,'volumesize');
+volSiz = volSiz(1:3);
+eSigImg = feValues2volume(eSig,coords,volSiz);
 
 % Create the nifti structure
-ni  = niftiCreate('data',eSigImg, ...
-    'qto_xyz',feGet(fe,'xform img 2 acpc'), ...
-    'fname','dwi_predicted_signal', ...
+niE  = niftiCreate('data',eSigImg, ...
+    'qto_xyz',xform, ...
+    'fname','dwi_rmse_signal', ...
     'data_type',class(eSigImg));
 
-% Resample at the resolution of the T1.
-%ni = mrAnatResampleToNifti(ni,t1File);
-
 % Dispaly the good fibers 
-fh = mrvNewGraphWin('Predicted DW signal');
-feDisplayBrainSlice( ni, volume);
-view(0,90)
-axis equal
-hold on
-set(gca,'xlim',[0 50],'ylim',[-100 -60])
+fh = mrvNewGraphWin('RMSE cross-validated');
+sh = mbaDisplayOverlay(t1, niE, volume(1:3));
+set(gca,'xlim',xlim,'ylim',ylim)
 set(fh,'Position',[0 0 .45 .95],'Color',[0 0 0]);
 drawnow
 
 saveFig(fh,fullfile(saveDir,sprintf('dwi_rmse_signal_dir%i_%s_lmax%i_bval%i_rep%i_diffMode%i_%i',dirs,trackingType,lmax,bval,rep, ...
+  100*diffusionModelParams(1),100*diffusionModelParams(2))));
+
+%% Rrmse
+% Get the signal into an image.
+rSig    = feGetRep(fe,'voxrmseratio');%'resfibervox')';
+volSiz = feGet(fe,'volumesize');
+volSiz = volSiz(1:3);
+rSigImg = feValues2volume(rSig,coords,volSiz);
+
+% Create the nifti structure
+niR  = niftiCreate('data',rSigImg, ...
+    'qto_xyz',xform, ...
+    'fname','dwi_rmse_signal', ...
+    'data_type',class(eSigImg));
+
+% Dispaly the good fibers 
+fh = mrvNewGraphWin('Rrmse DW signal');
+sh = mbaDisplayOverlay(t1, niR, volume(1:3));
+set(gca,'xlim',xlim,'ylim',ylim)
+set(fh,'Position',[0 0 .45 .95],'Color',[0 0 0]);
+drawnow
+
+saveFig(fh,fullfile(saveDir,sprintf('dwi_Rrmse_dir%i_%s_lmax%i_bval%i_rep%i_diffMode%i_%i',dirs,trackingType,lmax,bval,rep, ...
   100*diffusionModelParams(1),100*diffusionModelParams(2))));
 
 end

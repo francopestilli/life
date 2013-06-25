@@ -9,7 +9,7 @@ function vol3d = feValues2volume(vals,coords,vSize)
 % coords -  N x 3 matrix of coords, (not in acpc)
 % vSize  -  The size of the image volume 
 % 
-% Franco (c) 2012 Stanford VISTA Team 
+% Written by Franco Pestilli (c) Vistasoft Stanford University 2013
 
 % Check that we have a value for each coordinate.
 if ~( length(vals) == size(coords,1) )
