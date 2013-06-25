@@ -5,7 +5,8 @@ function feFileToLoad = s_ms_connectomes_rmse(connectomeType,rep)
 % Loads a connectome and produces a figure of the rmse M-D and rmse D-D.
 %
 % Written by Franco Pestilli (c) Stanford University 2013 
-if notDefined('rep'),         rep          = [1,2,3];end
+if notDefined('connectomeType'), connectomeType = 6;end
+if notDefined('rep'),         rep          = [1,2];end
 if notDefined('cullType'),   cullType={'culledL2',''};end
 if notDefined('saveDir'), saveDir = fullfile('/home/frk/Dropbox','connectomes_rmse');end
 colors = {[.25 .25 .25],[.5 .5 .5],[.75 .75 .75]};
@@ -53,10 +54,12 @@ for irep = 1:length(rep)
     
     if irep == 1
         % Make a 2D histogram pf the RMSEt
-        figNameRmseMap = sprintf('rmse_map_hist_%s_%',fName,cullType{icull});
+        figNameRmseMap = sprintf('rmse_map_hist_%s_%s',fName,cullType{icull});
         fhRmseMap = mrvNewGraphWin(figNameRmse);
         [ymap,x]= hist3([Mrmse;Drmse]',{[1:.5:60], [1:.5:60]});
-        sh = imagesc(flipud(ymap));colormap(flipud(hot)); view(0,90);
+        ymap = ymap./length(Mrmse);
+        sh = imagesc(flipud(log10(ymap)));
+        cm = colormap(flipud(hot)); view(0,90);
         axis('square')
         set(gca,'xlim',[0 length(x{2})],...
             'ylim',    [0 length(x{2})], ...
@@ -76,12 +79,20 @@ for irep = 1:length(rep)
             'xtick',[0 30 60 90 length(x{2})], ...
             'yticklabel',[x{2}(end) 45 30 15 0], ...
             'xticklabel',[0 15 30 45 x{2}(end)], ...
-            'tickdir','out','box','off', ...
+            'tickdir','out','ticklen',[.025 .05],'box','off', ...
             'fontsize',fontSiz','visible','on')
         hold on
         plot3([0 120],[120 0],[max(ymap(:)) max(ymap(:))],'k-','linewidth',1)
-        ylabel('Model_{rmse}','fontsize',fontSiz)
-        xlabel('Data_{rmse}','fontsize',fontSiz)
+        ylabel('M_{rmse}','fontsize',fontSiz)
+        xlabel('D_{rmse}','fontsize',fontSiz)
+        cb = colorbar;
+        tck = get(cb,'ytick');
+        set(cb,'yTick',[min(tck)  mean(tck) max(tck)], ...
+               'yTickLabel',round(10000*10.^[min(tck),...
+                                 mean(tck), ...
+                                 max(tck)])/10000, ...
+               'tickdir','out','ticklen',[.025 .05],'box','on', ...
+               'fontsize',fontSiz','visible','on')
         saveFig(fhRmseMap,fullfile(saveDir,figNameRmseMap),1);
     end
 

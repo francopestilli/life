@@ -9,9 +9,9 @@ function s_ms_test_connectomes_maps(trackingType,dataType,lmax,diffusionModelPar
 % Franco (C) 2012 Stanford VISTA team.
 
 if notDefined('trackingType'),trackingType = {'p'};end
-if notDefined('lmax'),        lmax         = [6,8,10,12,14,16,4,2];end
+if notDefined('lmax'),        lmax         = [8];end
 if notDefined('bval'),        bval         = 2000;end
-if notDefined('rep'),         rep          = [1,2,3];end
+if notDefined('rep'),         rep          = [1];end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
 if notDefined('cullType'),   cullType={'','culledL2'};end
 if notDefined('saveDir'), saveDir = fullfile('/home/frk/Dropbox','connectomes_hists_maps');end
@@ -27,7 +27,7 @@ wx     = 1:length(wxBins);
 fontSiz    = 16;
 doMaps     = 1;
 doFD       = 1;
-doRMSE     = 0;
+doRMSE     = 1;
 figVisible = 'on';
 
 for itrk = 1:length(trackingType)
@@ -64,6 +64,7 @@ for itrk = 1:length(trackingType)
                     end
                     
                     if doMaps
+                        coords = feGet(fe,'roi coords') + 1;
                     if irep == 1
                         % Make a plot of the maps
                         slice = 26:37;
@@ -72,7 +73,8 @@ for itrk = 1:length(trackingType)
                                 % Fiber density maps
                                 figName = sprintf('FDM_%s_rep%i_%s_slice%i',fname,irep,cullType{icull},slice(is));
                                 fh = figure('name',figName,'visible',figVisible,'color','w');
-                                img = feReplaceImageValues(nan(feGet(fe,'map size')),fd(:,icull)',feGet(fe,'roiCoords'));
+                                img = feReplaceImageValues(nan(feGet(fe,'map size')),fd(:,icull)',coords);
+                                keyboard
                                 % This will be used tonormalize the fiber density plots
                                 if  (icull == 1)
                                     maxfd(irep) = nanmax(img(:));
@@ -93,7 +95,7 @@ for itrk = 1:length(trackingType)
                                 figName = sprintf('FWM_%s_rep%i_%s_slice%i',fname,irep,cullType{icull},slice(is));
                                 fh = figure('name',figName,'visible',figVisible,'color','w');
                                 
-                                img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,3))',feGet(fe,'roiCoords'));
+                                img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,3))',coords);
                                 % This will be used tonormalize the fiber density plots
                                 if (icull == 1)
                                     maxw(irep) = nanmax(img(:));
@@ -117,7 +119,7 @@ for itrk = 1:length(trackingType)
                             fh = figure('name',figName,'visible',figVisible,'color','w');
                             
                             rmse = feGetRep(fe, 'vox rmse');
-                            img = feReplaceImageValues(nan(feGet(fe,'map size')),rmse,feGet(fe,'roiCoords'));
+                            img = feReplaceImageValues(nan(feGet(fe,'map size')),rmse,coords);
                             if (icull == 1)
                                 maxw(irep) = 60;
                                 %maxw(irep) = nanmax(img(:));
@@ -140,7 +142,7 @@ for itrk = 1:length(trackingType)
                             fh = figure('name',figName,'visible',figVisible,'color','w');
                             
                             rmse = feGetRep(fe, 'vox rmse data');
-                            img = feReplaceImageValues(nan(feGet(fe,'map size')),rmse,feGet(fe,'roiCoords'));
+                            img = feReplaceImageValues(nan(feGet(fe,'map size')),rmse,coords);
                             if (icull == 1)
                                 maxw(irep) = 60;
                                 %maxw(irep) = nanmax(img(:));
@@ -162,7 +164,7 @@ for itrk = 1:length(trackingType)
                             fh = figure('name',figName,'visible',figVisible,'color','w');
                             
                             rmse = feGetRep(fe, 'vox rmse ratio');
-                            img = feReplaceImageValues(nan(feGet(fe,'map size')),rmse,feGet(fe,'roiCoords'));
+                            img = feReplaceImageValues(nan(feGet(fe,'map size')),rmse,coords);
                             if (icull == 1)
                                 maxw(irep) = nanmax(img(:));
                                 minw(irep) = nanmin(img(:));

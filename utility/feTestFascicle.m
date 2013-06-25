@@ -7,7 +7,7 @@ function [feWithoutFas,  feWithFas, connectivity, newFascicleIndices, indicesFib
 % This file tests the hypothesis of the importance of a fascicle in a
 % volume of white matter.
 %
-% Franco (c) Stanford Vista Team 2013
+% Written by Franco Pestilli (c) Vista Team, Stanford University 2013
 
 if notDefined('displayFibers'),   displayFibers = 0;end
 if notDefined('refitConnectome'), refitConnectome=1;end
