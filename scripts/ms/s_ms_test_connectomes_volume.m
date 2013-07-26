@@ -8,20 +8,20 @@ function s_ms_test_connectomes_volume(trackingType,lmax,diffusionModelParams)
 %
 % Franco (C) 2012 Stanford VISTA team.
 
-if notDefined('trackingType'),trackingType = 'd';end
+if notDefined('trackingType'),trackingType = 'p';end
 if notDefined('lmax'),        lmax         = 8;end
 if notDefined('bval'),        bval         = 2000;end
-if notDefined('rep'),         rep          = [1,2,3];end
+if notDefined('rep'),         rep          = [1,2];end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
 if notDefined('cullType'),   cullType='culledL2';end
 if notDefined('saveDir'), saveDir = fullfile('/home/frk/Dropbox','connectomes_volume');end
 % Check that the connectome were proprocessed before attempting to make a
 % plot.
-done = s_ms_check_processes([],trackingType,lmax,bval,cullType);
-if ~all(done), 
-    fprintf('\n[%s] Not all connectomes were proprocessed... not proceeding with plot.\n',mfilename);
-    return
-end
+% done = s_ms_check_processes([],trackingType,lmax,bval,cullType);
+% if ~all(done), 
+%     fprintf('\n[%s] Not all connectomes were proprocessed... not proceeding with plot.\n',mfilename);
+%     return
+% end
 
 for i_lmax = 1:length(lmax)
     % Loop over Bvalues and tracking reps.

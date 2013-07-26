@@ -1,4 +1,4 @@
-function s_ms_test_connectomes_maps2(trackingType,dataType,lmax,diffusionModelParams,recompute)
+function s_ms_test_connectomes_maps2_hemisphere(trackingType,dataType,lmax,diffusionModelParams,recompute)
 %
 % Load FE structeres obtained by preprocessing connectomesconstrained within a
 % region of interest and within the cortex and makes some basic plot of
@@ -255,7 +255,6 @@ for itrk = 1:length(trackingType)
                     xlabel('Fibers per voxel')
                     set(gca,'tickdir','out','ticklength',[0.025 0],'box','off','FontSize',fontSiz,'ylim',[0 0.4], ...
                         'xlim',[0 max(x)+1],'xtick',x,'xticklabel',xBins);
-                end
             end
             title(sprintf('Dynamic range | Before %2.2f | After %2.2f',mean(dyrng{1}),mean(dyrng{2})))
             saveFig(fh,fullfile(saveDir,figName),1)

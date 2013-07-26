@@ -1,4 +1,4 @@
-function s_ms_mt_ips(hemisphere,saveDir)
+function s_ms_mt_ips_pooledsd(hemisphere,saveDir)
 %
 % This script performs a test of conenctivity of MT+ (LO1 and LO2) with
 % IPS0. THe following are the steps we perform:
@@ -23,7 +23,7 @@ if notDefined('saveDir'),
     saveDir = sprintf('~/Dropbox/connectomes_plot_mt_ips/%s',mfilename);
 end
 if notDefined('hemisphere'), hemisphere = {'left','right'};end
-if notDefined('plotSlices'), plotSlices = 1;end
+if notDefined('plotSlices'), plotSlices = 0;end
 
 nboots      = 10000;
 nmontecarlo = 100;
@@ -40,7 +40,8 @@ switch hemisphere{ih}
         slices     = {[-18 0 0],[0 -40 0],[0 0 -14 ]};
         lght       = 'left';
         SLaxLims   = [-55 2 -120 120 -20 40 ];
-        histcolor  = [0.4 0.4 0.4];
+        histcolor{1}  = [0.4 0.4 0.4];
+        histcolor{2}  = [.6 0.4 0.4];
 
     case {'right'}
         feFileName = 'fe_culled_FP_150_B2000_LMAX8_right.mat';
@@ -51,8 +52,9 @@ switch hemisphere{ih}
         slices     = {[18 0 0],[0 -40 0],[0 0 -14 ]};
         lght       = 'right';
         SLaxLims   = [-2 55 -120 120 -20 40 ];
-        histcolor  = [0 0 0];
-
+        histcolor{1}  = [0 0 0]; 
+        histcolor{2}  = [.8 0.4 0.4];
+        
     otherwise
         keyboard
 end
@@ -140,30 +142,39 @@ WITHOUT.rrmse   = median(feGetRep(feWithoutFas,'vox  rmse ratio'));
 WITHOUT.rmseall = (feGetRep(feWithoutFas,'vox  rmse'));
 
 %% The following is the code for the bootstrap test on the MEAN rmse
-e_rmse      = mean(WITHOUT.rmseall);
-NullSet     = [WITH.rmseall];
 sizeWith    = length(WITH.rmseall);
+nullDistributionW = nan(nboots,nmontecarlo);
+nullDistributionWO = nan(nboots,nmontecarlo);
+clear y x y_m y_e ;
 
-nullDistribution = nan(nboots,nmontecarlo);
 for inm = 1:nmontecarlo
     parfor ibt = 1:nboots
-        nullDistribution(ibt,inm) = mean(randsample(NullSet,sizeWith,true));
+        nullDistributionW(ibt,inm) = mean(randsample(WITH.rmseall,   sizeWith,true));      
+        nullDistributionWO(ibt,inm) = mean(randsample(WITHOUT.rmseall,sizeWith,true));
     end
     
-    [y(:,inm),xhis] = hist(nullDistribution(:,inm),linspace(28.5,31.5,100));
+    % Distribution With
+    [y(:,inm),xhis] = hist(nullDistributionW(:,inm),linspace(28.5,35.5,200));
     y(:,inm) = y(:,inm)./sum(y(:,inm));
+    
+    % Distribution without
+    [woy(:,inm),woxhis] = hist(nullDistributionWO(:,inm),linspace(28.5,35.5,200));
+    woy(:,inm) = woy(:,inm)./sum(woy(:,inm));
 end
 y_m = mean(y,2);
 y_e = [y_m, y_m] + 2*[-std(y,[],2),std(y,[],2)];
+
+ywo_m = mean(woy,2);
+ywo_e = [ywo_m, ywo_m] + 2*[-std(woy,[],2),std(woy,[],2)];
 
 % Plot the null distribution and the empirical difference
 figName = sprintf('Test_MT_IPS0_connection_rmse_mean_HIST_%s_%s',hemisphere{ih},feFileName(1:end-4));
 fh = mrvNewGraphWin(figName);
 %bar(x,y_m,'k')
 %plot([xhis,xhis],y_e','color',[.3 .3 .3]); % Error bars for the distribution in
-patch([min(xhis), xhis,xhis, max(xhis)],[0, y_e(:)', 0],histcolor,'FaceColor',histcolor,'EdgeColor',histcolor); % Distribution as the +/- 2SD
+patch([xhis,xhis],y_e(:),histcolor{1},'FaceColor',histcolor{1},'EdgeColor',histcolor{1}); % Distribution as the +/- 2SD
 hold on
-plot([e_rmse,e_rmse],[0 max(y_m)],'r-','linewidth',2)
+patch([woxhis,woxhis],ywo_e(:),histcolor{2},'FaceColor',histcolor{2},'EdgeColor',histcolor{2}); % Distribution as the +/- 2SD
 set(gca,'tickdir','out', ...
         'box','off', ...
         'ylim',[0 0.125], ... 
@@ -177,40 +188,44 @@ xlabel('rmse','fontsize',16')
 % (3) Compute the probability that the empirical difference (1) was
 %     observed by chance given th data, by looking at the percentile of the
 %     empirical difference in the Nul distribution (2).
-if max(nullDistribution)<e_rmse
-      p = 100*0.5/nboots;
-else  p = sum(nullDistribution( nullDistribution > e_rmse ),1);
-end
-dprime_mean(:,ih) = repmat(e_rmse,1,nmontecarlo)./std(nullDistribution,[],1);
-title(sprintf('The probability of obtaining the difference by chance is less than %2.6f%%\nStrength of connection evidence %2.3f',p,mean(dprime_mean(:,ih))), ...
+dprime_mean(:,ih) = diff([mean(nullDistributionW,1);mean(nullDistributionWO,1)])./sqrt(sum([std(nullDistributionW,[],1);std(nullDistributionWO,[],1)].^2,1));
+title(sprintf('Strength of connection evidence %2.3f',mean(dprime_mean(:,ih))), ...
     'FontSize',16)
 saveFig(fh,fullfile(saveDir,figName),'eps')
 
 %% The following is the code for the bootstrap test on the MEDIAN rmse
-e_rmse   = median(WITHOUT.rmseall);
-NullSet  = [WITH.rmseall];
-sizeWith = length(WITH.rmseall);
+sizeWith    = length(WITH.rmseall);
+nullDistributionW = nan(nboots,nmontecarlo);
+nullDistributionWO = nan(nboots,nmontecarlo);
 
-nullDistribution = nan(nboots,nmontecarlo);
 for inm = 1:nmontecarlo
     parfor ibt = 1:nboots
-        nullDistribution(ibt,inm) = median(randsample(NullSet,sizeWith,true));
+        nullDistributionW(ibt,inm) = median(randsample(WITH.rmseall,   sizeWith,true));      
+        nullDistributionWO(ibt,inm) = median(randsample(WITHOUT.rmseall,sizeWith,true));
     end
     
-    [y(:,inm),xhis] = hist(nullDistribution(:,inm),linspace(28.5,31.5,100));
+    % Distribution With
+    [y(:,inm),xhis] = hist(nullDistributionW(:,inm),linspace(28.5,34.5,200));
     y(:,inm) = y(:,inm)./sum(y(:,inm));
+    
+    % Distribution without
+    [woy(:,inm),woxhis] = hist(nullDistributionWO(:,inm),linspace(28.5,34.5,200));
+    woy(:,inm) = woy(:,inm)./sum(woy(:,inm));
 end
 y_m = mean(y,2);
 y_e = [y_m, y_m] + 2*[-std(y,[],2),std(y,[],2)];
+
+ywo_m = mean(woy,2);
+ywo_e = [ywo_m, ywo_m] + 2*[-std(woy,[],2),std(woy,[],2)];
 
 % Plot the null distribution and the empirical difference
 figName = sprintf('Test_MT_IPS0_connection_rmse_median_HIST_%s_%s',hemisphere{ih},feFileName(1:end-4));
 fh = mrvNewGraphWin(figName);
 %bar(x,y_m,'k')
 %plot([xhis,xhis],y_e','color',[.3 .3 .3]); % Error bars for the distribution in
-patch([min(xhis), xhis,xhis, max(xhis)],[0, y_e(:)', 0],histcolor,'FaceColor',histcolor,'EdgeColor',histcolor); % Distribution as the +/- 2SD
+patch([xhis,xhis],y_e(:),histcolor{1},'FaceColor',histcolor{1},'EdgeColor',histcolor{1}); % Distribution as the +/- 2SD
 hold on
-plot([e_rmse,e_rmse],[0 max(y_m)],'r-','linewidth',2)
+patch([woxhis,woxhis],ywo_e(:),histcolor{2},'FaceColor',histcolor{2},'EdgeColor',histcolor{2}); % Distribution as the +/- 2SD
 set(gca,'tickdir','out', ...
         'box','off', ...
         'ylim',[0 0.125], ... 
@@ -223,12 +238,8 @@ xlabel('rmse','fontsize',16')
 % (3) Compute the probability that the empirical difference (1) was
 %     observed by chance given th data, by looking at the percentile of the
 %     empirical difference in the Nul distribution (2).
-if max(nullDistribution)<e_rmse
-      p = 100*0.5/nboots;
-else  p = sum(nullDistribution( nullDistribution > e_rmse ),1);
-end
-dprime_median(:,ih) = repmat(e_rmse,1,nmontecarlo)./std(nullDistribution,[],1);
-title(sprintf('The probability of obtaining the difference by chance is less than %2.6f%%\nStrength of connection evidence %2.3f',p,mean(dprime_median(:,ih))), ...
+dprime_median(:,ih) = diff([mean(nullDistributionW,1);mean(nullDistributionWO,1)])./sqrt(sum([std(nullDistributionW,[],1);std(nullDistributionWO,[],1)].^2,1));
+title(sprintf('Strength of connection evidence %2.3f',mean(dprime_median(:,ih))), ...
     'FontSize',16)
 saveFig(fh,fullfile(saveDir,figName),'eps')
 
@@ -271,7 +282,7 @@ figName = sprintf('Test_MT_IPS0_connection_rmseDiff_HIST_%s_%s',hemisphere{ih},f
 fh = mrvNewGraphWin(figName);
 %bar(x,y_m,'k')
 %plot([xhis,xhis],y_e','color',[.3 .3 .3]); % Error bars for the distribution in
-patch([min(xhis), xhis,xhis, max(xhis)],[0, y_e(:)', 0],histcolor,'FaceColor',histcolor,'EdgeColor',histcolor); % Distribution as the +/- 2SD
+patch([min(xhis), xhis,xhis, max(xhis)],[0, y_e(:)', 0],histcolor{1},'FaceColor',histcolor{1},'EdgeColor',histcolor{1}); % Distribution as the +/- 2SD
 hold on
 plot([EmpiricalDiff,EmpiricalDiff],[0 max(y_m)],'r-','linewidth',2)
 axis([-2 2 0 0.1])
@@ -353,8 +364,8 @@ hb = bar(mStrength,'facecolor','k');
 hold on
 plot([1 1; 2 2]',[eStrength],'r-','linewidth',4)
 set(gca,'xlim',[0.5 2.5],...
-    'ylim',    [0 7], ...
-    'ytick',[0 3.5 7], ...
+    'ylim',    [0 4], ...
+    'ytick',[0 2 4], ...
     'xtick',[1 2], ...
     'xticklabel',{hemisphere{1} hemisphere{2}}, ...
     'tickdir','out','box','off', ...
@@ -371,8 +382,8 @@ hb = bar(mStrength,'facecolor','k');
 hold on
 plot([1 1; 2 2]',[eStrength],'r-','linewidth',4)
 set(gca,'xlim',[0.5 2.5],...
-    'ylim',    [0 300], ...
-    'ytick',[0 150 300], ...
+    'ylim',    [0 7], ...
+    'ytick',[0 3.5 7], ...
     'xtick',[1 2], ...
     'xticklabel',{hemisphere{1} hemisphere{2}}, ...
     'tickdir','out','box','off', ...
@@ -389,9 +400,9 @@ hb = bar(mStrength,'facecolor','k');
 hold on
 plot([1 1; 2 2]',[eStrength],'r-','linewidth',4)
 set(gca,'xlim',[0.5 2.5],...
-    'ylim',    [0 300], ...
-    'ytick',[0 150 300], ...
-    'xtick',[1 2], ...
+    'ylim',    [0 7], ...
+    'ytick',[0 3.5 7], ...
+     'xtick',[1 2], ...
     'xticklabel',{hemisphere{1} hemisphere{2}}, ...
     'tickdir','out','box','off', ...
     'fontsize',16,'visible','on');

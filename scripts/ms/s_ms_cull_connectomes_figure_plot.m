@@ -5,26 +5,29 @@ function feFileToSave = s_ms_cull_connectomes_figure_plot(connectomeType,rep)
 % Loads a connectome and culls it down to the minimum number of fibers.
 %
 % Written by Franco Pestilli (c) Stanford University 2013 
+if notDefined('connectomeType'), connectomeType = [5];end
 if notDefined('rep'), rep = [1,2];end
+if notDefined('percentRemovedFas'),
+    percentRemovedFas = 'culledL2_example15thP';
+end
 
 if notDefined('fig_saveDir'), 
-    fig_saveDir = fullfile('/home/frk/Dropbox','connectome_culling_figures');
+    fig_saveDir = fullfile('/home/frk/Dropbox','connectome_culling_figures',percentRemovedFas);
     if ~exist(fig_saveDir,'dir');mkdir(fig_saveDir);end
 end
 fontSiz = 16;
-numBins = 60;
-%numIterToanalyze = 25;
-iterToanalyze = [1 2 4 6 8 10 12 14 16 18 20 22 24 26 28];
+numBins = 120;
+iterToanalyze = [1 14];
 
 % We have three reps of each conenctome.
 for irep = 1:length(rep)
-    [trackingType, lmax, bval, diffusionModelParams] = getConditions(connectomeType);
+    [trackingType, lmax, bval, diffusionModelParams] = getConditionsLocal(connectomeType);
     
     % Information on the path to the files to load.
     % This is where the inputs will be loaded from
     feFileToLoad = msBuildFeFileName(trackingType,lmax,bval,rep(irep),diffusionModelParams);
     % This is the file where the output connectome will be saved.
-    feFileToLoad = [feFileToLoad(1:end-4),'culledL2_example15thP','.mat'];
+    feFileToLoad = [feFileToLoad(1:end-4),percentRemovedFas,'.mat'];
     
     % Nowif this connectome was culled already we skip it.
     if exist(feFileToLoad,'file')
@@ -41,67 +44,86 @@ for irep = 1:length(rep)
     rmse(irep,:)      = cullingHist(irep).rmsexv;
     rrmse(irep,:)     = cullingHist(irep).rrmse;
     numFibers(irep,:) = cullingHist(irep).numFibers;
-    percentReduxFibers(irep,:) = 100*(1 - numFibers(irep,:)./numFibers(irep,1));
+    percentInitialNumberOfFascicles(irep,:) = 100.*(numFibers(irep,:)/numFibers(irep,1));
 end
 
 % Root mean square error
-figName = 'culling_cross_validated_rmse';
+figName = 'culling_rmse_and_proportion_fibers';
 fh = mrvNewGraphWin(figName);
+% rmse 
 rmse(:,1) = mean(rmse(:,2:5),2);
-m_rmse  = mean(rmse,1);
-x =1:length(m_rmse);
-err_rmse = [m_rmse; m_rmse] + [-2*std(rmse); 2*std(rmse)];
-plot([x;x],err_rmse,'r-','linewidth',3)
-hold on
-plot(x,m_rmse,'ko-', ...
+m_rmse    = mean(rmse,1);
+err_rmse  = [m_rmse; m_rmse] + 2*[-std(rmse); std(rmse)];
+x         = 1:length(m_rmse)-1;
+
+% proportion of number of fibers
+m_prnf  = mean(percentInitialNumberOfFascicles,1);
+
+[ax,h1,h2] = plotyy(x,m_prnf(1:length(x)),x,m_rmse(1:length(x))); 
+set(h2,'marker','s', ...
     'color','k', ...
     'markerfacecolor','k',...
     'markeredgecolor','w', ...
-    'markersize',8)
-ylabel('cross-validated rmse')
-xlabel('Iteration number')
-%axis('square')
-set(gca,'tickdir','out','box','off','FontSize',fontSiz,'xtick',iterToanalyze)
+    'markersize',12)
+set(h1,'Marker','o', ...
+    'color',[.5 .5 .5], ...
+    'markerfacecolor',[.5 .5 .5],...
+    'markeredgecolor','w', ...
+    'markersize',10)
+set(get(ax(2),'ylabel'),'String','Cross-validated rmse','FontSize',fontSiz);
+set(ax(2), ...
+    'tickdir','out','ycolor','k','box','off','FontSize',fontSiz, ...
+    'xtick',[1 7 14 21 28],...
+    'ytick',[26 28 30 32],'ylim',[25.875 32.125],'xlim',[0.5 29.5],...
+        'PlotBoxAspectRatio',[2 1 1])
+set(get(ax(1),'ylabel'),'String','Proportion fascicle number','FontSize',fontSiz);
+set(ax(1),'ycolor',[.5 .5 .5],...
+    'ylim',[-2 102],'tickdir','out','box','off','FontSize',fontSiz, ...
+    'xtick',[1 7 14 21 28],...
+    'ytick',[0 50 100],'xlim',[0.5 29.5],...
+        'PlotBoxAspectRatio',[2 1 1])
+axes(ax(2));hold on
+plot([x;x],err_rmse(:,1:length(x)),'r-','linewidth',4)
+xlabel('Iteration number','FontSize',fontSiz)
+title(sprintf('Iter: [14 15] | %% fibers: [%i, %i] | rmse: [%2.3f, %2.3f] initial: %2.3f', ...
+      round(m_prnf(14)),round(m_prnf(15)),m_rmse(14),m_rmse(15),m_rmse(1)))
 saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Root-mean squared ratio
-figName = 'culling_cross_validated_Rrmse';
+figName = 'culling_Rrmse_and_proportion_fibers';
 fh = mrvNewGraphWin(figName);
-x =1:length(m_rmse);
+x =1:length(m_rmse)-1;
 rrmse(:,1) = mean(rrmse(:,2:5),2);
-m_rrmse  = mean(rrmse,1);
-err_rrmse = [m_rrmse; m_rrmse] + [-2*std(rrmse); 2*std(rrmse)];
-plot([x;x],err_rrmse,'r-','linewidth',3)
-hold on
-plot(x,m_rrmse,'ko-', ...
+m_rrmse    = mean(rrmse,1);
+err_rrmse  = [m_rrmse; m_rrmse] + [-2*std(rrmse); 2*std(rrmse)];
+[ax,h1,h2] = plotyy(x,m_prnf(1:length(x)),x,m_rrmse(1:length(x))); 
+set(h2,'marker','s', ...
     'color','k', ...
     'markerfacecolor','k',...
     'markeredgecolor','w', ...
-    'markersize',8)
-ylabel('R_{rmse}')
-xlabel('Iteration number')
-%axis('square')
-set(gca,'tickdir','out','box','off','FontSize',fontSiz,'xtick',iterToanalyze)
-saveFig(fh,fullfile(fig_saveDir,figName))
-
-% PErcent reduction in number of fibers from the original number
-figName = 'culling_reduction_in_number_of_fibers';
-fh = mrvNewGraphWin(figName);
-x =1:length(percentReduxFibers);
-m_prnf  = mean(percentReduxFibers,1);
-err_prnf = [m_prnf; m_prnf] + [-2*std(percentReduxFibers); ....
-                                 2*std(percentReduxFibers)];
-plot([x;x],err_prnf,'r-','linewidth',3)
-hold on
-plot(x,m_prnf,'ko-', ...
-    'color','k', ...
-    'markerfacecolor','k',...
+    'markersize',12)
+set(h1,'Marker','o', ...
+    'color',[.5 .5 .5], ...
+    'markerfacecolor',[.5 .5 .5],...
     'markeredgecolor','w', ...
-    'markersize',8)
-ylabel('Percent reduction in number of fascicles')
-xlabel('Iteration number')
-%axis('square')
-set(gca,'tickdir','out','box','off','FontSize',fontSiz,'xtick',iterToanalyze)
+    'markersize',10)
+set(get(ax(2),'ylabel'),'String','R_{rmse}','FontSize',fontSiz);
+set(ax(2), ...
+    'tickdir','out','ycolor','k','box','off','FontSize',fontSiz, ...
+    'xtick',[1 7 14 21 28],...
+    'ytick',[0.9 1 1.1],'ylim',[.9-0.005 1.1+0.005],'xlim',[0.5 29.5],...
+        'PlotBoxAspectRatio',[2 1 1])
+set(get(ax(1),'ylabel'),'String','Proportion fascicle number','FontSize',fontSiz);
+set(ax(1),'ycolor',[.5 .5 .5],...
+    'ylim',[-2 102],'tickdir','out','box','off','FontSize',fontSiz, ...
+    'xtick',[1 7 14 21 28],...
+    'ytick',[0 50 100],'xlim',[0.5 29.5],...
+        'PlotBoxAspectRatio',[2 1 1])
+axes(ax(2));hold on
+plot([x;x],err_rrmse(:,1:length(x)),'r-','linewidth',4)
+xlabel('Iteration number','FontSize',fontSiz);
+title(sprintf('Iter: [14 15] | %% fibers: [%i, %i] | R_{rmse}: [%2.3f, %2.3f] initial: %2.3f', ...
+      round(m_prnf(14)),round(m_prnf(15)),m_rrmse(14),m_rrmse(15),m_rrmse(1)))
 saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Number of fibers across iteration
@@ -119,13 +141,14 @@ plot(x,m_nf,'ko-', ...
     'markeredgecolor','w', ...
     'markersize',8)
 %axis('square')
-ylabel('Number of fascicles')
-xlabel('Iteration number')
-set(gca,'tickdir','out','box','off','FontSize',fontSiz,'xtick',iterToanalyze)
+ylabel('Number of fascicles','FontSize',fontSiz)
+xlabel('Iteration number','FontSize',fontSiz)
+set(gca,'tickdir','out','box','off','FontSize',fontSiz,'xtick',iterToanalyze,...
+        'PlotBoxAspectRatio',[1 .5 1])
 saveFig(fh,fullfile(fig_saveDir,figName))
 
 % Histograms of the weights across iterations:
-maxWeight = 0.32;
+maxWeight = 0.08;
 xh = linspace(0,maxWeight,numBins);
 for iter= 1:length(iterToanalyze)
     for irep =1:length(rep)
@@ -143,30 +166,29 @@ colors = {[.35 .35 .35]};
 for iter= 1:length(iterToanalyze)
     figName = sprintf('weights_across_culling_iter%i',iterToanalyze(iter));
     fh = mrvNewGraphWin(figName);
-    if iterToanalyze(iter) >= 8 && iterToanalyze(iter) < 15
-        ylims =  [0,0.32];
-        yticks = [0,0.16,0.32];
-    elseif iterToanalyze(iter) >= 15
-            ylims =  [0,0.16];
+    if iterToanalyze(iter) >= 8 && iterToanalyze(iter) < 12
+        ylims =  [0,0.16];
         yticks = [0,0.08,0.16];
+    elseif iterToanalyze(iter) >= 12
+        ylims =  [0,0.04];
+        yticks = [0,0.02,0.04];
     else
-        ylims =  [0,0.64];
-        yticks = [0,0.32,.64];
+        ylims =  [0,0.4];
+        yticks = [0,0.16,.32];
     end
     
     title(sprintf('RMSE: %2.3f',mean(rmse(:,iterToanalyze(iter)),1)))
     set(gca,'tickdir','out','box','off','FontSize',fontSiz, ...
-        'xlim',[0,maxWeight/2],'xtick',[0,maxWeight/4,maxWeight/2],...
+        'xlim',[-0.005,maxWeight+0.005],'xtick',[0,maxWeight/2,maxWeight],...
         'ylim',ylims,'ytick',yticks,...
-        'PlotBoxAspectRatio',[.5 1 1])
+        'PlotBoxAspectRatio',[1 .5 1])
     hold on
     bar(xh,my{iter},'edgecolor',colors{1},'facecolor',colors{1})
-    plot([xh;xh],[my{iter};my{iter}] + [-sdy{iter};sdy{iter}],'r-','linewidth',2)
-    ylabel('Probability')
-    xlabel('Fascicle contribution')
+    plot([xh;xh],[my{iter};my{iter}] + 2*[-sdy{iter};sdy{iter}],'r-','linewidth',2)
+    ylabel('Probability','FontSize',fontSiz)
+    xlabel('Fascicle weight','FontSize',fontSiz)
     saveFig(fh,fullfile(fig_saveDir,figName))
 end
-keyboard
 
 end
 
@@ -184,7 +206,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %-------------------------------------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [algo, lmax, bval, diffModParamsType] = getConditions(runType)
+function [algo, lmax, bval, diffModParamsType] = getConditionsLocal(runType)
 %
 % trackingType,lmax,bval,rep,diffusionModelParams
 %

@@ -1,14 +1,16 @@
-function s_ms_mt_ips(hemisphere,saveDir)
+function s_ms_mt_ac_pooledsd(hemisphere,saveDir)
 %
 % This script performs a test of conenctivity of MT+ (LO1 and LO2) with
-% IPS0. THe following are the steps we perform:
+% the anterior commissure (AC).
+%
+% The following are the steps we perform:
 %  - It loads a culled half hemisphere connectome (FE structure). 
 %  - It loads the MT+ ROI.
-%  - It loads the IPS0 ROI. 
-%  - It finds the fascicles connecting MT+ and IPS0
+%  - It loads the AC ROI. 
+%  - It finds the fascicles connecting MT+ and AC
 %  - It reduces the connectome to the voxels and fibers of the conenctions
 %  - It Perform a bootstrap test WITH and WITHOUT the connection between
-%    MT+ and IPS0.
+%    MT+ and AC.
 %
 % Written by Franco Pestilli (c) Stanford University, Vista Team 2013
 
@@ -20,39 +22,41 @@ if matlabpool('size') == 0
 end
 
 if notDefined('saveDir'), 
-    saveDir = sprintf('~/Dropbox/connectomes_plot_mt_ips/%s',mfilename);
+    saveDir = sprintf('~/Dropbox/connectomes_plot_mt_ac/%s',mfilename);
 end
-if notDefined('hemisphere'), hemisphere = {'left','right'};end
-if notDefined('plotSlices'), plotSlices = 1;end
+if notDefined('hemisphere'), hemisphere = {'left'};end
+if notDefined('plotSlices'), plotSlices = 0;end
 
 nboots      = 10000;
-nmontecarlo = 100;
+nmontecarlo = 20;
 
 for ih = 1:length(hemisphere)
 % Set all the variables that depend on the hemisphere
 switch hemisphere{ih}
     case {'left'}
         feFileName = 'fe_culled_FP_150_B2000_LMAX8_left.mat';
-        ipsRoi     = 'LIPS0_cleaned.mat';
+        acRoi     = 'ac_sphere_5mm.mat';
         mtRoi      = 'LTO1_O2_cleaned.mat';
         axisLims   = [-67 -18 -110 -40 -18 80];
         vw         = [-75,30];
         slices     = {[-18 0 0],[0 -40 0],[0 0 -14 ]};
         lght       = 'left';
         SLaxLims   = [-55 2 -120 120 -20 40 ];
-        histcolor  = [0.4 0.4 0.4];
+        histcolor{1}  = [0.4 0.4 0.4];
+        histcolor{2}  = [.6 0.4 0.4];
 
     case {'right'}
         feFileName = 'fe_culled_FP_150_B2000_LMAX8_right.mat';
-        ipsRoi     = 'RIPS0_cleaned.mat';
+        acRoi     = 'RAC_cleaned.mat';
         mtRoi      = 'RTO1_O2_cleaned.mat';
         axisLims   = [18 67 -110 -40 -18 80];
         vw         = [75,30];
         slices     = {[18 0 0],[0 -40 0],[0 0 -14 ]};
         lght       = 'right';
         SLaxLims   = [-2 55 -120 120 -20 40 ];
-        histcolor  = [0 0 0];
-
+        histcolor{1}  = [0 0 0]; 
+        histcolor{2}  = [.8 0.4 0.4];
+        
     otherwise
         keyboard
 end
@@ -64,21 +68,21 @@ load(fullfile(feDir,feFileName));
 
 % Load the ROIs
 roiDir = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/results/life_mrtrix_rep1/mt_roi';
-mtFileName   = fullfile(roiDir,mtRoi);
-ips0FileName = fullfile(roiDir,ipsRoi);
+mtFileName = fullfile(roiDir,mtRoi);
+acFileName = fullfile(roiDir,acRoi);
 mt   = dtiReadRoi(mtFileName);
-ips0 = dtiReadRoi(ips0FileName);
+ac   = dtiReadRoi(acFileName);
 t1File = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/150dirs_b2000/t1/t1.nii.gz';
 
-% Find the fascicles in the connectome that touch both MT+ and IPS0.
+% Find the fascicles in the connectome that touch both MT+ and AC.
 operations = {'and','and'};
-rois       = {mt,ips0};
+rois       = {mt,ac};
 fg         = feGet(fe,'fg acpc');
-[mtIpsFG, keepFascicles] = feSegmentFascicleFromConnectome(fg, rois, operations, 'mt_ips_zero');
+[mtAcFG, keepFascicles] = feSegmentFascicleFromConnectome(fg, rois, operations, 'mt_ac_zero');
 
 % Clean the fibers by length, fibers that too long are likely to go far
-% frontal and not just touch MT+ and IPS0.
-[Lnorm, Lmm]   = mbaComputeFiberLengthDistribution(mtIpsFG, false);
+% frontal and not just touch MT+ and AC.
+[Lnorm, Lmm]   = mbaComputeFiberLengthDistribution(mtAcFG, false);
 maxSD          = 1; % Max standard deviation of the fibers to keep in the group.
 fibers2delete  = Lnorm > maxSD;
 
@@ -93,15 +97,15 @@ keepFascicles(fasIndices) = false;
 % High-resolution Anatomy
 % t1File = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/150dirs_b2000/t1/t1.nii.gz';
 % t1     = niftiRead(t1File);
-% mtIpsFG = fgExtract(mtIpsFG,Lnorm < maxSD,'keep');
-% figName = sprintf('Test_MT_IPS0_connection_brain_%s_%s',hemisphere{ih},feFileName(1:end-4));
+% mtAcFG = fgExtract(mtAcFG,Lnorm < maxSD,'keep');
+% figName = sprintf('Test_MT_AC_connection_brain_%s_%s',hemisphere{ih},feFileName(1:end-4));
 % figureHandle = mrvNewGraphWin(figName);
 % h  = mbaDisplayBrainSlice(t1, slices{1});
 % hold on
 % h  = mbaDisplayBrainSlice(t1, slices{2});
 % h  = mbaDisplayBrainSlice(t1, slices{3});
 % tractColor = [.8 .6 .2];%[.3 .7 .9];
-% [figureHandle, lightHandle, sHandle] = mbaDisplayConnectome(mtIpsFG.fibers,figureHandle,tractColor,'uniform');
+% [figureHandle, lightHandle, sHandle] = mbaDisplayConnectome(mtAcFG.fibers,figureHandle,tractColor,'uniform');
 % delete(lightHandle)
 % view(vw(1),vw(2));
 % axis(axisLims);
@@ -111,7 +115,7 @@ keepFascicles(fasIndices) = false;
 % saveFig(figureHandle,fullfile(saveDir,figName),'jpg')
 
 % Reduce the connectome to the voxels and fibers of the connection between
-% MT+ and IPS0.
+% MT+ and AC.
 [feWithoutFas, feWithFas, ~] = feTestFascicle(fe,keepFascicles,0);
 
 if plotSlices
@@ -140,36 +144,45 @@ WITHOUT.rrmse   = median(feGetRep(feWithoutFas,'vox  rmse ratio'));
 WITHOUT.rmseall = (feGetRep(feWithoutFas,'vox  rmse'));
 
 %% The following is the code for the bootstrap test on the MEAN rmse
-e_rmse      = mean(WITHOUT.rmseall);
-NullSet     = [WITH.rmseall];
 sizeWith    = length(WITH.rmseall);
+nullDistributionW = nan(nboots,nmontecarlo);
+nullDistributionWO = nan(nboots,nmontecarlo);
+clear y x y_m y_e ;
 
-nullDistribution = nan(nboots,nmontecarlo);
 for inm = 1:nmontecarlo
     parfor ibt = 1:nboots
-        nullDistribution(ibt,inm) = mean(randsample(NullSet,sizeWith,true));
+        nullDistributionW(ibt,inm) = mean(randsample(WITH.rmseall,   sizeWith,true));      
+        nullDistributionWO(ibt,inm) = mean(randsample(WITHOUT.rmseall,sizeWith,true));
     end
     
-    [y(:,inm),xhis] = hist(nullDistribution(:,inm),linspace(28.5,31.5,100));
+    % Distribution With
+    [y(:,inm),xhis] = hist(nullDistributionW(:,inm),linspace(26.5,32,200));
     y(:,inm) = y(:,inm)./sum(y(:,inm));
+    
+    % Distribution without
+    [woy(:,inm),woxhis] = hist(nullDistributionWO(:,inm),linspace(26.5,32,200));
+    woy(:,inm) = woy(:,inm)./sum(woy(:,inm));
 end
 y_m = mean(y,2);
 y_e = [y_m, y_m] + 2*[-std(y,[],2),std(y,[],2)];
 
+ywo_m = mean(woy,2);
+ywo_e = [ywo_m, ywo_m] + 2*[-std(woy,[],2),std(woy,[],2)];
+
 % Plot the null distribution and the empirical difference
-figName = sprintf('Test_MT_IPS0_connection_rmse_mean_HIST_%s_%s',hemisphere{ih},feFileName(1:end-4));
+figName = sprintf('Test_MT_AC_connection_rmse_mean_HIST_%s_%s',hemisphere{ih},feFileName(1:end-4));
 fh = mrvNewGraphWin(figName);
 %bar(x,y_m,'k')
 %plot([xhis,xhis],y_e','color',[.3 .3 .3]); % Error bars for the distribution in
-patch([min(xhis), xhis,xhis, max(xhis)],[0, y_e(:)', 0],histcolor,'FaceColor',histcolor,'EdgeColor',histcolor); % Distribution as the +/- 2SD
+patch([xhis,xhis],y_e(:),histcolor{1},'FaceColor',histcolor{1},'EdgeColor',histcolor{1}); % Distribution as the +/- 2SD
 hold on
-plot([e_rmse,e_rmse],[0 max(y_m)],'r-','linewidth',2)
+patch([woxhis,woxhis],ywo_e(:),histcolor{2},'FaceColor',histcolor{2},'EdgeColor',histcolor{2}); % Distribution as the +/- 2SD
 set(gca,'tickdir','out', ...
         'box','off', ...
         'ylim',[0 0.125], ... 
-        'xlim',[28,35], ...
+        'xlim',[26,32], ...
         'ytick',[0 0.05 0.1], ...
-        'xtick',[27 29 31 33 35], ...
+        'xtick',[26 28 30 32], ...
         'fontsize',16)
 ylabel('Probability','fontsize',16)
 xlabel('rmse','fontsize',16')
@@ -177,61 +190,10 @@ xlabel('rmse','fontsize',16')
 % (3) Compute the probability that the empirical difference (1) was
 %     observed by chance given th data, by looking at the percentile of the
 %     empirical difference in the Nul distribution (2).
-if max(nullDistribution)<e_rmse
-      p = 100*0.5/nboots;
-else  p = sum(nullDistribution( nullDistribution > e_rmse ),1);
-end
-dprime_mean(:,ih) = repmat(e_rmse,1,nmontecarlo)./std(nullDistribution,[],1);
-title(sprintf('The probability of obtaining the difference by chance is less than %2.6f%%\nStrength of connection evidence %2.3f',p,mean(dprime_mean(:,ih))), ...
+dprime_mean(:,ih) = diff([mean(nullDistributionW,1);mean(nullDistributionWO,1)])./sqrt(sum([std(nullDistributionW,[],1);std(nullDistributionWO,[],1)].^2,1));
+title(sprintf('Strength of connection evidence %2.3f',mean(dprime_mean(:,ih))), ...
     'FontSize',16)
 saveFig(fh,fullfile(saveDir,figName),'eps')
-
-%% The following is the code for the bootstrap test on the MEDIAN rmse
-e_rmse   = median(WITHOUT.rmseall);
-NullSet  = [WITH.rmseall];
-sizeWith = length(WITH.rmseall);
-
-nullDistribution = nan(nboots,nmontecarlo);
-for inm = 1:nmontecarlo
-    parfor ibt = 1:nboots
-        nullDistribution(ibt,inm) = median(randsample(NullSet,sizeWith,true));
-    end
-    
-    [y(:,inm),xhis] = hist(nullDistribution(:,inm),linspace(28.5,31.5,100));
-    y(:,inm) = y(:,inm)./sum(y(:,inm));
-end
-y_m = mean(y,2);
-y_e = [y_m, y_m] + 2*[-std(y,[],2),std(y,[],2)];
-
-% Plot the null distribution and the empirical difference
-figName = sprintf('Test_MT_IPS0_connection_rmse_median_HIST_%s_%s',hemisphere{ih},feFileName(1:end-4));
-fh = mrvNewGraphWin(figName);
-%bar(x,y_m,'k')
-%plot([xhis,xhis],y_e','color',[.3 .3 .3]); % Error bars for the distribution in
-patch([min(xhis), xhis,xhis, max(xhis)],[0, y_e(:)', 0],histcolor,'FaceColor',histcolor,'EdgeColor',histcolor); % Distribution as the +/- 2SD
-hold on
-plot([e_rmse,e_rmse],[0 max(y_m)],'r-','linewidth',2)
-set(gca,'tickdir','out', ...
-        'box','off', ...
-        'ylim',[0 0.125], ... 
-        'xlim',[28,35], ...
-        'ytick',[0 0.05 0.1], ...
-        'xtick',[27 29 31 33 35], ...
-        'fontsize',16)
-ylabel('Probability','fontsize',16)
-xlabel('rmse','fontsize',16')
-% (3) Compute the probability that the empirical difference (1) was
-%     observed by chance given th data, by looking at the percentile of the
-%     empirical difference in the Nul distribution (2).
-if max(nullDistribution)<e_rmse
-      p = 100*0.5/nboots;
-else  p = sum(nullDistribution( nullDistribution > e_rmse ),1);
-end
-dprime_median(:,ih) = repmat(e_rmse,1,nmontecarlo)./std(nullDistribution,[],1);
-title(sprintf('The probability of obtaining the difference by chance is less than %2.6f%%\nStrength of connection evidence %2.3f',p,mean(dprime_median(:,ih))), ...
-    'FontSize',16)
-saveFig(fh,fullfile(saveDir,figName),'eps')
-
 
 %% The following is the code for the bootstrap test of the difference in rmse
 %
@@ -255,32 +217,32 @@ nullDistribution = nan(nboots,nmontecarlo);
 for inm = 1:nmontecarlo
 parfor ibt = 1:nboots
     % Y = RANDSAMPLE(POPULATION,K)
-    BootWith    = median(randsample(NullSet,sizeWith,true));
-    BootWithout = median(randsample(NullSet,sizeWithout,true));   
+    BootWith    = mean(randsample(NullSet,sizeWith,true));
+    BootWithout = mean(randsample(NullSet,sizeWithout,true));   
     nullDistribution(ibt,inm) = BootWithout - BootWith;
 end
     
-    [y(:,inm),xhis] = hist(nullDistribution(:,inm),linspace(-1.5,1.5,100));
+    [y(:,inm),xhis] = hist(nullDistribution(:,inm),linspace(-3,3,100));
     y(:,inm) = y(:,inm)./sum(y(:,inm));
 end
 y_m = mean(y,2);
 y_e = [y_m, y_m] + 2*[-std(y,[],2),std(y,[],2)];
 
 % Plot the null distribution and the empirical difference
-figName = sprintf('Test_MT_IPS0_connection_rmseDiff_HIST_%s_%s',hemisphere{ih},feFileName(1:end-4));
+figName = sprintf('Test_MT_AC_connection_rmseDiff_HIST_%s_%s',hemisphere{ih},feFileName(1:end-4));
 fh = mrvNewGraphWin(figName);
 %bar(x,y_m,'k')
 %plot([xhis,xhis],y_e','color',[.3 .3 .3]); % Error bars for the distribution in
-patch([min(xhis), xhis,xhis, max(xhis)],[0, y_e(:)', 0],histcolor,'FaceColor',histcolor,'EdgeColor',histcolor); % Distribution as the +/- 2SD
+patch([min(xhis), xhis,xhis, max(xhis)],[0, y_e(:)', 0],histcolor{1},'FaceColor',histcolor{1},'EdgeColor',histcolor{1}); % Distribution as the +/- 2SD
 hold on
 plot([EmpiricalDiff,EmpiricalDiff],[0 max(y_m)],'r-','linewidth',2)
 axis([-2 2 0 0.1])
 set(gca,'tickdir','out', ...
         'box','off', ...
-        'ylim',[0 0.12], ...
-        'xlim',[-2 3], ...
-        'ytick',[0 0.05 0.1], ...
-        'xtick',[-2 -1 0 1 2 3], ...
+        'ylim',[0 0.05], ...
+        'xlim',[-3.5 3.5], ...
+        'ytick',[0 0.025 0.05], ...
+        'xtick',[-3 -1.5 0 1.5 3], ...
         'fontsize',16)
 ylabel('Probability','fontsize',16)
 xlabel('Difference in rmse','fontsize',16')
@@ -288,17 +250,19 @@ xlabel('Difference in rmse','fontsize',16')
 % (3) Compute the probability that the empirical difference (1) was
 %     observed by chance given th data, by looking at the percentile of the
 %     empirical difference in the Nul distribution (2).
-if max(nullDistribution)<EmpiricalDiff
+nullD = mean(nullDistribution,2);
+nullY = mean(y,2);
+if max(nullD)<EmpiricalDiff
       p = 100*1/nboots;
-else  p = sum(nullDistribution( nullDistribution > EmpiricalDiff ));
+else  p = 1 - sum(nullY( xhis > EmpiricalDiff ));
 end
-dprime_d(:,ih) = repmat(EmpiricalDiff,1,nmontecarlo)./std(nullDistribution,[],1);
+dprime_d(:,ih) = EmpiricalDiff/std(nullD);
 title(sprintf('The probability of obtaining the difference by chance is less than %2.6f%%\nStrength of connection evidence %2.3f',p,mean(dprime_d(:,ih))), ...
     'FontSize',16)
 saveFig(fh,fullfile(saveDir,figName),'eps')
  
 % Make a scatter plot:
-figName = sprintf('Test_MT_IPS0_connection_rmse_SCATTER_%s_%s',hemisphere{ih},feFileName(1:end-4));
+figName = sprintf('Test_MT_AC_connection_rmse_SCATTER_%s_%s',hemisphere{ih},feFileName(1:end-4));
 fh = mrvNewGraphWin(figName);
 hold on
 plot([0 80],[0 80],'k-',[median(WITH.rmse),median(WITH.rmse)],[0 80],'k--',[0 80],[median(WITHOUT.rmse),median(WITHOUT.rmse)],'k--')
@@ -314,7 +278,7 @@ xlabel('rmse WITH Tract','fontsize',16)
 ylabel('rmse WITHOUT Tract','fontsize',16)
 saveFig(fh,fullfile(saveDir,figName),'eps')
 
-figName = sprintf('Test_MT_IPS0_connection_rmse_MAP_%s_%s',hemisphere{ih},feFileName(1:end-4));
+figName = sprintf('Test_MT_AC_connection_rmse_MAP_%s_%s',hemisphere{ih},feFileName(1:end-4));
 fh = mrvNewGraphWin(figName);
 [ymap,x]= hist3([WITHOUT.rmseall;WITH.rmseall]',{[0:2:60], [0:2:60]});
 ymap = ymap./length(WITHOUT.rmseall);
@@ -345,54 +309,36 @@ saveFig(fh,fullfile(saveDir,figName),'eps')
 end % Hemisphere
 
 % Make a plot fo the strenght fo conenction evidnce:
-figName = sprintf('Test_MT_IPS0_Sce_bar_%s_%s',hemisphere{ih},feFileName(1:end-4));
+figName = sprintf('Test_MT_AC_Sce_bar_%s_%s',hemisphere{ih},feFileName(1:end-4));
 fh = mrvNewGraphWin(figName);
 mStrength = mean(dprime_d,1);
 eStrength = [mStrength;mStrength] + 2*[-std(dprime_d,[],1);std(dprime_d,[],1)];
 hb = bar(mStrength,'facecolor','k');
 hold on
 plot([1 1; 2 2]',[eStrength],'r-','linewidth',4)
-set(gca,'xlim',[0.5 2.5],...
-    'ylim',    [0 7], ...
-    'ytick',[0 3.5 7], ...
-    'xtick',[1 2], ...
-    'xticklabel',{hemisphere{1} hemisphere{2}}, ...
+set(gca,'xlim',[0.5 1.5],...
+    'ylim',    [0 6], ...
+    'ytick',[0 3 6], ...
+    'xtick',[1], ...
+    'xticklabel',{hemisphere{1}},... hemisphere{2}}, ...
     'tickdir','out','box','off', ...
     'fontsize',16,'visible','on');
 ylabel(sprintf('S_{ce}'),'FontSize',16)
 saveFig(fh,fullfile(saveDir,figName),'eps')
 
 % Make a plot fo the strenght fo conenction evidnce:
-figName = sprintf('Test_MT_IPS0_Sce_median_RMSE_bar_%s_%s',hemisphere{ih},feFileName(1:end-4));
-fh = mrvNewGraphWin(figName);
-mStrength = mean(dprime_median,1);
-eStrength = [mStrength;mStrength] + 2*[-std(dprime_median,[],1);std(dprime_median,[],1)];
-hb = bar(mStrength,'facecolor','k');
-hold on
-plot([1 1; 2 2]',[eStrength],'r-','linewidth',4)
-set(gca,'xlim',[0.5 2.5],...
-    'ylim',    [0 300], ...
-    'ytick',[0 150 300], ...
-    'xtick',[1 2], ...
-    'xticklabel',{hemisphere{1} hemisphere{2}}, ...
-    'tickdir','out','box','off', ...
-    'fontsize',16,'visible','on');
-ylabel(sprintf('S_{ce}'),'FontSize',16)
-saveFig(fh,fullfile(saveDir,figName),'eps')
-
-% Make a plot fo the strenght fo conenction evidnce:
-figName = sprintf('Test_MT_IPS0_Sce_mean_RMSE_bar_%s_%s',hemisphere{ih},feFileName(1:end-4));
+figName = sprintf('Test_MT_AC_Sce_mean_RMSE_bar_%s_%s',hemisphere{ih},feFileName(1:end-4));
 fh = mrvNewGraphWin(figName);
 mStrength = mean(dprime_mean,1);
 eStrength = [mStrength;mStrength] + 2*[-std(dprime_mean,[],1);std(dprime_mean,[],1)];
 hb = bar(mStrength,'facecolor','k');
 hold on
 plot([1 1; 2 2]',[eStrength],'r-','linewidth',4)
-set(gca,'xlim',[0.5 2.5],...
-    'ylim',    [0 300], ...
-    'ytick',[0 150 300], ...
-    'xtick',[1 2], ...
-    'xticklabel',{hemisphere{1} hemisphere{2}}, ...
+set(gca,'xlim',[0.5 1.5],...
+    'ylim',    [0 7], ...
+    'ytick',[0 3.5 7], ...
+     'xtick',[1], ...
+    'xticklabel',{hemisphere{1}},... hemisphere{2}}, ...
     'tickdir','out','box','off', ...
     'fontsize',16,'visible','on');
 ylabel(sprintf('S_{ce}'),'FontSize',16)
