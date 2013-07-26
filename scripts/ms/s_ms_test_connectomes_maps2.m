@@ -78,7 +78,7 @@ for itrk = 1:length(trackingType)
                             if doFD
                                 % Fiber density maps
                                 figName = sprintf('FDM_%s_rep%i_%s_slice%i',fname,irep,cullType{icull},slice(is));
-                                fh = figure('name',figName,'visible',figVisible,'color','w');
+                                fh  = figure('name',figName,'visible',figVisible,'color','w');
                                 img = feReplaceImageValues(nan(feGet(fe,'map size')),fd(:,icull)',coords);
                                 
                                 % This will be used tonormalize the fiber density plots
@@ -95,7 +95,7 @@ for itrk = 1:length(trackingType)
                                  
                                 % Weigth density (sum of weights)
                                 figName = sprintf('FWM_%s_rep%i_%s_slice%i',fname,irep,cullType{icull},slice(is));
-                                fh = figure('name',figName,'visible',figVisible,'color','w');
+                                fh  = figure('name',figName,'visible',figVisible,'color','w');
                                 img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,3))',coords);
                                 maxw(icull,irep) = nanmax(img(:));
                                 minw(icull,irep) = nanmin(img(:));
@@ -255,6 +255,7 @@ for itrk = 1:length(trackingType)
                     xlabel('Fibers per voxel')
                     set(gca,'tickdir','out','ticklength',[0.025 0],'box','off','FontSize',fontSiz,'ylim',[0 0.4], ...
                         'xlim',[0 max(x)+1],'xtick',x,'xticklabel',xBins);
+                end
             end
             title(sprintf('Dynamic range | Before %2.2f | After %2.2f',mean(dyrng{1}),mean(dyrng{2})))
             saveFig(fh,fullfile(saveDir,figName),1)

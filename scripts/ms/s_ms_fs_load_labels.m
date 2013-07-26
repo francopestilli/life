@@ -15,7 +15,7 @@ end
 
 % Hemisphere, 'lh' or 'rh'
 if notDefined('hemisphere')
-    hemisphere = 'lh';
+    hemisphere = {'rh','lh'};
 end
 
 % The default label and ROIs dir for this subject.
@@ -23,17 +23,19 @@ if notDefined('roiSaveDir')
     roiSaveDir = fullfile(fsSubDir,subject,'label');       
 end
 
+% Create ROIs for the left and right hemishpere if requested.
+for iH = 1:length(hemisphere)
 % The following are the file name sof the labels we want to load.
 % The fullpath to a .label FreeSurfer file.
 if notDefined('labels')
-    labels = {sprintf('%s.%s.label',hemisphere,'middletemporal'),...
-              sprintf('%s.%s.label',hemisphere,'parsopercularis'), ...
-              sprintf('%s.%s.label',hemisphere,'parstriangularis'), ...
-              sprintf('%s.%s.label',hemisphere,'bankssts')};
+    labels = {sprintf('%s.%s.label',hemisphere{iH},'middletemporal'),...
+              sprintf('%s.%s.label',hemisphere{iH},'parsopercularis'), ...
+              sprintf('%s.%s.label',hemisphere{iH},'parstriangularis'), ...
+              sprintf('%s.%s.label',hemisphere{iH},'G_and_S_cingul-Ant'), ...
+              sprintf('%s.%s.label',hemisphere{iH},'G_temp_sup-Plan_tempo'), ...
+};
           
 end
-labels = {sprintf('%s.%s.label',hemisphere,'insula'), ...
-          sprintf('%s.%s.label',hemisphere,'G_and_S_cingul-Ant')};
 
 % The fullpath to the .nii.gz file that will be saved out. With NO .nii.gz 
 % extension.
@@ -55,12 +57,13 @@ if recomputelabels
     % % In case not all the labels were create dtis is an example of how to
     % % create labesl from a segementation
     annotation     = 'aparc';
-    annotationFile = fullfile(fsSubDir,subject,'label',sprintf('%s.%s.annot',hemisphere,annotation));
-    fs_annotationToLabelFiles(subject,annotationFile,hemisphere)
+    annotationFile = fullfile(fsSubDir,subject,'label',sprintf('%s.%s.annot',hemisphere{iH},annotation));
+    fs_annotationToLabelFiles(subject,annotationFile,hemisphere{iH})
 end
 
 for ir = 1:length(labels)
-    fs_labelFileToNiftiRoi(subject,labels{ir},niftiRoiName{ir},hemisphere);
+    fs_labelFileToNiftiRoi(subject,labels{ir},niftiRoiName{ir},hemisphere{iH});
+end
 end
 
 end % end main function

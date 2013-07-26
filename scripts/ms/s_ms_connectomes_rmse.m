@@ -56,7 +56,7 @@ for irep = 1:length(rep)
         % Make a 2D histogram pf the RMSEt
         figNameRmseMap = sprintf('rmse_map_hist_%s_%s',fName,cullType{icull});
         fhRmseMap = mrvNewGraphWin(figNameRmse);
-        [ymap,x]= hist3([Mrmse;Drmse]',{[1:.5:60], [1:.5:60]});
+        [ymap,x]  = hist3([Mrmse;Drmse]',{[1:.5:60], [1:.5:60]});
         ymap = ymap./length(Mrmse);
         sh = imagesc(flipud(log10(ymap)));
         cm = colormap(flipud(hot)); view(0,90);

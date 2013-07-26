@@ -5,7 +5,7 @@ function s_ms_plot_culling_results_across_iterations(fitType,baseDir)
 %
 % It is in dev state, it might improve if these plots become useful.
 %
-% Franco Pestilli (c) Stanford Univserity 2013
+% Franco Pestilli (c) Stanford University 2013
 
 close all
 clear h
