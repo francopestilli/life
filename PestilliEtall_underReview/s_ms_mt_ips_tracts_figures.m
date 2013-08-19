@@ -4,7 +4,8 @@ function s_ms_mt_ips_tracts_figures(hemisphere,saveDir)
 % Also it shows the tracts conencting MT+ (LO1 and LO2) with
 % IPS0. 
 %
-% Written by Franco Pestilli (c) Stanford University, Vista Team 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 if notDefined('saveDir'), 
     saveDir = '~/Dropbox/connectomes_plot_mt_ips/';

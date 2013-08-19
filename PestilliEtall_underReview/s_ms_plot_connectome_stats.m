@@ -4,7 +4,8 @@ function s_ms_plot_connectome_stats(trackingType)
 %
 % See also: s_life_track.m,  s_lifeTestTractographyModels.m, 
 %
-% Franco (c) Stanford VISTA Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 %% Load the data
 % Get the data path

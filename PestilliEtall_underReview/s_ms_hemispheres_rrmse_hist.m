@@ -8,7 +8,8 @@ function s_ms_hemispheres_rrmse_hist(trackingType,lmax,bval,rep,volume)
 % This is part of a series of reproducible science scritps to be published
 % with the LiFE mansucript.
 %
-% Written by Franco P(c) Stanford Vista Team 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 if notDefined('trackingType'),trackingType = 'deterministic';end
 if notDefined('lmax'),        lmax         = 8;end

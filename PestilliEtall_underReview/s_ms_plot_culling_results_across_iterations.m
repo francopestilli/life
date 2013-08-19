@@ -5,7 +5,8 @@ function s_ms_plot_culling_results_across_iterations(fitType,baseDir)
 %
 % It is in dev state, it might improve if these plots become useful.
 %
-% Franco Pestilli (c) Stanford University 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 close all
 clear h

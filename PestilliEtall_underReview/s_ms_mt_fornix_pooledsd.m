@@ -12,7 +12,8 @@ function s_ms_mt_fornix_pooledsd(hemisphere,saveDir)
 %  - It Perform a bootstrap test WITH and WITHOUT the connection between
 %    MT+ and fornix.
 %
-% Written by Franco Pestilli (c) Stanford University, Vista Team 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Handle parallel computing
 if matlabpool('size') == 0

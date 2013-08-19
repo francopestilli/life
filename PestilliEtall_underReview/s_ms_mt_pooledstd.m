@@ -9,7 +9,8 @@ function s_ms_mt_pooledstd(hemisphere,saveDir)
 %  - It Perform a bootstrap test WITH and WITHOUT the connection between
 %    MT+.
 %
-% Written by Franco Pestilli (c) Stanford University, Vista Team 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Handle parallel computing
 if matlabpool('size') == 0
