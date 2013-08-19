@@ -4,7 +4,9 @@ function feFileToLoad = s_ms_connectomes_rmse_compare_tractography(feType,connec
 %
 % Loads a connectome and produces a figure of the rmse M-D and rmse D-D.
 %
-% Written by Franco Pestilli (c) Stanford University 2013 
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+
 if notDefined('connectomeType'), connectomeType = [41 4];end
 if notDefined('rep'),         rep          = [1];end
 if notDefined('cullType'),   cullType='culledL2';end

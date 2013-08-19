@@ -4,7 +4,9 @@ function feFileToSave = s_ms_cull_connectomes_figure_plot(connectomeType,rep)
 %
 % Loads a connectome and culls it down to the minimum number of fibers.
 %
-% Written by Franco Pestilli (c) Stanford University 2013 
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+
 if notDefined('connectomeType'), connectomeType = [5];end
 if notDefined('rep'), rep = [1,2];end
 if notDefined('percentRemovedFas'),
