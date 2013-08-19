@@ -23,7 +23,7 @@ dirs   = [65];
 slices = [-70];
 xlim   = [-70 67];
 zlim   = [-22 75];
-dsig_colormap = 'winter';
+dsig_colormap = 'jet';
 figVisible    = 'on';
 
 % High-resolution Anatomy
@@ -335,7 +335,7 @@ for isl = 1:length(slices)
                   slices(isl),trackingType,lmax,bval,rep, ...
                   100*diffusionModelParams(1),100*diffusionModelParams(2));
         fh = figure('name',figName,'visible',figVisible,'color','w');
-        sh = mbaDisplayOverlay(t1, niR, volume(1:3));
+        sh = mbaDisplayOverlay(t1, niR, volume(1:3),[],'hot');
         
         % Tick marks for the colorbar
         mm = minmax(niR.data(:));

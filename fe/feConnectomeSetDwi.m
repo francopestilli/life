@@ -34,17 +34,6 @@ fe  = feSet(fe, sprintf('dwi%sfile',tag),dwiFileName);
 % load the dwi data
 dwi = feGet(fe, sprintf('dwi%s',tag));
 
-% Extract the dwi signal at the coordinates of the connectome
-fe  = feSet(fe, sprintf('diffusion signal image %s',tag), ...
-            dwiGet(dwi, 'diffusion signal image',feGet(fe,'roi coords')));
-          
-% Extract the non-diffusion direction signal at the coordinates of the
-% conenctome
-fe  = feSet(fe, sprintf('S0 image %s',tag), ...
-            dwiGet(dwi, 'S0 image',feGet(fe,'roi coords')));
-
-          if length(isrepeat)>1, keyboard;end
-
 % Store the bvecs, bvals and the indices for the new file.
 fe  = feSet(fe, sprintf('diffusion bvecs %s',tag), ...
             dwiGet(dwi, 'diffusion bvecs'));
@@ -52,6 +41,18 @@ fe  = feSet(fe, sprintf('diffusion bvals %s',tag), ...
             dwiGet(dwi, 'diffusion bvals'));
 fe  = feSet(fe, sprintf('bvecs indices %s',tag),   ...
             dwiGet(dwi, 'diffusionimagenums'));
+
+% Extract the dwi signal at the coordinates of the connectome
+fe  = feSet(fe, sprintf('diffusion signal image %s',tag), ...
+            dwiGet(dwi, 'diffusion signal image',feGet(fe,'roi coords')) ./ ...
+            repmat(dwiGet(dwi, 'S0 image',feGet(fe,'roi coords')),1,feGet(fe,'nbvecs')) );
+          
+% Extract the non-diffusion direction signal at the coordinates of the
+% conenctome
+fe  = feSet(fe, sprintf('S0 image %s',tag), ...
+            dwiGet(dwi, 'S0 image',feGet(fe,'roi coords')));
+
+if length(isrepeat)>1, keyboard;end
           
 % Here I set the dimensions of the dwi file so that I have that
 % available everytime when creating a map of parameters.

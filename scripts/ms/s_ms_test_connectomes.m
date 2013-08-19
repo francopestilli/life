@@ -13,8 +13,8 @@ function s_ms_test_connectomes(trackingType,lmax,diffusionModelParams)
 %
 % Franco (C) 2012 Stanford VISTA team.
 
-if notDefined('trackingType'),trackingType = 'tensor';end
-if notDefined('lmax'),        lmax=[0];end
+if notDefined('trackingType'),trackingType = 'p';end
+if notDefined('lmax'),        lmax=[8];end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
 if notDefined('dataType'), dataType='150dirs';end
 
@@ -118,7 +118,7 @@ for irep = 1:length(connectSubfolders)
     % enough:
     cName = [connectomeFile{ii}(1:57),'_',connectomeFile{ii}(end-16:end-4)];
     feSaveDir         = fullfile(saveDir,connectSubfolders{irep},'fe_structures');
-    feSaveName        = sprintf('%s_diffModAx%sRd%s_%s',cName,num2str(100*diffusionModelParams(1)),num2str(100*diffusionModelParams(2)));
+    feSaveName        = sprintf('%s_diffModAx%sRd%s_%s_SoverS0',cName,num2str(100*diffusionModelParams(1)),num2str(100*diffusionModelParams(2)));
     switch dataType
       case {'150dirs','2mm'}
         
@@ -170,14 +170,15 @@ for irep = 1:length(connectSubfolders)
       
       %% Build a model of the connectome.
       fe = feConnectomeInit(dwiFile,dtFile,fg,feSaveName,feSaveDir,dwiFileRepeat,t1File,diffusionModelParams);
-      feConnectomeSave(fe,feSaveName)
-      fgWrite(fg, fgSaveName,'pdb');
-      clear fg
+      %feConnectomeSave(fe,feSaveName)
+      %fgWrite(fg, fgSaveName,'mat');
+      %clear fg
       
       %% Fit the model with global weights.
       fefit = feFitModel(feGet(fe,'Mfiber'),feGet(fe,'dsig demeaned'),'sgdnn');
+      
       fe    = feSet(fe,'fit',fefit);
-      feConnectomeSave(fe,feSaveName)
+      feConnectomeSave(fe,[feSaveName,'SoverS0'])
       
       %% Fit the model with voxel-wise weights.
       %fe = feFitModelByVoxel(fe);

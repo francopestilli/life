@@ -539,9 +539,7 @@ switch param
     nBvecs     = feGet(fe,'nBvecs');
     voxelIndices = feGet(fe,'voxelsindices',varargin);
     val = fe.life.diffusion_signal_img(voxelIndices,:) - repmat(mean(fe.life.diffusion_signal_img(voxelIndices,:), 2),1,nBvecs);
-    keyboard
-    % THis seems to be wrong
-    
+       
   case {'b0signalimage','b0vox'}
     % Get the diffusion signal at 0 diffusion weighting (B0) for this voxel
     %

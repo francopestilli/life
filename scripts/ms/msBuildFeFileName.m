@@ -1,4 +1,4 @@
-function [feFileToLoad, feLoadName] = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams,cullType)
+function [feFileToLoad, feLoadName, feLoadDir] = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams,cullType)
 %
 % Build a file name for one of the several connectomes preprocessed for the
 % LiFE manuscript.

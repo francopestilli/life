@@ -9,7 +9,7 @@ function s_ms_test_connectomes_maps2(trackingType,dataType,lmax,diffusionModelPa
 % Franco (C) 2012 Stanford VISTA team.
 
 if notDefined('trackingType'),trackingType = {'p'};end
-if notDefined('lmax'),        lmax         = [2 4 6 8 10 12 14 16];end
+if notDefined('lmax'),        lmax         = [8];end
 if notDefined('bval'),        bval         = 2000;end
 if notDefined('rep'),         rep          = [1,2,3];end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
@@ -50,10 +50,14 @@ for itrk = 1:length(trackingType)
                     
                     % File to load
                     % This is where the inputs will be loaded from
-                    [feFileToLoad, fname] = ...
+                    [feFileToLoad, fname, feLoadDir] = ...
                         msBuildFeFileName(trackingType{itrk},lmax(i_lmax),bval(i_bval),rep(irep), ...
                         diffusionModelParams,cullType{icull});
-                    
+                   
+                    % Rebuild the name for this special case.
+                    fname =  '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8__m_prob-500000_diffModAx100Rd0_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8__m_prob-500000_diffModAx100Rd0_SoverS0';
+                    feFileToLoad = fullfile(feLoadDir,[fname,'.mat']);
+
                     if (exist(feFileToLoad,'file') == 2)
                         fprintf('[%s] Loading: \n%s\n ======================================== \n\n',mfilename,feFileToLoad)
                         load(feFileToLoad);

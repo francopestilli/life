@@ -4,10 +4,12 @@ function voxDSig = feComputeVoxelSignal(fe,voxIndex)
 %
 %   voxDSig = feComputeVoxelSignal(fe,voxelIndex)
 %
-% Franco (c) Stanford Vista Team 2012
+% Note. voxDSig is S/S0.
+%
+% Written by Franco Pestilli (c) Stanford University Vistasfot 2013
 
 % Extract information regarding, voxels, signal and fibers.
-S0                = feGet(fe,'b0signalimage',   voxIndex);  % non diffusion-weighted signal
+%S0                = feGet(fe,'b0signalimage',   voxIndex);  % non diffusion-weighted signal
 bvecs             = feGet(fe,'bvecs');                      % bvecs
 bvals             = feGet(fe,'bvals');                      % bvals
 tot_fibers_num    = feGet(fe,'tot f num',       voxIndex);  % number of total fibers in the voxel
@@ -18,7 +20,7 @@ voxTensors        = feGet(fe,'voxeltensors',    voxIndex);  % Get the tensors fo
                                                             % going through this voxel
 
 % Compute the predicted signal by each tensors of each node in this voxel.
-voxDSig = feComputeSignal(S0, bvecs, bvals, voxTensors);
+voxDSig = feComputeSignal(bvecs, bvals, voxTensors);
 
 % Combine the diffusion predictions across nodes of a single fiber.
 % Use only the prediction from the unique fibers, not from all the fibers.

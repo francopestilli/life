@@ -1,4 +1,4 @@
-function s_ms_afq_fascicles_figures
+function s_ms_afq_fascicles_figures(fig_saveDir)
 %
 % Uses AFQ to segment a series of connectomes. 
 %
@@ -73,7 +73,7 @@ elseif thisbval == 2000
   dwiFileRepeat = fullfile(dataRootPath,'raw','0007_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz');
   connectomeFile= { ...
 %     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_dwi_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_tensor-500000.pdb'%, ...
-     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax6_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};%, ...
+     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};%, ...
 %     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax10_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'%, ...
 %     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax14_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb', ...
 %     '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax16_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_brainmask_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_wm_prob-500000.pdb'};%, ...
@@ -93,7 +93,7 @@ else
   keyboard
 end
 
-lmax = {'ProbLmax6'};
+lmax = {'ProbLmax8'};
 
 for irep = 1:length(connectSubfolders)
   for ii = 1:length(connectomeFile)
@@ -193,55 +193,58 @@ for irep = 1:length(connectSubfolders)
     delete(lightH)
     lightH = camlight('right');drawnow;
     saveFig(gcf,fullfile(fig_saveDir,figName))
-        
-%    % The following is an attept to plot the arcuate with the FA map
-    figName = sprintf('left_fascicles_ARC_sagittal_FA_map_%s',lmax{ii});
-    fg = fascicles(19);
-     % Eigenvalues are necessary for all the computations.
-    % Here we precompute them then we pass them in for different values:
-    sprintf('\nComputing eigenvalues for %s...\n',fg.name)
-    eigenvals = fefgGet(fg,'eigenvals',dtFile);
-    fa = fefgGet(fg, 'fa', eigenvals);
-    
-    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
-    fg.fibers = fg.fibers(subsampleindx);
-    faDisp = fa(subsampleindx);
-    [figH1, lightH] = mbaDisplayConnectome(fg.fibers,figure,faDisp,'map',hot(60));
-    hold on
-    sliceH = feDisplayBrainSlice(anat, [-40 0 0]);    
-    view(90,0);
-    set(gca,'ylim',[-70 55],'xlim',[-75 0],'zlim',[-25 85])
-    delete(lightH)
-    lightH = camlight('right');drawnow;
-    saveFig(gcf,fullfile(fig_saveDir,figName))
-    
-    % Arcuate and corticospinal tract 
-    figName = sprintf('left_fascicles_ARC_CST_sagittal_FA_map_%s',lmax{ii});
-    sprintf('\nComputing eigenvalues for %s...\n',fg.name)
-    fgCST = fascicles(3);
-    eigenvals = fefgGet(fgCST,'eigenvals',dtFile);
-    faCST = fefgGet(fgCST, 'fa', eigenvals);
-    
-    fibers = {};
-    fibers(1:length(fg.fibers)) = fg.fibers;
-    fibers(length(fg.fibers)+1:length(fg.fibers)+length(fgCST.fibers)) = fgCST.fibers;
      
-    faAll(1:length(fa)) = fa;
-    faAll(length(fa)+1:length(fa)+length(faCST)) = faCST;
-
-    [figH1, lightH] = mbaDisplayConnectome(fibers,figure,faAll,'map',hot(60));
-    hold on
-    sliceH = feDisplayBrainSlice(anat, [-40 0 0]);
-    
-    subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
-    fg.fibers = fg.fibers(subsampleindx);
-    [figH2, lightH2] = mbaDisplayConnectome(fg.fibers,gcf,[.8 .6 .2],'single');
-    view(90,0);
-    set(gca,'ylim',[-70 55],'xlim',[-75 0],'zlim',[-25 85])
-    delete(lightH)
-    delete(lightH2)
-    lightH = camlight('right');drawnow;
-    saveFig(gcf,fullfile(fig_saveDir,figName))
+    doFAmap = 0;
+    if doFAmap
+        %    % The following is an attept to plot the arcuate with the FA map
+        figName = sprintf('left_fascicles_ARC_sagittal_FA_map_%s',lmax{ii});
+        fg = fascicles(19);
+        % Eigenvalues are necessary for all the computations.
+        % Here we precompute them then we pass them in for different values:
+        sprintf('\nComputing eigenvalues for %s...\n',fg.name)
+        eigenvals = fefgGet(fg,'eigenvals',dtFile);
+        fa = fefgGet(fg, 'fa', eigenvals);
+        
+        subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+        fg.fibers = fg.fibers(subsampleindx);
+        faDisp = fa(subsampleindx);
+        [figH1, lightH] = mbaDisplayConnectome(fg.fibers,figure,faDisp,'map',hot(60));
+        hold on
+        sliceH = feDisplayBrainSlice(anat, [-40 0 0]);
+        view(90,0);
+        set(gca,'ylim',[-70 55],'xlim',[-75 0],'zlim',[-25 85])
+        delete(lightH)
+        lightH = camlight('right');drawnow;
+        saveFig(gcf,fullfile(fig_saveDir,figName))
+        
+        % Arcuate and corticospinal tract
+        figName = sprintf('left_fascicles_ARC_CST_sagittal_FA_map_%s',lmax{ii});
+        sprintf('\nComputing eigenvalues for %s...\n',fg.name)
+        fgCST = fascicles(3);
+        eigenvals = fefgGet(fgCST,'eigenvals',dtFile);
+        faCST = fefgGet(fgCST, 'fa', eigenvals);
+        
+        fibers = {};
+        fibers(1:length(fg.fibers)) = fg.fibers;
+        fibers(length(fg.fibers)+1:length(fg.fibers)+length(fgCST.fibers)) = fgCST.fibers;
+        
+        faAll(1:length(fa)) = fa;
+        faAll(length(fa)+1:length(fa)+length(faCST)) = faCST;
+        
+        [figH1, lightH] = mbaDisplayConnectome(fibers,figure,faAll,'map',hot(60));
+        hold on
+        sliceH = feDisplayBrainSlice(anat, [-40 0 0]);
+        
+        subsampleindx = randsample(length(fg.fibers),floor(length(fg.fibers)*proportionFibers));
+        fg.fibers = fg.fibers(subsampleindx);
+        [figH2, lightH2] = mbaDisplayConnectome(fg.fibers,gcf,[.8 .6 .2],'single');
+        view(90,0);
+        set(gca,'ylim',[-70 55],'xlim',[-75 0],'zlim',[-25 85])
+        delete(lightH)
+        delete(lightH2)
+        lightH = camlight('right');drawnow;
+        saveFig(gcf,fullfile(fig_saveDir,figName))
+    end
     
     % Arcuate and corticospinal tract 
     figName = sprintf('left_fascicles_ARC_CST_sagittal_%s',lmax{ii});

@@ -13,7 +13,7 @@ if notDefined('lmax'),        lmax         = [8];end
 if notDefined('bval'),        bval         = 2000;end
 if notDefined('rep'),         rep          = [1];end
 if notDefined('diffusionModelParams'),   diffusionModelParams=[1,0];end
-if notDefined('cullType'),   cullType={'','culledL2'};end
+if notDefined('cullType'),   cullType={'culledL2',''};end
 if notDefined('saveDir'), saveDir = fullfile('/home/frk/Dropbox','connectomes_hists_maps');end
 
 % Bins for the fiber density estimates
@@ -46,9 +46,23 @@ for itrk = 1:length(trackingType)
                     
                     % File to load
                     % This is where the inputs will be loaded from
-                    [feFileToLoad, fname] = ...
+%                     [feFileToLoad, fname] = ...
+%                         msBuildFeFileName(trackingType{itrk},lmax(i_lmax),bval(i_bval),rep(irep), ...
+%                         diffusionModelParams,cullType{icull});
+                    if icull == 2
+                    % File to load
+                    % This is where the inputs will be loaded from
+                    [feFileToLoad, fname, feLoadDir] = ...
                         msBuildFeFileName(trackingType{itrk},lmax(i_lmax),bval(i_bval),rep(irep), ...
                         diffusionModelParams,cullType{icull});
+                    else
+                        [feFileToLoad, fname, feLoadDir] = ...
+                        msBuildFeFileName(trackingType{itrk},lmax(i_lmax),bval(i_bval),rep(irep), ...
+                        diffusionModelParams,cullType{icull});
+                    % Rebuild the name for this special case.
+                    fname =  '0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8__m_prob-500000_diffModAx100Rd0_0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin_csd_lmax8__m_prob-500000_diffModAx100Rd0_SoverS0';
+                    feFileToLoad = fullfile(feLoadDir,[fname,'.mat']);
+                    end
                     
                     if (exist(feFileToLoad,'file') == 2)
                         fprintf('[%s] Loading: \n%s\n ======================================== \n\n',mfilename,feFileToLoad)
@@ -74,7 +88,7 @@ for itrk = 1:length(trackingType)
                                 figName = sprintf('FDM_%s_rep%i_%s_slice%i',fname,irep,cullType{icull},slice(is));
                                 fh = figure('name',figName,'visible',figVisible,'color','w');
                                 img = feReplaceImageValues(nan(feGet(fe,'map size')),fd(:,icull)',coords);
-                                keyboard
+                                
                                 % This will be used tonormalize the fiber density plots
                                 if  (icull == 1)
                                     maxfd(irep) = nanmax(img(:));
@@ -121,9 +135,11 @@ for itrk = 1:length(trackingType)
                             rmse = feGetRep(fe, 'vox rmse');
                             img = feReplaceImageValues(nan(feGet(fe,'map size')),rmse,coords);
                             if (icull == 1)
-                                maxw(irep) = 60;
+                                maxw(irep) = .1;
                                 %maxw(irep) = nanmax(img(:));
                                 minw(irep) = nanmin(img(:));
+                            else
+                               maxw(irep) = 60;
                             end
                             surf(fliplr(img(:,:,slice(is))./maxw(irep))'*255,...
                                 'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
@@ -144,9 +160,11 @@ for itrk = 1:length(trackingType)
                             rmse = feGetRep(fe, 'vox rmse data');
                             img = feReplaceImageValues(nan(feGet(fe,'map size')),rmse,coords);
                             if (icull == 1)
-                                maxw(irep) = 60;
+                                maxw(irep) = .1;
                                 %maxw(irep) = nanmax(img(:));
                                 minw(irep) = nanmin(img(:));
+                            else
+                               maxw(irep) = 60;
                             end
                           
                             surf(fliplr(img(:,:,slice(is))./maxw(irep))'*255,...
