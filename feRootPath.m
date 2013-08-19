@@ -6,8 +6,8 @@ function p = feRootPath
 %
 % See also: v_lifeExample
 %
-% (c) Stanford VISTA Team
-
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 p = which('feRootPath');
 
 p = fileparts(p);
