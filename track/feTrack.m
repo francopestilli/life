@@ -11,8 +11,8 @@ function [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibe
 %  - nSeeds - number of seeds to use for mrtrix, this determines the final
 %             number of fibers.
 %
-% Written by Franco Pestilli (c) Stanford University, VISTA Team 2012
-
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 if notDefined('trackingAlgorithm'), trackingAlgorithm = {'tensor'};end
 if notDefined('dtFile'),            dtFile = ...
     '/biac2/wandell6/data/frk/LiFE/data/fp20120420/150dirs_b1000_1/dt6.mat';end
@@ -55,8 +55,8 @@ function algo = switchAlgo(algo)
 % 
 % 1=prob, 2=stream, 3=tensor.
 %
-% Written by Franco Pestilli (c) Stanford University, VISTA Team 2012
-
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 if isnumeric(algo) % from index to string
   switch algo
     case {1}

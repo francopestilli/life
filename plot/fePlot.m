@@ -11,7 +11,8 @@ function [uData, g] = fePlot(fe,plotType,varargin)
 %
 %   fePlot(fe,'dsig measured');
 %
-% Franco (c) Stanford VISTA Team, 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 %
 %-----------
 % Plot the fiber group in a matlab 3D mesh.
@@ -38,6 +39,9 @@ function [uData, g] = fePlot(fe,plotType,varargin)
 %-----------
 %
 %-----------
+%
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 if notDefined('fe'),       error('''fe'' structure required.'); end
 if notDefined('plotType'), error('plotType required'); end
 

@@ -22,7 +22,8 @@ function val = feGetRep(fe,param,varargin)
 %              a match in the coords
 %
 %
-% Franco (c) Stanford Vista Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 %
 %---------- List of arguments ----
 % Name of the current fe structure.
@@ -189,8 +190,9 @@ function val = feGetRep(fe,param,varargin)
 %
 % End of feGetRep.m parameters, 
 % 
-% Franco Pestilli (c) Stanford Vista Team 2012
-   
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+
 val = [];
 
 % Format the input parameters.

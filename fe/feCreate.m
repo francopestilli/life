@@ -3,7 +3,7 @@ function fe = feCreate
 %
 %  fe = feCreate
 %
-% Franco (c) Stanford VISTA Team 2012
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Book-keeping
 fe.name  = 'default'; % This one's name

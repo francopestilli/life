@@ -7,7 +7,8 @@ function fe = feGetConnectomeInfo(fe)
 % through exactly the same voxels) within the ROI. These are stored in the
 % fe slot 'unique index'.
 %
-% Franco & Brian (c) Stanford Vista Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Get the indexes to the voxels actually used to build LifE.
 % Remember that voxels with no fibers are disregarded during the build.

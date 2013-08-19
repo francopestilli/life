@@ -10,13 +10,9 @@ function [fe, indicesFibersKept] = feConnectomeReduceVoxels(fe,voxelsToKeep)
 % will keep.
 %
 %  Example:
-%    Run v_lifeExample to get a fe that is initialized.
-%    n = feGet(fe,'n voxels');
-%    tmp = sort(unique(randi(n,500,1)));
-%    voxelsToKeep = zeros(n,1); voxelsToKeep(tmp) = 1;
-%    fe = feConnectomeReduceVoxels(fe,voxelsToKeep);
 %
-% Franco (c) Stanford Vista Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Get the indices to each voxels' signal
 vxRows = feGet(fe,'voxelrows',voxelsToKeep);

@@ -5,7 +5,8 @@ function [fgFileToLoad, fgLoadDir] = msBuildFgFileName(trackingType,lmax,bval,re
 %
 %  [fgFileToLoad, fgLoadDir] = msBuildFgFileName(trackingType,lmax,bval,rep)
 %
-% Written by Franco Pestilli (c) Stanford Vista Team 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Build a file name for the directory to load the data
 loadDir = msPaths('projectDir');

@@ -46,7 +46,8 @@ function [w, R2] = sgd(y,X,numtoselect,finalstepsize,convergencecriterion,checke
 % See also: Friedman, Hastie and Tibshirani (2008). The elements of
 % statistical learning, chapter 3 (page 31, equation 3.54)
 %
-% Kendrick & Franco (c) 2012 Stanford VISTA team.
+%
+% Copyright Franco Pestilli and Kendrick Kay (2013) Vistasoft Stanford University.
 
 % Set the default for input params: 
 if notDefined('convergencecriterion'), convergencecriterion = [.15 3 5]; end 

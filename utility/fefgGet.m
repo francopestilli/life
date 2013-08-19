@@ -4,6 +4,9 @@ function val = fefgGet(fg,param,varargin)
 %  val = fefgGet(fg,param,varargin)
 %
 %
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+%
 %------------
 % Returns the length of each fiber in the fiber group
 % flen = fefgGet(fg,'length')
@@ -97,8 +100,8 @@ function val = fefgGet(fg,param,varargin)
 %
 % See also: dwiGet/Set, fgCreate; fgSet
 %
-% Franco (c) Stanford VISTA Team 2012
-
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 val = [];
 
 switch strrep(lower(param),' ','')

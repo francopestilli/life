@@ -6,7 +6,7 @@ function fe = s_fe_fit(hemisphere)
 % s_fe_fit
 %
 %
-% Written by Franco Pestilli (c) 2013 Stanford VISTA team.
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 switch hemisphere
     case 'left'

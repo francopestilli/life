@@ -9,15 +9,7 @@ function fe = feConnectomeInit(dwiFile,dtFile,fgFileName,feFileName,savedir,dwiF
 %
 % Example: 
 %
-%   baseDir    = fullfile(mrvDataRootPath,'diffusion','sampleData');
-%   dtFile     = fullfile(baseDir,'dti40','dt6.mat');
-%   dwiFile    = fullfile(baseDir,'raw','dwi.nii.gz');
-%   fgFileName = fullfile(baseDir,'fibers','leftArcuate.pdb');
-%   fe         = feConnectomeInit(dwiFile,dtFile,fgFileName);
-% 
-%   fe         = feConnectomeInit(dwiFile,dtFile,fgFileName,'name','test');
-%
-% Franco (c) 2012 Stanford VISTA Team.
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Handling parallel processing
 poolwasopen=1; % if a matlabpool was open already we do not open nor close one

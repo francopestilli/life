@@ -22,7 +22,7 @@ function Q = feComputeCanonicalDiffusion(fibers,dParms)
 %
 % See also: feConnectomeInit.m v_lifeExample.m
 %
-% Franco (c) 2012 Stanford VISTA Team
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Preallocate
 nFibers = length(fibers); % The number of Fibers.

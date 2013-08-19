@@ -28,7 +28,8 @@ function [fe, o, fefitGood] = feConnectomeCull(fe,maxNumInter, fitType, percentR
 %   fe         = feConnectomeInit(dwiFile,dtFile,fgFileName);
 %   fe         = feConnectomeCull(fe);
 % 
-% Franco (c) 2013 Stanford VISTA Team.
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % For large Conectomes this number might need to be increased, convergence
 % might require more interations.

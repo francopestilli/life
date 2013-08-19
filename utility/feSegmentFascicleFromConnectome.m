@@ -35,7 +35,8 @@ function [fg, keepFG] = feSegmentFascicleFromConnectome(fg, rois, operation, fas
 %                  not survive some of the logical operations and it was
 %                  deleted from the output fiber group.
 %
-% Franco (c) Stanford Vistasoft, 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Make sure that the inputs have one logical operation per ROI
 if ~(length(rois) == length(operation))

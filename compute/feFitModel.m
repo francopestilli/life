@@ -18,9 +18,9 @@ function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)
 % See also: feCreate.m, feConnectomeBuildModel.m, feGet.m, feGet.
 %
 % Example:
-%  See v_lifeExample.m
+%  
 %
-% Franco (c) 2012 Stanford VISTA Team
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % ** Notes **
 %

@@ -14,7 +14,7 @@ function [fe, removedFibers] = feConnectomeReduceFibers(fe, fibersToKeep)
 %   fibersToKeep = 1:50;
 %   feConnectomeReduceFibers(fe, fibersToKeep)
 %
-% Franco (c) Stanford Vista Team 2012
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Return the indices to the fibers removed from the connectome
 removedFibers = find(~fibersToKeep);

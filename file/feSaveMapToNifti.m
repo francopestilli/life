@@ -4,7 +4,8 @@ function feSaveMapToNifti(fe,mapType, niftiName)
 %
 % feSaveMapToNifti(fe,mapType, niftiName)
 %
-% Franco (c) 2012 Stanford Vista Team
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Generate the requested map and save it to volume.
 map = feValues2volume((feGetRep(fe, mapType)),feGet(fe,'roi coords'),feGetRep(fe,'map size'));

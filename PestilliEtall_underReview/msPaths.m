@@ -5,7 +5,8 @@ function p = msPaths(pathType)
 % Example: p = msCodePaths('code')
 %      
 % 
-% Franco (c) VISTA Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 if notDefined('pathType'), error('[%s] pathTYpe is requried as an input.',mfilename);end
 

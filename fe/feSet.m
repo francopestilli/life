@@ -4,7 +4,8 @@ function fe = feSet(fe,param,val,varargin)
 %   fe = feSet(fe,param,val,varargin)
 %
 %
-% Franco & Brian (c) Stanford VISTA Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 %
 %----------
 % feSet(fe,'bvecsindices');
@@ -21,7 +22,8 @@ function fe = feSet(fe,param,val,varargin)
 % fe = feSet(fe,'b0signalrepeat',image_vals);
 %----------
 %
-% Franco Pestilli (c) Stanford VISTA Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Check for input parameters
 if notDefined('fe'),    error('fe structure required'); end

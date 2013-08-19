@@ -7,9 +7,11 @@ function fe = feConnectomeBuildModel(fe)
 %
 % See also: feFitModel.m, feComputePredictedSignal.m
 %
-% Example:  See v_lifeExample.m
+% Example:  
 %
-% Written by Franco Pestilli (c) Stanford University Vistasoft, 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+%
 %
 % -- The LiFE Model --
 %

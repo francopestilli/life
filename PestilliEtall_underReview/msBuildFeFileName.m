@@ -5,7 +5,8 @@ function [feFileToLoad, feLoadName, feLoadDir] = msBuildFeFileName(trackingType,
 %  
 %  [feFileToLoad, feLoadName] = msBuildFeFileName(trackingType,lmax,bval,rep,diffusionModelParams,cullType)
 % 
-% Written by Franco Pestilli (c) Stanford Vista Team 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Build a file name for the directory to load the data
 loadDir = fullfile( msPaths('projectDir'), 'results' );

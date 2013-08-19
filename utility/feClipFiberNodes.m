@@ -18,7 +18,8 @@ function nodesToKeep = feClipFiberNodes(fiber,coords, maxVolDistance)
 %
 % SEE ALSO: feClipFibersToVolume.m, feConnectomePreprocess.m
 %
-% Franco (c) 2012 Stanford Vista Team.
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Compute the squared distance between each node on fiber ii and the
 % nearest roi coordinate

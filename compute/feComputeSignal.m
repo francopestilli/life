@@ -31,7 +31,8 @@ function S = feComputeSignal(bvecs, bvals, Q)
 %
 % Example:
 %
-% Written by Franco Pestilli (c) Stanford University Vistasoft 2013
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Converts the tensors and bvecs into ADC values.  If there are 80
 % directions and 4 tensors, the returned ADC is 80 x 4, with each column
