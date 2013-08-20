@@ -4,8 +4,11 @@ Version 0.1
 
 This software is intended for validating white-matter connectomes and performing statistical hypotheses testign on white matter tracts.
 
-    
-    Copyright (C) Franco Pestilli | Vistasoft| Stanford University 2013 | franco.pestilli@stanford.edu
+
+Copyright (c) Franco Pestilli | Vistasoft | Stanford University 2013 | franco.pestilli@stanford.edu
+
+
+https://github.com/vistalab/life/releases/tag/v0.1
 
 
 If you use this software please cite:
