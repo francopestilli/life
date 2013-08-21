@@ -1,4 +1,4 @@
-function fe = feConnectomeInit(dwiFile,dtFile,fgFileName,feFileName,savedir,dwiFileRepeated,anatomyFile,varargin)
+function fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepeated,anatomyFile,varargin)
 %
 % Initialize a new connectome (fe) structure. 
 %
@@ -23,14 +23,11 @@ if notDefined('savedir'),  savedir = fullfile(fileparts(dtFile),'LiFE');
 end
 fe = feSet(fe,'savedir',savedir);
 
-% Get the xforms. 
-if isstruct(dtFile), dt = dtFile; clear dtFile
-else                 dt = dtiLoadDt6(dtFile);
-end
-fe = feSet(fe,'dtfile',dtFile);
-fe = feSet(fe, 'img2acpc xform', dt.xformToAcpc);
-fe = feSet(fe, 'acpc2img xform', inv(dt.xformToAcpc));
-clear dt
+% Set the xforms (transformations from diffusion data to acpc)
+tempNi = niftiRead(dwiFile);
+fe = feSet(fe, 'img2acpc xform', tempNi.qto_xyz);
+fe = feSet(fe, 'acpc2img xform', inv(tempNi.qto_xyz));
+clear tempNi
 
 % Set up the fe name
 if isstruct(fgFileName),  n  = fgFileName.name;

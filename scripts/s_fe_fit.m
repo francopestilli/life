@@ -1,34 +1,36 @@
-function fe = s_fe_fit(hemisphere)
+function fe = s_fe_fit()
 %
-% Illustrate how to open up data and run a small linear fascicle evaluation
-% (LIFE).
+% This function llustrates how to:
+%  - initialize a LIFE structure from a candidate connectome
+%  - Generate an optimized connectome from a cadidate LIFE structure
+%
+%  fe = s_fe_fit()
 % 
-% s_fe_fit
-%
+% INPUTS:  none
+% OUTPUTS: fe structure the optimized life structure
 %
 % Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
-switch hemisphere
-    case 'left'
-         fgFileName = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/life_mrtrix_rep1/FP_LH_150_B2000_LMAX8.mat';
-    case 'right'
-         fgFileName = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/life_mrtrix_rep1/FP_RH_150_B2000_LMAX8.mat';
-end
+% Get the base directory for the data
+datapath = pestilliDataPath;
 
-dtFile        = '/biac2/wandell2/data/diffusion/pestilli/20110922_1125/150dirs_b2000_1/dt6.mat';
-dwiFile       = '/biac2/wandell2/data/diffusion/pestilli/20110922_1125/raw/0005_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz';
-dwiFileRepeat = '/biac2/wandell2/data/diffusion/pestilli/20110922_1125/raw/0009_01_DTI_2mm_150dir_2x_b2000_aligned_trilin.nii.gz';
-t1File        = '/biac2/wandell2/data/diffusion/pestilli/20110922_1125/t1/t1.nii.gz';
-savedir       = '/azure/scr1/frk/150dirs_b1000_b2000_b4000/life_mrtrix_rep1/results/hemisphere';
-feFileName    = fullfile(savedir,sprintf('fe_culled_FP_150_B2000_LMAX8_%s',hemisphere));
+dwiFile       = fullfile(datapath,'diffusion','subject1_scan1_2mm_150dir_b2000.nii.gz');
+dwiFileRepeat = fullfile(datapath,'diffusion','subject1_scan2_2mm_150dir_b2000.nii.gz');
+t1File        = fullfile(datapath,'anatomy','subject1_t1_anatomy.nii.gz');
+fgFileName    = fullfile(datapath,'connectomes','subject1_fibers_unculled_2mm_150dir_b2000_probabilistic_lmax8.mat');
+savedir       = datapath;
+feFileName    = 'fe_culled_subject1_scan1_2mm_150dir_b2000';
 
-%% Initialize the Connectome
-fe = feConnectomeInit(dwiFile,dtFile,fgFileName,feFileName,savedir,dwiFileRepeat,t1File);
+% Intialize a local matlab cluster if the parallel toolbox is available.
+feOpenLocalCluster;
 
-%% Now reduce the size of the fiber groups
-fe = feConnectomeCullNew(fe);
+% Initialize the Connectome
+fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepeat,t1File);
 
-%% Save it
+% Now reduce the size of the fiber groups
+fe = feConnectomeCull(fe);
+
+% Save it
 feConnectomeSave(fe);
 
 return

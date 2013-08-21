@@ -38,7 +38,7 @@ if notDefined('maxNumInter'), maxNumInter = 1000;end
 % The percent change in R2 from that of the orignal model. 
 % The smaller this number the faster the convergence, the more the fibers
 % kept in the connectome.
-if notDefined('percentReduxRMSE'), percentReduxRMSE = 10;end
+if notDefined('percentReduxRMSE'), percentReduxRMSE = 0;end
 
 % This is the minimum weight that we use to "keep" fibers.
 % We want to delete fibers that have some contribution to the signal.

@@ -18,9 +18,9 @@ function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)
 % See also: feCreate.m, feConnectomeBuildModel.m, feGet.m, feGet.
 %
 % Example:
-%  
+%  See v_lifeExample.m
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Franco (c) 2012 Stanford VISTA Team
 
 % ** Notes **
 %
@@ -43,6 +43,23 @@ switch fitMethod
     options      = optimset('lsqnonneg');
     w = lsqnonneg(M,dSig,options);
     fprintf(' ...fit process completed in %2.3fs\n',toc)
+    R2=[];
+  case {'bbnnls'}
+    fprintf('\nLiFE: Computing least-square minimization with BBNNLS...\n')
+    opt = solopt;
+    opt.maxit = 250;
+    out_data = bbnnls(M,dSig,zeros(size(M,2),1),opt);
+    fprintf('BBNNLS status: %s\nReason: %s\n',out_data.status,out_data.termReason);
+    w = out_data.x;
+    fprintf(' ...fit process completed in %2.3fs\n',toc)
+    % Save the state of the random generator so that the stochasit cfit can be recomputed.
+    defaultStream = RandStream.getGlobalStream; %RandStream.getDefaultStream;
+    fit.randState = defaultStream.State;   
+    
+    % Save out some results 
+    fit.results.R2        = [];
+    fit.results.nParams   = size(M,2);
+    fit.results.nMeasures = size(M,1);
     R2=[];
   case {'sgd','sgdnn'}% stochastic gradient descend, or non-negative stochastic gradient descend
     tic
