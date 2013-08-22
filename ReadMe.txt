@@ -2,10 +2,10 @@ Linear Iterative Fascicle Evaluation (LIFE).
 
 Version 0.1.1
 
-This software is intended for validating white-matter connectomes and performing statistical hypotheses testign on white matter tracts.
+This software is intended for validating white-matter connectomes and performing statistical hypotheses testing on white matter tracts.
 
 
-Copyright (C) Franco Pestilli | Vistasoft| Stanford University 2013 | franco.pestilli@stanford.edu
+Copyright (C) Franco Pestilli | Vistasoft | Stanford University 2013 | franco.pestilli@stanford.edu
 
 
 https://github.com/vistalab/life/releases/tag/v0.1.1
