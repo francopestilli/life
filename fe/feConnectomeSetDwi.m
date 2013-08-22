@@ -45,8 +45,7 @@ fe  = feSet(fe, sprintf('bvecs indices %s',tag),   ...
 
 % Extract the dwi signal at the coordinates of the connectome
 fe  = feSet(fe, sprintf('diffusion signal image %s',tag), ...
-            dwiGet(dwi, 'diffusion signal image',feGet(fe,'roi coords')) ./ ...
-            repmat(dwiGet(dwi, 'S0 image',feGet(fe,'roi coords')),1,feGet(fe,'nbvecs')) );
+            dwiGet(dwi, 'diffusion signal image',feGet(fe,'roi coords')) );
           
 % Extract the non-diffusion direction signal at the coordinates of the
 % conenctome

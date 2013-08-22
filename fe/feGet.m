@@ -11,8 +11,7 @@ function val = feGet(fe,param,varargin)
 %              a match in the coords
 %
 %
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Franco & Brian (c) Stanford Vista Team 2012
 %
 %
 %---------- List of arguments ----
@@ -408,9 +407,8 @@ function val = feGet(fe,param,varargin)
 %
 % End of feGet.m parameters, 
 % 
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
-
+% Franco Pestilli (c) Stanford Vista Team 2012
+   
 val = [];
 
 % Format the input parameters.
@@ -541,7 +539,9 @@ switch param
     nBvecs     = feGet(fe,'nBvecs');
     voxelIndices = feGet(fe,'voxelsindices',varargin);
     val = fe.life.diffusion_signal_img(voxelIndices,:) - repmat(mean(fe.life.diffusion_signal_img(voxelIndices,:), 2),1,nBvecs);
-       
+    keyboard
+    % THis seems to be wrong
+    
   case {'b0signalimage','b0vox'}
     % Get the diffusion signal at 0 diffusion weighting (B0) for this voxel
     %

@@ -7,11 +7,9 @@ function fe = feConnectomeBuildModel(fe)
 %
 % See also: feFitModel.m, feComputePredictedSignal.m
 %
-% Example:  
-%
+% Example:  See v_lifeExample.m
 %
 % Copyright Franco Pestilli (2013) Vistasoft Stanford University.
-%
 %
 % -- The LiFE Model --
 %
@@ -47,7 +45,7 @@ function fe = feConnectomeBuildModel(fe)
 % When a fiber passes through a voxel, the element of M at (voxel * bvec, fiber)
 % will contain the following the predicted diffusion signal as follows:
 %
-%   S/S0  = exp(-bval*(bvec*Q*bvec))
+%   S = S0 exp(-bval*(bvec*Q*bvec))
 %
 % Where Q is the quadratic form of the tensor and S0 is the diffusion
 % signal measured with no diffusion weighting (baseline measured in B0
@@ -123,7 +121,7 @@ fprintf('LiFE - Allocating the model prediction...')
 nUniqueFibersInEachVoxel = feGet(fe,'unique f num');
 
 % number of non-zero elements in the MFiber matrix
-M_siz  = sum(nUniqueFibersInEachVoxel( 1:nVoxels ))*nBvecs;
+M_siz  = sum(nUniqueFibersInEachVoxel(1:nVoxels))*nBvecs;
 
 % This is a vector that will contain the diffusion signals
 M_signal = zeros(M_siz, 1);
@@ -168,8 +166,7 @@ for vv = 1:nVoxels
   
   % Reorganize the diffusion data for each voxel into a long vector: 
   % nDirs X nVoxels.
-  fe.life.dSig(dense_rows) = feGet(fe,'diffusion signal in voxel',usedVoxels(vv));% ./ ...
-                             %feGet(fe,'b0 signal image',  usedVoxels(vv) ) ;
+  fe.life.dSig(dense_rows) = feGet(fe,'diffusion signal in voxel',usedVoxels(vv));
 end
 
 % Install the matrix in the fe structure.

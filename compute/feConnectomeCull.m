@@ -38,8 +38,8 @@ if notDefined('maxNumInter'), maxNumInter = 500;end
 
 % The percent of fibers to remove at each iteration.
 if notDefined('redux')
-    redux.percentRmseIncrease = 0.65;     % The max percent increase in RMSE from the initial
-    redux.percentile = [20 10 5 2.5 1.25]; % The percentile reduction we perform 
+    redux.percentRmseIncrease = 0;     % The max percent increase in RMSE from the initial
+    redux.percentile = [20 10 5 2 1]; % The percentile reduction we perform 
     redux.proportionFibers = [0.1, 0.3, 0.5, 0.7, 0.8]; % The proportion of fiber reduction in which we allow fro each percentile
 end
 

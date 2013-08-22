@@ -35,22 +35,28 @@ fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepeat,t1File
 % Fit the model and cull. This will take some time...
 fe = feConnectomeCull(fe);
 
+% Fastest way to cull the connectome
+% fe = feSet(fe,'fit',feFitModel(feGet(fe,'mfiber'),feGet(fe,'dsigdemeaned'),'bbnnls'));
+
 % Save it
 feConnectomeSave(fe);
 
 % Make a plot of the weights:
 w = feGet(fe,'fiber weights');
-figure
-[y,x] = hist(w(w>0),logspace(-8,-.3,50));
+figName = sprintf('Fascicle weights');
+mrvNewGraphWin(figName);
+[y,x] = hist(w(w>0),logspace(-4,-.3,50));
 semilogx(x,y)
-title('fascicle weights')
-ylabel('number of fascicles')
-xlabel('weight')
+set(gca,'tickdir','out','fontsize',16,'box','off')
+title('fascicle weights','fontsize',16)
+ylabel('number of fascicles','fontsize',16)
+xlabel('fascicle weight','fontsize',16)
 
 % Make a plot of the RMSE:
 rmse   = feGet(fe,'vox rmse');
 rmsexv = feGetRep(fe,'vox rmse');
-figure
+figName = sprintf('RMSE');
+mrvNewGraphWin(figName);
 % Non-cross-validated
 [y,x] = hist(rmse,50);
 plot(x,y,'k-')
@@ -58,21 +64,24 @@ hold on
 % Cross-validated
 [y,x] = hist(rmsexv,50);
 plot(x,y,'r-')
-title('Root-mean squared error distribution across voxels')
-ylabel('number of voxels')
-xlabel('rmse')
-legend({'RMSE fitted data set','RMSE cross-validated'})
+set(gca,'tickdir','out','fontsize',16,'box','off')
+title('Root-mean squared error distribution across voxels','fontsize',16)
+ylabel('number of voxels','fontsize',16)
+xlabel('rmse','fontsize',16)
+legend({'RMSE fitted data set','RMSE cross-validated'},'fontsize',16)
 
 % Make a plot of the RMSE Ratio:
 R   = feGetRep(fe,'voxrmseratio');
-figure
+figName = sprintf('RMSE RATIO');
+mrvNewGraphWin(figName);
 [y,x] = hist(R,linspace(.5,2,50));
 plot(x,y,'k-')
 hold on
 plot([1 1],[0 450],'k--')
-title('Root-mean squared error Ratio')
-ylabel('number of voxels')
-xlabel('R_{rmse}')
+set(gca,'tickdir','out','fontsize',16,'box','off')
+title('Root-mean squared error Ratio','fontsize',16)
+ylabel('number of voxels','fontsize',16)
+xlabel('R_{rmse}','fontsize',16)
 
 
 return
