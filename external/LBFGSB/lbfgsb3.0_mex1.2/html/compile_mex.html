@@ -1,0 +1,347 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>compile_mex</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-02-14"><meta name="DC.source" content="compile_mex.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">test the new function</a></li><li><a href="#3">another test function, the 2D Rosenbrock function</a></li></ul></div><pre class="codeinput"><span class="comment">%{
+</span><span class="comment">Run this file to compile the mex files if you need to
+</span><span class="comment">(or if the binaries work for your computer, then you can skip this)
+</span><span class="comment">This file also contains two simple test problems
+</span><span class="comment">
+</span><span class="comment">I tested this on linux, so it might not work out-of-the-box on Windows or Mac OS,
+</span><span class="comment">but I don't foresee any major difficulties in getting it to work.
+</span><span class="comment">
+</span><span class="comment">Stephen Becker, Feb 14, 2012  srbecker@alumni.caltech.edu
+</span><span class="comment">
+</span><span class="comment">
+</span><span class="comment">See also lbfgsb.m and lbfgsb_wrapper.c
+</span><span class="comment">
+</span><span class="comment">%}
+</span>
+
+
+<span class="comment">% -- Download lbfgsb v. 3.0 from Jorge Nocedal's website --</span>
+<span class="comment">% From his website: Condition for Use: This</span>
+<span class="comment">% software is freely available, but we expect that all publications describing  work</span>
+<span class="comment">% using this software , or all commercial products using it, quote at least one of</span>
+<span class="comment">% the references given below. This software is released under the BSD License</span>
+
+url =<span class="string">'http://users.eecs.northwestern.edu/~nocedal/Software/Lbfgsb.3.0.tar.gz'</span>;
+srcDir = untar(url,<span class="string">'./'</span>);
+
+
+<span class="comment">% Use -DDEBUG to define the "DEBUG" symbol, or -UDEBUG to undefine it</span>
+<span class="comment">%   (if defined, it gives more verbose output when you run the program )</span>
+
+<span class="comment">% run mex -setup if you haven't already...</span>
+
+<span class="comment">% use -lblas if you have it, otherwise change it below to -lmwblas</span>
+
+<span class="keyword">if</span> strcmp( mexext, <span class="string">'mexa64'</span> )
+   disp(<span class="string">'Try the included executable first; if that fails, then compile with mex'</span>);
+<span class="keyword">else</span>
+  mex <span class="string">lbfgsb_wrapper.c</span> <span class="string">-largeArrayDims</span>  <span class="string">-UDEBUG</span> <span class="keyword">...</span>
+    <span class="string">Lbfgsb.3.0/lbfgsb.f</span> <span class="string">Lbfgsb.3.0/linpack.f</span> <span class="string">Lbfgsb.3.0/timer.f</span> <span class="keyword">...</span>
+    <span class="string">-lm</span> <span class="string">-lblas</span>  <span class="string">CFLAGS="\$CFLAGS</span> <span class="string">-O3"</span>
+<span class="keyword">end</span>
+
+disp(<span class="string">'Done compiling'</span>);
+</pre><pre class="codeoutput">Try the included executable first; if that fails, then compile with mex
+Done compiling
+</pre><h2>test the new function<a name="2"></a></h2><pre class="codeinput">disp(<span class="string">'=== lbfgsb "driver1" test problem, 2D === '</span>);
+<span class="comment">% Here's the test problem included with lbfgsb called 'driver1'</span>
+
+n   = 25;
+
+l   = ones(n,1); u = l;
+odd = 1:2:n;
+even= 2:2:n;
+l(odd) = 1.0;
+u(odd) = 1.0e2;
+l(even)= -1.0e2;
+u(even)=  1.0e2;
+
+
+opts    = struct( <span class="string">'x0'</span>, 3*ones(n,1) );
+opts.printEvery     = 1;
+opts.m  = 5;
+
+<span class="comment">% trueSoln = zeros(n,1);</span>
+<span class="comment">% opts.errFcn   = @(x) norm(x-trueSoln)/max(norm(trueSoln),1);</span>
+
+[x,f,info] = lbfgsb( @driver1, l, u, opts );
+
+<span class="comment">% The true objective value is 0.</span>
+<span class="keyword">if</span> abs(f) &lt; 1e-8
+    disp(<span class="string">'Success!'</span>);
+<span class="keyword">else</span>
+    disp(<span class="string">'Something didn''t work right :-(  '</span>);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">=== lbfgsb "driver1" test problem, 2D === 
+Iteration    1, f = 2.40e+03, ||g||_inf = 3.40e+02
+Iteration    2, f = 1.44e+02, ||g||_inf = 3.92e+01
+Iteration    3, f = 7.28e+01, ||g||_inf = 2.32e+01
+Iteration    4, f = 1.60e+01, ||g||_inf = 6.95e+00
+Iteration    5, f = 5.19e+00, ||g||_inf = 9.05e+00
+Iteration    6, f = 2.13e+00, ||g||_inf = 1.97e+01
+Iteration    7, f = 2.08e-01, ||g||_inf = 2.13e+00
+Iteration    8, f = 5.33e-02, ||g||_inf = 8.32e-01
+Iteration    9, f = 1.30e-02, ||g||_inf = 4.28e-01
+Iteration   10, f = 3.86e-03, ||g||_inf = 2.01e-01
+Iteration   11, f = 7.46e-04, ||g||_inf = 1.38e-01
+Iteration   12, f = 3.54e-04, ||g||_inf = 1.21e-01
+Iteration   13, f = 7.43e-05, ||g||_inf = 2.98e-02
+Iteration   14, f = 3.74e-05, ||g||_inf = 1.73e-02
+Iteration   15, f = 1.10e-05, ||g||_inf = 2.87e-02
+Iteration   16, f = 3.91e-06, ||g||_inf = 8.08e-03
+Iteration   17, f = 2.00e-06, ||g||_inf = 3.48e-03
+Iteration   18, f = 8.26e-07, ||g||_inf = 2.25e-03
+Iteration   19, f = 1.99e-07, ||g||_inf = 1.46e-03
+Iteration   20, f = 5.76e-08, ||g||_inf = 1.48e-03
+Iteration   21, f = 1.46e-08, ||g||_inf = 5.49e-04
+Iteration   22, f = 2.36e-09, ||g||_inf = 2.25e-04
+Iteration   23, f = 1.08e-09, ||g||_inf = 1.72e-04
+Success!
+</pre><h2>another test function, the 2D Rosenbrock function<a name="3"></a></h2><pre class="codeinput">disp(<span class="string">'=== Rosenbrock test function, 2D === '</span>);
+n = 2;
+
+fxy = @(x,y) 100*( y-x.^2).^2  +  (1-x ).^2 ;
+f   = @(x)   fxy( x(1,:), x(2,:) );
+gxy = @(x,y) [100*(4*x.^3-4*x.*y)+2*x-2; 100*(2*y-2*x.^2)];
+g   = @(x)   gxy( x(1,:), x(2,:) );
+
+<span class="comment">% There are no constraints</span>
+l   = -inf(n,1);
+u   = inf(n,1);
+
+opts    = struct( <span class="string">'x0'</span>, [-1.9;2] );
+opts.printEvery     = 1;
+opts.m  = 5;
+
+trueSoln = [1;1];
+opts.errFcn     = @(x) norm(x-trueSoln)/max(norm(trueSoln),1);
+<span class="comment">% Ask for very high accuracy</span>
+opts.pgtol      = 1e-10;
+opts.factr      = 1e3;
+
+<span class="comment">% The {f,g} is another way to call it</span>
+[x,f,info] = lbfgsb( {f,g} , l, u, opts );
+
+<span class="keyword">if</span> abs(f) &lt; 1e-8
+    disp(<span class="string">'Success!'</span>);
+<span class="keyword">else</span>
+    disp(<span class="string">'Something didn''t work right :-(  '</span>);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">=== Rosenbrock test function, 2D === 
+Iteration    1, f = 1.95e+02, ||g||_inf = 5.12e+02; error 1.63e+00
+Iteration    2, f = 4.76e+01, ||g||_inf = 3.13e+02; error 1.76e+00
+Iteration    3, f = 6.05e+00, ||g||_inf = 1.68e+01; error 1.88e+00
+Iteration    4, f = 5.96e+00, ||g||_inf = 4.90e+00; error 1.89e+00
+Iteration    5, f = 5.95e+00, ||g||_inf = 1.58e+00; error 1.89e+00
+Iteration    6, f = 5.95e+00, ||g||_inf = 2.40e+00; error 1.88e+00
+Iteration    7, f = 5.92e+00, ||g||_inf = 5.58e+00; error 1.87e+00
+Iteration    8, f = 5.81e+00, ||g||_inf = 1.39e+01; error 1.82e+00
+Iteration    9, f = 4.05e+00, ||g||_inf = 2.14e+01; error 1.39e+00
+Iteration   10, f = 4.03e+00, ||g||_inf = 1.68e+01; error 1.40e+00
+Iteration   11, f = 3.75e+00, ||g||_inf = 1.41e+01; error 1.36e+00
+Iteration   12, f = 3.35e+00, ||g||_inf = 2.34e+01; error 1.26e+00
+Iteration   13, f = 2.85e+00, ||g||_inf = 2.80e+00; error 1.25e+00
+Iteration   14, f = 2.44e+00, ||g||_inf = 6.90e+00; error 1.21e+00
+Iteration   15, f = 2.29e+00, ||g||_inf = 9.63e+00; error 1.19e+00
+Iteration   16, f = 2.08e+00, ||g||_inf = 9.21e+00; error 1.16e+00
+Iteration   17, f = 1.67e+00, ||g||_inf = 5.14e+00; error 1.12e+00
+Iteration   18, f = 1.39e+00, ||g||_inf = 5.92e+00; error 1.08e+00
+Iteration   19, f = 1.03e+00, ||g||_inf = 6.44e+00; error 9.66e-01
+Iteration   20, f = 6.98e-01, ||g||_inf = 4.09e+00; error 9.01e-01
+Iteration   21, f = 6.52e-01, ||g||_inf = 3.84e+00; error 8.84e-01
+Iteration   22, f = 4.41e-01, ||g||_inf = 2.18e+00; error 7.78e-01
+Iteration   23, f = 3.65e-01, ||g||_inf = 4.26e+00; error 7.11e-01
+Iteration   24, f = 3.08e-01, ||g||_inf = 2.70e+00; error 6.82e-01
+Iteration   25, f = 2.44e-01, ||g||_inf = 3.56e+00; error 6.09e-01
+Iteration   26, f = 1.39e-01, ||g||_inf = 1.06e+00; error 5.02e-01
+Iteration   27, f = 1.18e-01, ||g||_inf = 2.96e+00; error 4.46e-01
+Iteration   28, f = 6.86e-02, ||g||_inf = 3.23e+00; error 3.42e-01
+Iteration   29, f = 4.28e-02, ||g||_inf = 2.21e+00; error 2.86e-01
+Iteration   30, f = 2.29e-02, ||g||_inf = 1.66e-01; error 2.25e-01
+Iteration   31, f = 1.61e-02, ||g||_inf = 1.47e+00; error 1.80e-01
+Iteration   32, f = 1.20e-02, ||g||_inf = 2.08e+00; error 1.41e-01
+Iteration   33, f = 5.48e-03, ||g||_inf = 1.43e+00; error 9.74e-02
+Iteration   34, f = 1.56e-03, ||g||_inf = 1.48e-01; error 6.12e-02
+Iteration   35, f = 5.74e-04, ||g||_inf = 8.91e-01; error 1.31e-02
+Iteration   36, f = 5.30e-05, ||g||_inf = 1.14e-02; error 1.15e-02
+Iteration   37, f = 2.82e-06, ||g||_inf = 9.50e-03; error 2.62e-03
+Iteration   38, f = 1.45e-08, ||g||_inf = 4.67e-03; error 4.64e-05
+Iteration   39, f = 9.93e-12, ||g||_inf = 8.99e-05; error 3.54e-06
+Iteration   40, f = 1.11e-16, ||g||_inf = 1.35e-07; error 1.59e-08
+Iteration   41, f = 6.58e-24, ||g||_inf = 6.10e-11; error 3.24e-12
+Success!
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%{
+Run this file to compile the mex files if you need to
+(or if the binaries work for your computer, then you can skip this)
+This file also contains two simple test problems
+
+I tested this on linux, so it might not work out-of-the-box on Windows or Mac OS,
+but I don't foresee any major difficulties in getting it to work. 
+
+Stephen Becker, Feb 14, 2012  srbecker@alumni.caltech.edu
+
+
+See also lbfgsb.m and lbfgsb_wrapper.c
+
+%}
+
+
+
+% REPLACE_WITH_DASH_DASH Download lbfgsb v. 3.0 from Jorge Nocedal's website REPLACE_WITH_DASH_DASH 
+% From his website: Condition for Use: This
+% software is freely available, but we expect that all publications describing  work
+% using this software , or all commercial products using it, quote at least one of
+% the references given below. This software is released under the BSD License
+
+url ='http://users.eecs.northwestern.edu/~nocedal/Software/Lbfgsb.3.0.tar.gz';
+srcDir = untar(url,'./');
+
+
+% Use -DDEBUG to define the "DEBUG" symbol, or -UDEBUG to undefine it
+%   (if defined, it gives more verbose output when you run the program )
+
+% run mex -setup if you haven't already...
+
+% use -lblas if you have it, otherwise change it below to -lmwblas
+
+if strcmp( mexext, 'mexa64' )
+   disp('Try the included executable first; if that fails, then compile with mex');
+else
+  mex lbfgsb_wrapper.c -largeArrayDims  -UDEBUG ...
+    Lbfgsb.3.0/lbfgsb.f Lbfgsb.3.0/linpack.f Lbfgsb.3.0/timer.f ...
+    -lm -lblas  CFLAGS="\$CFLAGS -O3"
+end
+
+disp('Done compiling');
+%% test the new function
+disp('=== lbfgsb "driver1" test problem, 2D === ');
+% Here's the test problem included with lbfgsb called 'driver1'
+
+n   = 25;
+
+l   = ones(n,1); u = l;
+odd = 1:2:n;
+even= 2:2:n;
+l(odd) = 1.0;
+u(odd) = 1.0e2;
+l(even)= -1.0e2;
+u(even)=  1.0e2;
+
+
+opts    = struct( 'x0', 3*ones(n,1) );
+opts.printEvery     = 1;
+opts.m  = 5;
+
+% trueSoln = zeros(n,1);
+% opts.errFcn   = @(x) norm(x-trueSoln)/max(norm(trueSoln),1);
+
+[x,f,info] = lbfgsb( @driver1, l, u, opts );
+
+% The true objective value is 0.
+if abs(f) < 1e-8
+    disp('Success!');
+else
+    disp('Something didn''t work right :-(  ');
+end
+
+%% another test function, the 2D Rosenbrock function
+disp('=== Rosenbrock test function, 2D === ');
+n = 2;
+
+fxy = @(x,y) 100*( y-x.^2).^2  +  (1-x ).^2 ;
+f   = @(x)   fxy( x(1,:), x(2,:) );
+gxy = @(x,y) [100*(4*x.^3-4*x.*y)+2*x-2; 100*(2*y-2*x.^2)];
+g   = @(x)   gxy( x(1,:), x(2,:) );
+
+% There are no constraints
+l   = -inf(n,1);
+u   = inf(n,1);
+
+opts    = struct( 'x0', [-1.9;2] );
+opts.printEvery     = 1;
+opts.m  = 5;
+
+trueSoln = [1;1];
+opts.errFcn     = @(x) norm(x-trueSoln)/max(norm(trueSoln),1);
+% Ask for very high accuracy
+opts.pgtol      = 1e-10;
+opts.factr      = 1e3;
+
+% The {f,g} is another way to call it
+[x,f,info] = lbfgsb( {f,g} , l, u, opts );
+
+if abs(f) < 1e-8
+    disp('Success!');
+else
+    disp('Something didn''t work right :-(  ');
+end
+
+##### SOURCE END #####
+--></body></html>

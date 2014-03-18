@@ -1,0 +1,551 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>lbfgsb</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-02-14"><meta name="DC.source" content="lbfgsb.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [x,f,info] = lbfgsb( fcn, l, u, opts )
+<span class="comment">% x = lbfgsb( fcn, l, u )</span>
+<span class="comment">%   uses the lbfgsb v.3.0 library (fortran files must be installed;</span>
+<span class="comment">%       see compile_mex.m ) which is the L-BFGS-B algorithm.</span>
+<span class="comment">%   The algorithm is similar to the L-BFGS quasi-Newton algorithm,</span>
+<span class="comment">%   but also handles bound constraints via an active-set type iteration.</span>
+<span class="comment">%</span>
+<span class="comment">%  The minimization problem that is solves is:</span>
+<span class="comment">%       min_x  f(x)     subject to   l &lt;= x &lt;= u</span>
+<span class="comment">%</span>
+<span class="comment">% 'fcn' is a function handle that accepts an input, 'x',</span>
+<span class="comment">%   and returns two outputs, 'f' (function value), and 'g' (function gradient).</span>
+<span class="comment">%</span>
+<span class="comment">% 'l' and 'u' are column-vectors of constraints. Set their values to Inf</span>
+<span class="comment">%   if you want to ignore them. (You can set some values to Inf, but keep</span>
+<span class="comment">%   others enforced).</span>
+<span class="comment">%</span>
+<span class="comment">% The full format of the function is:</span>
+<span class="comment">% [x,f,info] = lbfgsb( fcn, l, u, opts )</span>
+<span class="comment">%   where the output 'f' has the value of the function f at the final iterate</span>
+<span class="comment">%   and 'info' is a structure with useful information</span>
+<span class="comment">%       (self-explanatory, except for info.err. The first column of info.err</span>
+<span class="comment">%        is the history of the function values f, and the second column</span>
+<span class="comment">%        is the history of norm( gradient, Inf ).  )</span>
+<span class="comment">%</span>
+<span class="comment">%   The 'opts' structure allows you to pass further options.</span>
+<span class="comment">%   Possible field name values:</span>
+<span class="comment">%</span>
+<span class="comment">%       opts.x0     The starting value (default: all zeros)</span>
+<span class="comment">%       opts.m      Number of limited-memory vectors to use in the algorithm</span>
+<span class="comment">%                       Try 3 &lt;= m &lt;= 20. (default: 5 )</span>
+<span class="comment">%       opts.factr  Tolerance setting (see this source code for more info)</span>
+<span class="comment">%                       (default: 1e7 ). This is later multiplied by machine epsilon</span>
+<span class="comment">%       opts.pgtol  Another tolerance setting, relating to norm(gradient,Inf)</span>
+<span class="comment">%                       (default: 1e-5)</span>
+<span class="comment">%       opts.maxits         How many iterations to allow (default: 100)</span>
+<span class="comment">%       opts.maxTotalIts    How many iterations to allow, including linesearch iterations</span>
+<span class="comment">%                       (default: 5000)</span>
+<span class="comment">%       opts.printEvery     How often to display information (default: 1)</span>
+<span class="comment">%       opts.errFcn         A function handle (or cell array of several function handles)</span>
+<span class="comment">%                       that computes whatever you want. The output will be printed</span>
+<span class="comment">%                       to the screen every 'printEvery' iterations. (default: [] )</span>
+<span class="comment">%       opts.outputFcn      Similar to 'errFcn', but will save the output to</span>
+<span class="comment">%                       the info.err variable.</span>
+<span class="comment">%</span>
+<span class="comment">% Stephen Becker, srbecker@alumni.caltech.edu</span>
+<span class="comment">% Feb 14, 2012</span>
+
+
+
+
+error(nargchk(3, 4, nargin, <span class="string">'struct'</span>))
+<span class="keyword">if</span> nargin &lt; 4, opts = struct([]); <span class="keyword">end</span>
+
+<span class="comment">% Matlab doesn't let you use the .name convention with structures</span>
+<span class="comment">%   if they are empty, so in that case, make the structure non-empty:</span>
+<span class="keyword">if</span> isempty(opts), opts=struct(<span class="string">'a'</span>,1) ; <span class="keyword">end</span>
+
+<span class="keyword">function</span> out = setOpts( field, default, mn, mx )
+    <span class="keyword">if</span> ~isfield( opts, field )
+        opts.(field)    = default;
+    <span class="keyword">end</span>
+    out = opts.(field);
+    <span class="keyword">if</span> nargin &gt;= 3 &amp;&amp; ~isempty(mn) &amp;&amp; any(out &lt; mn), error(<span class="string">'Value is too small'</span>); <span class="keyword">end</span>
+    <span class="keyword">if</span> nargin &gt;= 4 &amp;&amp; ~isempty(mx) &amp;&amp; any(out &gt; mx), error(<span class="string">'Value is too large'</span>); <span class="keyword">end</span>
+    opts    = rmfield( opts, field ); <span class="comment">% so we can do a check later</span>
+<span class="keyword">end</span>
+
+<span class="comment">% [f,g] = callF( x );</span>
+<span class="keyword">if</span> iscell(fcn)
+    <span class="comment">% the user has given us separate functions to compute</span>
+    <span class="comment">%   f (function) and g (gradient)</span>
+    callF   = @(x) fminunc_wrapper(x,fcn{1},fcn{2} );
+<span class="keyword">else</span>
+    callF   = fcn;
+<span class="keyword">end</span>
+
+
+n   = length(l);
+<span class="keyword">if</span> length(u) ~= length(l), error(<span class="string">'l and u must be same length'</span>); <span class="keyword">end</span>
+x0  = setOpts( <span class="string">'x0'</span>, zeros(n,1) );
+x   = x0 + 0; <span class="comment">% important: we want Matlab to make a copy of this.</span>
+              <span class="comment">%  'x' will be modified in-place</span>
+
+<span class="keyword">if</span> size(x0,2) ~= 1, error(<span class="string">'x0 must be a column vector'</span>); <span class="keyword">end</span>
+<span class="keyword">if</span> size(l,2) ~= 1, error(<span class="string">'l must be a column vector'</span>); <span class="keyword">end</span>
+<span class="keyword">if</span> size(u,2) ~= 1, error(<span class="string">'u must be a column vector'</span>); <span class="keyword">end</span>
+<span class="keyword">if</span> size(x,1) ~= n, error(<span class="string">'x0 and l have mismatchig sizes'</span>); <span class="keyword">end</span>
+<span class="keyword">if</span> size(u,1) ~= n, error(<span class="string">'u and l have mismatchig sizes'</span>); <span class="keyword">end</span>
+
+<span class="comment">% Number of L-BFGS memory vectors</span>
+<span class="comment">% From the fortran driver file:</span>
+<span class="comment">% "Values of m &lt; 3  are not recommended, and</span>
+<span class="comment">%  large values of m can result in excessive computing time.</span>
+<span class="comment">%  The range  3 &lt;= m &lt;= 20 is recommended.  "</span>
+m   = setOpts( <span class="string">'m'</span>, 5, 0 );
+
+
+<span class="comment">% 'nbd' is 0 if no bounds, 1 if lower bound only,</span>
+<span class="comment">%       2 if both upper and lower bounds, and 3 if upper bound only.</span>
+<span class="comment">% This .m file assumes l=-Inf and u=+Inf imply that there are no constraints.</span>
+<span class="comment">% So, convert this to the fortran convention:</span>
+nbd     = isfinite(l) + isfinite(u) + 2*isinf(l).*isfinite(u);
+
+
+<span class="comment">% Some scalar settings, "factr" and "pgtol"</span>
+<span class="comment">% Their descriptions, from the fortran file:</span>
+
+<span class="comment">%     factr is a DOUBLE PRECISION variable that must be set by the user.</span>
+<span class="comment">%       It is a tolerance in the termination test for the algorithm.</span>
+<span class="comment">%       The iteration will stop when</span>
+<span class="comment">%</span>
+<span class="comment">%        (f^k - f^{k+1})/max{|f^k|,|f^{k+1}|,1} &lt;= factr*epsmch</span>
+<span class="comment">%</span>
+<span class="comment">%       where epsmch is the machine precision which is automatically</span>
+<span class="comment">%       generated by the code. Typical values for factr on a computer</span>
+<span class="comment">%       with 15 digits of accuracy in double precision are:</span>
+<span class="comment">%       factr=1.d+12 for low accuracy;</span>
+<span class="comment">%             1.d+7  for moderate accuracy;</span>
+<span class="comment">%             1.d+1  for extremely high accuracy.</span>
+<span class="comment">%       The user can suppress this termination test by setting factr=0.</span>
+factr   = setOpts( <span class="string">'factr'</span>, 1e7 );
+
+<span class="comment">%     pgtol is a double precision variable.</span>
+<span class="comment">%       On entry pgtol &gt;= 0 is specified by the user.  The iteration</span>
+<span class="comment">%         will stop when</span>
+<span class="comment">%</span>
+<span class="comment">%                 max{|proj g_i | i = 1, ..., n} &lt;= pgtol</span>
+<span class="comment">%</span>
+<span class="comment">%         where pg_i is the ith component of the projected gradient.</span>
+<span class="comment">%       The user can suppress this termination test by setting pgtol=0.</span>
+pgtol   = setOpts( <span class="string">'pgtol'</span>, 1e-5 );
+
+
+<span class="comment">% Maximum number of outer iterations</span>
+maxIts  = setOpts( <span class="string">'maxIts'</span>, 100, 1 );
+
+<span class="comment">% Maximum number of total iterations</span>
+<span class="comment">%   (this includes the line search steps )</span>
+maxTotalIts     = setOpts( <span class="string">'maxTotalIts'</span>, 5e3 );
+
+<span class="comment">% Print out information this often:</span>
+printEvery  = setOpts( <span class="string">'printEvery'</span>, 1 );
+
+errFcn      = setOpts( <span class="string">'errFcn'</span>, [] );
+outputFcn   = setOpts( <span class="string">'outputFcn'</span>, [] );
+width       = 0;
+<span class="keyword">if</span> iscell( outputFcn ), width = length(outputFcn);
+<span class="keyword">elseif</span> ~isempty(outputFcn), width = 1; <span class="keyword">end</span>
+width       = width + 2; <span class="comment">% include fcn and norm(grad) as well</span>
+err         = zeros( maxIts, width );
+
+<span class="comment">% Make the work arrays</span>
+wa      = ones(2*m*n + 5*n + 11*m*m + 8*m,1);
+iwa     = ones(3*n,1,<span class="string">'int32'</span>);
+task    = <span class="string">'START'</span>;
+iprint  = 0;
+csave   = <span class="string">''</span>;
+lsave   = zeros(4,1);
+isave   = zeros(44,1, <span class="string">'int32'</span>);
+dsave   = zeros(29,1);
+f       = 0;
+g       = zeros(n,1);
+
+
+outer_count     = 0;
+<span class="keyword">for</span> k = 1:maxTotalIts
+
+    <span class="comment">% Call the mex file. The way it works is that you call it,</span>
+    <span class="comment">%   then it returns a "task". If that task starts with 'FG',</span>
+    <span class="comment">%   it means it is requesting you to compute the function and gradient,</span>
+    <span class="comment">%   and then call the function again.</span>
+    <span class="comment">% If it is 'NEW_X', it means it has completed one full iteration.</span>
+    [f, task, csave, lsave, isave, dsave] = <span class="keyword">...</span>
+        lbfgsb_wrapper( m, x, l, u, nbd, f, g, factr, pgtol, wa, iwa, task,iprint,<span class="keyword">...</span>
+        csave, lsave, isave, dsave );
+
+    task    = deblank(task(1:60)); <span class="comment">% this is critical!</span>
+                                   <span class="comment">%otherwise, fortran interprets the string incorrectly</span>
+
+    <span class="keyword">if</span> 1 == strfind( task, <span class="string">'FG'</span> )
+        <span class="comment">% L-BFGS-B requests that we compute the gradient and function value</span>
+
+        [f,g] = callF( x );
+
+    <span class="keyword">elseif</span> 1 == strfind( task, <span class="string">'NEW_X'</span> )
+        outer_count     = outer_count + 1;
+
+        <span class="comment">% Display information if requested</span>
+        <span class="keyword">if</span> ~mod( outer_count, printEvery )
+            fprintf(<span class="string">'Iteration %4d, f = %5.2e, ||g||_inf = %5.2e'</span>, <span class="keyword">...</span>
+                outer_count, f, norm(g,Inf) );
+            <span class="keyword">if</span> isa( errFcn, <span class="string">'function_handle'</span> )
+                fprintf(<span class="string">'; error %.2e'</span>, errFcn(x) );
+            <span class="keyword">elseif</span> iscell( errFcn )
+                <span class="keyword">for</span> j = 1:length(errFcn)
+                    fprintf(<span class="string">'; err %.2e'</span>, errFcn{j}(x) );
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            fprintf(<span class="string">'\n'</span>);
+        <span class="keyword">end</span>
+
+        err(outer_count,1)  = f;
+        err(outer_count,2)  = norm(g,Inf);
+
+
+        <span class="comment">% Record information for the output, if requested</span>
+        <span class="comment">% e.g. outputFcn = errFcn</span>
+        <span class="keyword">if</span> isa( outputFcn, <span class="string">'function_handle'</span> )
+            err(outer_count,3) = outputFcn(x);
+        <span class="keyword">elseif</span> iscell( outputFcn )
+            <span class="keyword">for</span> j = 1:length(outputFcn)
+                err(outer_count,k+2) = outputFcn{j}(x);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+
+    <span class="keyword">else</span>
+        <span class="keyword">break</span>;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+info.err    = err(1:outer_count,:);
+info.iterations     = outer_count;
+info.totalIterations = k;
+info.lbfgs_message1  = task;
+info.lbfgs_message2  = csave;
+info.g  = g;
+
+<span class="keyword">end</span> <span class="comment">% end of main function</span>
+
+
+<span class="keyword">function</span> [f,g] = fminunc_wrapper(x,F,G)
+<span class="comment">% [f,g] = fminunc_wrapper( x, F, G )</span>
+<span class="comment">%   for use with Matlab's "fminunc"</span>
+f = F(x);
+<span class="keyword">if</span> nargin &gt; 2 &amp;&amp; nargout &gt; 1
+    g = G(x);
+<span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Error using ==&gt; lbfgsb at 52
+Not enough input arguments.
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+function [x,f,info] = lbfgsb( fcn, l, u, opts )
+% x = lbfgsb( fcn, l, u )
+%   uses the lbfgsb v.3.0 library (fortran files must be installed;
+%       see compile_mex.m ) which is the L-BFGS-B algorithm.
+%   The algorithm is similar to the L-BFGS quasi-Newton algorithm,
+%   but also handles bound constraints via an active-set type iteration.
+%
+%  The minimization problem that is solves is:
+%       min_x  f(x)     subject to   l <= x <= u
+%
+% 'fcn' is a function handle that accepts an input, 'x',
+%   and returns two outputs, 'f' (function value), and 'g' (function gradient).
+%
+% 'l' and 'u' are column-vectors of constraints. Set their values to Inf
+%   if you want to ignore them. (You can set some values to Inf, but keep
+%   others enforced).
+%
+% The full format of the function is:
+% [x,f,info] = lbfgsb( fcn, l, u, opts )
+%   where the output 'f' has the value of the function f at the final iterate
+%   and 'info' is a structure with useful information
+%       (self-explanatory, except for info.err. The first column of info.err
+%        is the history of the function values f, and the second column
+%        is the history of norm( gradient, Inf ).  )
+%
+%   The 'opts' structure allows you to pass further options.
+%   Possible field name values:
+%
+%       opts.x0     The starting value (default: all zeros)
+%       opts.m      Number of limited-memory vectors to use in the algorithm
+%                       Try 3 <= m <= 20. (default: 5 )
+%       opts.factr  Tolerance setting (see this source code for more info)
+%                       (default: 1e7 ). This is later multiplied by machine epsilon
+%       opts.pgtol  Another tolerance setting, relating to norm(gradient,Inf)
+%                       (default: 1e-5)
+%       opts.maxits         How many iterations to allow (default: 100)
+%       opts.maxTotalIts    How many iterations to allow, including linesearch iterations
+%                       (default: 5000)
+%       opts.printEvery     How often to display information (default: 1)
+%       opts.errFcn         A function handle (or cell array of several function handles)
+%                       that computes whatever you want. The output will be printed
+%                       to the screen every 'printEvery' iterations. (default: [] )
+%       opts.outputFcn      Similar to 'errFcn', but will save the output to
+%                       the info.err variable.
+%
+% Stephen Becker, srbecker@alumni.caltech.edu
+% Feb 14, 2012
+
+
+
+
+error(nargchk(3, 4, nargin, 'struct'))
+if nargin < 4, opts = struct([]); end
+
+% Matlab doesn't let you use the .name convention with structures
+%   if they are empty, so in that case, make the structure non-empty:
+if isempty(opts), opts=struct('a',1) ; end
+
+function out = setOpts( field, default, mn, mx )
+    if ~isfield( opts, field )
+        opts.(field)    = default;
+    end
+    out = opts.(field);
+    if nargin >= 3 && ~isempty(mn) && any(out < mn), error('Value is too small'); end
+    if nargin >= 4 && ~isempty(mx) && any(out > mx), error('Value is too large'); end
+    opts    = rmfield( opts, field ); % so we can do a check later
+end
+
+% [f,g] = callF( x );
+if iscell(fcn)
+    % the user has given us separate functions to compute
+    %   f (function) and g (gradient)
+    callF   = @(x) fminunc_wrapper(x,fcn{1},fcn{2} );
+else
+    callF   = fcn;
+end
+
+
+n   = length(l); 
+if length(u) ~= length(l), error('l and u must be same length'); end
+x0  = setOpts( 'x0', zeros(n,1) );
+x   = x0 + 0; % important: we want Matlab to make a copy of this. 
+              %  'x' will be modified in-place
+              
+if size(x0,2) ~= 1, error('x0 must be a column vector'); end
+if size(l,2) ~= 1, error('l must be a column vector'); end
+if size(u,2) ~= 1, error('u must be a column vector'); end
+if size(x,1) ~= n, error('x0 and l have mismatchig sizes'); end
+if size(u,1) ~= n, error('u and l have mismatchig sizes'); end
+
+% Number of L-BFGS memory vectors
+% From the fortran driver file:
+% "Values of m < 3  are not recommended, and 
+%  large values of m can result in excessive computing time. 
+%  The range  3 <= m <= 20 is recommended.  "
+m   = setOpts( 'm', 5, 0 );
+
+
+% 'nbd' is 0 if no bounds, 1 if lower bound only,
+%       2 if both upper and lower bounds, and 3 if upper bound only.
+% This .m file assumes l=-Inf and u=+Inf imply that there are no constraints.
+% So, convert this to the fortran convention:
+nbd     = isfinite(l) + isfinite(u) + 2*isinf(l).*isfinite(u);
+
+
+% Some scalar settings, "factr" and "pgtol"
+% Their descriptions, from the fortran file:
+
+%     factr is a DOUBLE PRECISION variable that must be set by the user.
+%       It is a tolerance in the termination test for the algorithm.
+%       The iteration will stop when
+%
+%        (f^k - f^{k+1})/max{|f^k|,|f^{k+1}|,1} <= factr*epsmch
+%
+%       where epsmch is the machine precision which is automatically
+%       generated by the code. Typical values for factr on a computer
+%       with 15 digits of accuracy in double precision are:
+%       factr=1.d+12 for low accuracy;
+%             1.d+7  for moderate accuracy; 
+%             1.d+1  for extremely high accuracy.
+%       The user can suppress this termination test by setting factr=0.
+factr   = setOpts( 'factr', 1e7 );
+
+%     pgtol is a double precision variable.
+%       On entry pgtol >= 0 is specified by the user.  The iteration
+%         will stop when
+%
+%                 max{|proj g_i | i = 1, ..., n} <= pgtol
+%
+%         where pg_i is the ith component of the projected gradient.
+%       The user can suppress this termination test by setting pgtol=0.
+pgtol   = setOpts( 'pgtol', 1e-5 );
+
+
+% Maximum number of outer iterations
+maxIts  = setOpts( 'maxIts', 100, 1 );
+
+% Maximum number of total iterations
+%   (this includes the line search steps )
+maxTotalIts     = setOpts( 'maxTotalIts', 5e3 );
+
+% Print out information this often:
+printEvery  = setOpts( 'printEvery', 1 );
+
+errFcn      = setOpts( 'errFcn', [] );
+outputFcn   = setOpts( 'outputFcn', [] );
+width       = 0;
+if iscell( outputFcn ), width = length(outputFcn); 
+elseif ~isempty(outputFcn), width = 1; end
+width       = width + 2; % include fcn and norm(grad) as well
+err         = zeros( maxIts, width );
+
+% Make the work arrays
+wa      = ones(2*m*n + 5*n + 11*m*m + 8*m,1);
+iwa     = ones(3*n,1,'int32');
+task    = 'START';
+iprint  = 0;
+csave   = '';
+lsave   = zeros(4,1);
+isave   = zeros(44,1, 'int32');
+dsave   = zeros(29,1);
+f       = 0;
+g       = zeros(n,1);
+
+
+outer_count     = 0;
+for k = 1:maxTotalIts
+    
+    % Call the mex file. The way it works is that you call it,
+    %   then it returns a "task". If that task starts with 'FG',
+    %   it means it is requesting you to compute the function and gradient,
+    %   and then call the function again.
+    % If it is 'NEW_X', it means it has completed one full iteration.
+    [f, task, csave, lsave, isave, dsave] = ...
+        lbfgsb_wrapper( m, x, l, u, nbd, f, g, factr, pgtol, wa, iwa, task,iprint,...
+        csave, lsave, isave, dsave );
+    
+    task    = deblank(task(1:60)); % this is critical! 
+                                   %otherwise, fortran interprets the string incorrectly
+    
+    if 1 == strfind( task, 'FG' )
+        % L-BFGS-B requests that we compute the gradient and function value
+        
+        [f,g] = callF( x );
+        
+    elseif 1 == strfind( task, 'NEW_X' )
+        outer_count     = outer_count + 1;
+        
+        % Display information if requested
+        if ~mod( outer_count, printEvery )
+            fprintf('Iteration %4d, f = %5.2e, ||g||_inf = %5.2e', ...
+                outer_count, f, norm(g,Inf) );
+            if isa( errFcn, 'function_handle' )
+                fprintf('; error %.2e', errFcn(x) );
+            elseif iscell( errFcn )
+                for j = 1:length(errFcn)
+                    fprintf('; err %.2e', errFcn{j}(x) );
+                end
+            end
+            fprintf('\n');
+        end
+        
+        err(outer_count,1)  = f;
+        err(outer_count,2)  = norm(g,Inf);
+        
+        
+        % Record information for the output, if requested
+        % e.g. outputFcn = errFcn
+        if isa( outputFcn, 'function_handle' )
+            err(outer_count,3) = outputFcn(x);
+        elseif iscell( outputFcn )
+            for j = 1:length(outputFcn)
+                err(outer_count,k+2) = outputFcn{j}(x);
+            end
+        end
+        
+        
+    else
+        break;
+    end
+end
+info.err    = err(1:outer_count,:);
+info.iterations     = outer_count;
+info.totalIterations = k;
+info.lbfgs_message1  = task;
+info.lbfgs_message2  = csave;
+info.g  = g;
+
+end % end of main function
+
+
+function [f,g] = fminunc_wrapper(x,F,G)
+% [f,g] = fminunc_wrapper( x, F, G )
+%   for use with Matlab's "fminunc"
+f = F(x);
+if nargin > 2 && nargout > 1
+    g = G(x);
+end
+
+end
+##### SOURCE END #####
+--></body></html>
