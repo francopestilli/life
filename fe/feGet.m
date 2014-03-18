@@ -590,28 +590,28 @@ switch param
     % nVoxels = feGet(fe,'n voxels')
     val = size(feGet(fe,'roivoxels'),1);
     
-  case {'usedvoxels','indexesofusedvoxels'}
-    % Indexes of actually used voxels.
-    %
-    % These can be different than the number of voxels in the VOI in case some
-    % voxels have no fibers in them.
-    %
-    % TO BE DEPRECATED.
-    %
-    % indxUsedVx = feGet(fe,'index of used voxels')
-    val = find(feGet(fe,'nnodes'));
-    
-  case {'nusedvoxels','numberofusedvoxels'}
-    % Number of actually used voxels.
-    %
-    % This can be less than the number of voxels in the VOI in case some
-    % voxels have no fibers in them.
-    %
-    % TO BE DEPRECATED.
-    %
-    % nUsedVx = feGet(fe,'index of used voxels')
-    val = size(feGet(fe,'used voxels'),2);
-    
+    case {'usedvoxels','indexesofusedvoxels'}
+        % Indexes of actually used voxels.
+        %
+        % These can be different than the number of voxels in the VOI in case some
+        % voxels have no fibers in them.
+        %
+        % TO BE DEPRECATED.
+        %
+        % indxUsedVx = feGet(fe,'index of used voxels')
+        val = find(feGet(fe,'nnodes'));
+        
+    case {'nusedvoxels','numberofusedvoxels'}
+        % Number of actually used voxels.
+        %
+        % This can be less than the number of voxels in the VOI in case some
+        % voxels have no fibers in them.
+        %
+        % TO BE DEPRECATED.
+        %
+        % nUsedVx = feGet(fe,'index of used voxels')
+        val = size(feGet(fe,'used voxels'),2);
+        
   case {'startrow','first index into the dsig vector for a voxel'}
     % Returns the first index to a voxel in the dSig vector.
     %
@@ -628,7 +628,15 @@ switch param
     nBvecs   = feGet(fe,'n bvecs');
     voxelsToKeep = zeros(n,1); voxelsToKeep(varargin{1}) = 1;
     val = logical(kron(voxelsToKeep(:),ones(nBvecs,1)));
-    
+        
+    %val = zeros(nBvecs*n,1);
+    %k = varargin{1}; % number of indices
+    %startIdx = (k-1)*nBvecs + 1;
+    %endIdx = startIdx + nBvecs - 1;
+    %for idx=1:length(k)
+    %    val(startIdx(idx):endIdx(idx)) = 1;
+    %end
+
   case {'modeltensor'}
     val = fe.life.modelTensor;
     
@@ -732,6 +740,10 @@ switch param
     for ii = 1:nNodes(voxIndex)           % Get the tensors
       val(ii,:) = fe.life.fibers.tensors{fe.life.voxel2FNpair{voxIndex}(ii,1)} ...
         (fe.life.voxel2FNpair{voxIndex}(ii,2),:);
+
+    end
+    if isempty(val)
+        val = zeros(1, 9);
     end
     
   case {'nnodes','numofnodes'}

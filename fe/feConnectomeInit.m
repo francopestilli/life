@@ -11,10 +11,6 @@ function fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepe
 %
 % Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
-% Handling parallel processing
-poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
-
 % Intialize the fe structure.
 fe = feCreate;
 

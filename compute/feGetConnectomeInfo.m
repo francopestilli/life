@@ -21,7 +21,7 @@ unique_fibers_index= cell( nVoxels,1); % This will contain the *unique* fibers i
 unique_fibers_num  = zeros(nVoxels,1); % This will contain the number of unique fibers in each voxel
 
 % Get the fibers and unique fibers from voxel2FNpairs, in each voxel:
-parfor vv = 1:nVoxels
+for vv = 1:nVoxels
   % This is the index of the voxel used, it is used to address voxel2FNpair
   voxIndex = usedVoxels(vv);
   

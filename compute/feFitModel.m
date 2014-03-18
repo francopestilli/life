@@ -48,12 +48,12 @@ switch fitMethod
     tic
     fprintf('\nLiFE: Computing least-square minimization with BBNNLS...\n')
     opt = solopt;
-    opt.maxit = 210;
+    opt.maxit = 500;
     opt.use_tolo = 1;
     out_data = bbnnls(M,dSig,zeros(size(M,2),1),opt);
     fprintf('BBNNLS status: %s\nReason: %s\n',out_data.status,out_data.termReason);
     w = out_data.x;
-    fprintf(' ...fit process completed in %2.3fminutes\n',toc/60)
+    fprintf(' ...fit process completed in %2.3f hours\n',toc/60/60)
     % Save the state of the random generator so that the stochasit cfit can be recomputed.
     defaultStream = RandStream.getGlobalStream; %RandStream.getDefaultStream;
     fit.randState = defaultStream.State;   

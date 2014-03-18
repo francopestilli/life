@@ -201,19 +201,19 @@ switch strrep(lower(param),' ','')
       fList = 1:nFibers;
     end
     
-    % Pull out the coordinates and floor them.  These are in image
+    % Pull out the coordinates and ceil them.  These are in image
     % space.
     nFibers = length(fList);
     val = cell(1,nFibers);
     if nFibers == 1
-      val = floor(fg.fibers{fList(1)}');
+      val = ceil(fg.fibers{fList(1)}');
 
     else
       % Handling parallel processing
       poolwasopen=1; % if a matlabpool was open already we do not open nor close one
       if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
       parfor ii=1:nFibers
-        val{ii} = floor(fg.fibers{fList(ii)}');
+        val{ii} = ceil(fg.fibers{fList(ii)}');
       end
       if ~poolwasopen, matlabpool close; end
     end
@@ -225,11 +225,11 @@ switch strrep(lower(param),' ','')
     %
     % Returns the unique image coordinates of all the fibers as an Nx3
     % matrix of integers.
-    % val = round(horzcat(fg.fibers{:})'); 
-    val = floor(horzcat(fg.fibers{:})');
+    % val = round(horzcat(fg.fibers{:})');
+    val = round(horzcat(fg.fibers{:})');
     val = unique(val,'rows');
   
-    case {'allimagecoords'}
+  case {'allimagecoords'}
     %   coords = fefgGet(fgIMG,'all image coords');
     %
     % The fg input must be in IMG space.
@@ -237,7 +237,7 @@ switch strrep(lower(param),' ','')
     % Returns all image coordinates of all the fibers as an Nx3
     % matrix of integers.
     % val = round(horzcat(fg.fibers{:})'); 
-    val = floor(horzcat(fg.fibers{:})');
+    val = ceil(horzcat(fg.fibers{:})');
     
   case {'uniqueacpccoords'}
     %   coords = fefgGet(fg,'unique acpc coords');
@@ -297,6 +297,46 @@ switch strrep(lower(param),' ','')
     end    
     if ~poolwasopen, matlabpool close; end
     fprintf(' took: %2.3fminutes.\n',toc/60)
+ 
+  case 'v2fnfast'
+    % voxel2FNpairs = fefgGet(fgImg,'v2fnFAST',roiCoords);
+    %
+    % The return is a cell array whose size is the number of voxels.
+    % The cell is a Nx2 matrix of the (fiber, node) pairs that pass
+    % through it.
+    %
+    % The value N is the number of nodes in the voxel.  The first
+    % column is the fiber number.  The second column reports the indexes
+    % of the nodes for each fiber in each voxel.
+    fprintf('[%s] This call is not working yet... exiting\n',mfilename)
+    return
+    fprintf('[%s] Computing fibers/nodes pairing in each voxel.. ',mfilename)
+    if (length(varargin) < 1), error('Requires the roiCoords.');
+    else
+      roiCoords = varargin{1};
+      nCoords   = size(roiCoords,1);
+    end
+     
+    nFiber        = length(fg.fibers);
+    val          = cell(1,nCoords);
+    
+    for ii=1:nFiber        
+        % 3 x nNodes or nNodes x 3
+        nodeCoords = ceil(fg.fibers{ii}');
+        
+        % Same size of nodeCoords
+        [~, nodes2voxels] = ismember(nodeCoords, roiCoords, 'rows');
+        
+        % n of non zero values in nodes2voxels
+        list = (nodes2voxels ~= 0);
+        voxelsinfg = nodes2voxels(list);
+        
+        for jj=1:length(voxelsinfg)
+            thisVoxel = voxelsinfg(jj);
+            val{thisVoxel} = cat(1,val{thisVoxel},[ii,nodes2voxels(jj)]);
+        end
+    end
+    fprintf('done in: %2.3fs.\n', toc)
 
   case {'voxel2fibernodepairs','v2fn'}
     % voxel2FNpairs = fefgGet(fgImg,'voxel 2 fibernode pairs',roiCoords);
@@ -435,7 +475,8 @@ switch strrep(lower(param),' ','')
     % Now create find the unique fibers in each voxel
     val = cell(length(fibersInVox),1);
     for ivx = 1:length(fibersInVox)
-      val{ivx} = (unique(fibersInVox{ivx}));
+        val{ivx} = (fibersInVox{ivx});
+       %val{ivx} = (unique(fibersInVox{ivx}));
     end
     fprintf('[%s] done computing unique fibers in each voxel: %2.3fs.\n',mfilename, toc)
 

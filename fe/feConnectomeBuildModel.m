@@ -66,7 +66,7 @@ tic
 % voxels int he ROI in case some voxels have no fibers in them
 usedVoxels   = feGet(fe,'usedVoxels');
 nVoxels      = length(usedVoxels);
-nBvecs       = feGet(fe,'nBvecs');
+nBvecs        = feGet(fe,'nBvecs');
 vox_sparse_pSig = cell(nVoxels,1);
 
 % Generate the signal predicted in each voxel by the connectome.
@@ -75,16 +75,12 @@ vox_sparse_pSig = cell(nVoxels,1);
 % will run it in parallel if parallel processing is allowed.
 fprintf('LiFE - Predicting diffusion signal in %i voxel...\n',nVoxels);
 
-% Handling parallel processing
-poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
-
 parfor vv = 1:nVoxels
   num_unique_fibers = feGet(fe,'unique f num',usedVoxels(vv));
-  
+
   % This returns a matrix that is size nBvecs x num_unique_fibers 
   voxelPSignal      = feComputeVoxelSignal(fe,usedVoxels(vv));
-  
+
   % Fibers in the connectome determine the directional signal in the voxel
   % signal, not the mean signal in the voxel. Here we first demean the
   % voxel signal we will predict.
@@ -144,12 +140,12 @@ end_idx = 0;
 for vv = 1:nVoxels
   num_unique_fibers   = feGet(fe,'unique f num',usedVoxels(vv));
   index_unique_fibers = cell2mat(feGet(fe,'unique f',usedVoxels(vv)));
-
+ 
   % The first return is a binary vector of the locations of the rows of
   % Mfiber corresponding to the current voxel.  We do the find to get the
   % indices of these rows.
   dense_rows  = find(feGet(fe,'voxel rows',vv));
-  
+      
   % We determine the column/row combinations for the non-zero elements in
   % the part of M corresponding to the current voxel:
   sparse_rows = kron(dense_rows,ones(num_unique_fibers,1));
@@ -166,11 +162,17 @@ for vv = 1:nVoxels
   
   % Reorganize the diffusion data for each voxel into a long vector: 
   % nDirs X nVoxels.
-  fe.life.dSig(dense_rows) = feGet(fe,'diffusion signal in voxel',usedVoxels(vv));
-end
+  fe.life.dSig(dense_rows) = feGet(fe,'diffusion signal in voxel',usedVoxels(vv));  
 
+end
+fprintf('process completed in %2.3fs.\n',toc)
+
+
+tic
+fprintf('LiFE - Allocating the sparse matrix...')
 % Install the matrix in the fe structure.
 fe = feSet(fe,'Mfiber',sparse(M_rows, M_cols, M_signal));
+fprintf('process completed in %2.3fs.\n',toc)
 
 % Let's visualize the Mfiber matrix to make sure it has the right general
 % structure of columns with nBvecs numbers, but sparse.  We can visualize for
@@ -185,8 +187,6 @@ fe = feSet(fe,'Mfiber',sparse(M_rows, M_cols, M_signal));
 % NOTE TO SELF:  Let's make a nice way to plot the M fiber matrix with
 % lines demarking the voxels. 
 % mrvNewGraphWin;imagesc(feGet(fe,'M fiber'));
-fprintf('process completed in %2.3fs.\n',toc)
 disp('LiFE - DONE Building the connectome model.');
-if ~poolwasopen, matlabpool close; end
 
 return

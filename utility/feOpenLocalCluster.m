@@ -13,12 +13,12 @@ if (matlabpool('size') == 0),
     if exist('parcluster','file')
     c = parcluster;
     c.NumWorkers = 12;
+    matlabpool(c)
     else
     matlabpool open;     
     end
 else
-    disp('[feOpenLocalCluster] Cannot find the Matlab prallel toolbox, nto intializing a cluster.')
-    disp('[feOpenLocalCluster] Many computations will be substantially slower, withut the parallel toolbox.')
+    disp('[feOpenLocalCluster] Matlabpool was open, not intializing a cluster.')
 end
 
 end
