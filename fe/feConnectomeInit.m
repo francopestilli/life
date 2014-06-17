@@ -11,7 +11,11 @@ function fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepe
 % Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Programming TODO
-%  Re-write the arguments as ('name',val) pairs decoded from the varargin.
+%  * Re-write the arguments as ('name',val) pairs decoded from the varargin.
+%  * Store only the fiber group (fg) file name.  In general we will keep the
+%  files on disk rather than bringing them into memory, or duplicating the
+%  data by saving out the whole fe strcutre
+%
 %
 
 % Handling parallel processing
