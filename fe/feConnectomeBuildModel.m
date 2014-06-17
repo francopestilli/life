@@ -1,9 +1,16 @@
 function fe = feConnectomeBuildModel(fe)
-% Compute matrix to predict directional diffusion in each voxel from fibers
+% Create the matrices used to predict directional diffusion in each voxel
+% from the connectome
 %
 %   fe = feConnectomeBuildModel(fe)
 %
 % INPUTS: fe -  An fe structure, see feCreate.m
+% OUTPUT: The fe structure contains the needed to compute the model, including
+%    * the model matrix from the fibers and isotropic (M)
+%    * the diffusion signal we are trying to predict
+% These are stored inside the fe.life slot of the returned structure.
+%
+% The model fitting takes place in feFitModel.
 %
 % See also: feFitModel.m, feComputePredictedSignal.m
 %
@@ -11,7 +18,7 @@ function fe = feConnectomeBuildModel(fe)
 %
 % Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 %
-% -- The LiFE Model --
+% -- The LiFE Model -- (See Pestilli et al. Reference to go here)
 %
 % LiFE stands for Linear Fascicle Evaluation. The quality of a white-matter
 % connectome is evaluated by using the connectome to model the diffusion

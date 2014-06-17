@@ -17,7 +17,7 @@ if (matlabpool('size') == 0),
     matlabpool open;     
     end
 else
-    disp('[feOpenLocalCluster] Cannot find the Matlab prallel toolbox, nto intializing a cluster.')
+    disp('[feOpenLocalCluster] Cannot find the Matlab prallel toolbox, not intializing a cluster.')
     disp('[feOpenLocalCluster] Many computations will be substantially slower, withut the parallel toolbox.')
 end
 

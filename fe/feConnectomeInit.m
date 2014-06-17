@@ -1,15 +1,18 @@
 function fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepeated,anatomyFile,varargin)
-%
-% Initialize a new connectome (fe) structure. 
+% Initialize a fascicle evaluation (fe) structure
 %
 %    fe = feConnectomeInit(dwiFile,dtFile,fgFileName,feFileName,savedir,dwiFileRepeated,anatomyFile,varargin);
 %    
-% We allow a set of (paramName,val) pairs in the varargin that will be
-% executed as fe = feSet(fe,paramName,val)
+% The fe structure contains all the information needed to evaluate a
+% connectome with respect to the diffusion data.
 %
 % Example: 
 %
 % Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+
+% Programming TODO
+%  Re-write the arguments as ('name',val) pairs decoded from the varargin.
+%
 
 % Handling parallel processing
 poolwasopen=1; % if a matlabpool was open already we do not open nor close one
