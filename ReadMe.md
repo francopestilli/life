@@ -8,7 +8,7 @@ LiFE is intended for:
 
 * Performing statistical inference on white-matter connectomes: Compare white-matter connectomes, show the evidence for white-matter tracts and connections between brain areas.
 
-##### Copyright 2013-2014 | [Franco Pestilli](francopestilli.com) | pestillifranco@gmail.com
+##### Copyright 2013-2014, [Franco Pestilli](francopestilli.com), pestillifranco@gmail.com
 
 [Current stable code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
 
