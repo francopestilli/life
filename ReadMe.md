@@ -6,9 +6,9 @@ This software is intended for:
 
 * Evaluating the evidence supporting white-matter connectomes generated using [magnetic resonance diffusion imaging](http://en.wikipedia.org/wiki/Diffusion_MRI) and [computational tractography methods](http://en.wikipedia.org/wiki/Tractography).
 
-* Performing statistical inference on white matter connectomes.
+* Performing statistical inference on the structure of white-matter connectomes.
 
-##### Copyright [Franco Pestilli, PhD](francopestilli.com) | Stanford University 2013-2014 | pestillifranco@gmail.com
+##### Copyright 2013-2014 | [Franco Pestilli, PhD](francopestilli.com) | pestillifranco@gmail.com
 
 ##### [Current stable code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
 
