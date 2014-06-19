@@ -8,10 +8,10 @@ This software is intended for:
 
 * Performing statistical inference on white matter connectomes.
 
-##### Copyright [Franco Pestilli, PhD](francopestilli.com) | Stanford University 2013 | pestillifranco@gmail.com
+##### Copyright [Franco Pestilli, PhD](francopestilli.com) | Stanford University 2013-2014 | pestillifranco@gmail.com
 
 ##### [Current code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
 
-####### If you use this software please cite:
+###### If you use this software please cite:
 
-####### Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle evaluation (LIFE) of white matter connectomes. Poster presentation at the Organization for Human Brain Mapping Annual Meeting, Seattle, WA, June 2013.
+###### Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle evaluation (LIFE) of white matter connectomes. Poster presentation at the Organization for Human Brain Mapping Annual Meeting, Seattle, WA, June 2013.
