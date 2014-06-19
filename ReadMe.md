@@ -6,7 +6,7 @@ LiFE is intended for:
 
 * Evaluating the evidence supporting white-matter connectomes generated using [magnetic resonance diffusion imaging](http://en.wikipedia.org/wiki/Diffusion_MRI) and [computational tractography ](http://en.wikipedia.org/wiki/Tractography).
 
-* Performing statistical inference on white-matter connectomes. Compare white-matter models, connectomes, tracts and connections.
+* Performing statistical inference on white-matter connectomes: Compare white-matter connectomes, show the evidence for white-matter tracts and connections between brain areas.
 
 ##### Copyright 2013-2014 | [Franco Pestilli](francopestilli.com) | pestillifranco@gmail.com
 
