@@ -8,7 +8,7 @@ This software is intended for:
 
 * Performing statistical inference on the structure of white-matter connectomes.
 
-##### Copyright 2013-2014 | [Franco Pestilli, PhD](francopestilli.com) | pestillifranco@gmail.com
+##### Copyright 2013-2014 | [Franco Pestilli](francopestilli.com) | pestillifranco@gmail.com
 
 ##### [Current stable code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
 
