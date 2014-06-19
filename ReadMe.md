@@ -10,11 +10,9 @@ LiFE is intended for:
 
 ##### Copyright 2013-2014 | [Franco Pestilli](francopestilli.com) | pestillifranco@gmail.com
 
-##### [Current stable code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
+[Current stable code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
 
-###### If you use this software please cite:
-
-Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle evaluation (LIFE) of white matter connectomes. Poster presentation at the Organization for Human Brain Mapping Annual Meeting, Seattle, WA, June 2013.
+If you use this software please cite: Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle evaluation (LIFE) of white matter connectomes. Poster presentation at the Organization for Human Brain Mapping Annual Meeting, Seattle, WA, June 2013.
 
 ##### LiFE is based on [MatLab](http://www.mathworks.com/products/matlab/) and requires [vistasoft](https://github.com/vistalab/vistasoft). 
 ##### Installation
