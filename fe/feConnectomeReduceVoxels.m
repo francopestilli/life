@@ -29,18 +29,25 @@ fe.roi.coords = feGet(fe,'roi coords subset',voxelsToKeep);
 fe.life.diffusion_signal_img = fe.life.diffusion_signal_img(voxelsToKeep,:);
 
 % Set the diffusion signal at 0 diffusion weighting (B0) for this voxel:
+if ~isempty(fe.life.diffusion_S0_img)
 fe.life.diffusion_S0_img = fe.life.diffusion_S0_img(voxelsToKeep);
+end
 
 % Set the voxels to fiber/node pairs for a subset of voxels in the conncetome.
 fe.life.vovel2FNpair = [];
 
 % Now remove singals for the second data set if it was loaded
-if isfield(fe,'rep')
+if isfield(fe,'rep')   
+    if ~isempty(fe.rep.diffusion_signal_img)
     % Set the new diffusion signal, the one for only these subset of voxels.
     fe.rep.diffusion_signal_img = fe.rep.diffusion_signal_img(voxelsToKeep,:);
+    end
     
+    if ~isempty(fe.rep.diffusion_S0_img)
     % Set the diffusion signal at 0 diffusion weighting (B0) for this voxel:
     fe.rep.diffusion_S0_img = fe.rep.diffusion_S0_img(voxelsToKeep); 
+    end
+    
 end
 
 % Now that we have removed some voxels fom the model, we need to remove also

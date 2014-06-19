@@ -1,4 +1,4 @@
-function fg = feClipFibersToVolume(fg,coords,maxVolDist)
+function [fg, kept] = feClipFibersToVolume(fg,coords,maxVolDist)
 %
 % Clip fibers to be constrained withint a Volume.
 %
@@ -14,6 +14,10 @@ function fg = feClipFibersToVolume(fg,coords,maxVolDist)
 % OUTPUTS:
 %        fibersOut      - A cell-array of fibers clipped within the volume 
 %                        defined by coords.
+%        kept           - fibers that were kept out of the original fiber
+%                         group. Because fibers left with no nodes in coords
+%                         are deleted the numbe rof kept fibes can be less
+%                         then the original number of fibers,
 %
 % SEE ALSO: feClipFiberNodes.m, feConnectomePreprocess.m
 % 
@@ -42,8 +46,10 @@ end
 fg.fibers     = fibers; clear fibers;
 
 % Remove the empty fibers, fibers that had no nodes in the volume
-fibersToKeep = (~cellfun('isempty',fg.fibers));
-fg           = fgExtract(fg,fibersToKeep,'keep');
+kept = (~cellfun('isempty',fg.fibers));
+if sum(kept) < length(kept)
+fg           = fgExtract(fg,kept,'keep');
+end
 
 if ~poolwasopen, matlabpool close; end
 

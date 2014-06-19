@@ -48,7 +48,7 @@ switch fitMethod
     tic
     fprintf('\nLiFE: Computing least-square minimization with BBNNLS...\n')
     opt = solopt;
-    opt.maxit = 210;
+    opt.maxit = 500;
     opt.use_tolo = 1;
     out_data = bbnnls(M,dSig,zeros(size(M,2),1),opt);
     fprintf('BBNNLS status: %s\nReason: %s\n',out_data.status,out_data.termReason);
