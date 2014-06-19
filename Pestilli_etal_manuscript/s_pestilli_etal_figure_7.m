@@ -1,16 +1,16 @@
-function fe = s_fe_probabilistic_vs_deterministic()
+function s_pestilli_etal_figure_7()
 %
 % This function llustrates how to:
 %  - initialize a LIFE structure from a candidate connectome
 %  - Generate an optimized connectome from a cadidate connectome using the
 %  LIFE strustrue
 %
-%  fe = s_fe_fit()
+%  fe = s_pestilli_etal_figure_7()
 % 
 % INPUTS:  none
 % OUTPUTS: fe structure the optimized life structure
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright 2013-2014 Franco Pestilli Stanford University pestillifranco@gmail.com.
 
 % Get the base directory for the data
 datapath = pestilliDataPath;
