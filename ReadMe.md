@@ -10,7 +10,7 @@ This software is intended for:
 
 ##### Copyright [Franco Pestilli, PhD](francopestilli.com) | Stanford University 2013-2014 | pestillifranco@gmail.com
 
-##### [Current code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
+##### [Current stable code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
 
 ###### If you use this software please cite:
 
