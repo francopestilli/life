@@ -19,7 +19,7 @@ Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle eval
 ##### LiFE is based on [MatLab](http://www.mathworks.com/products/matlab/) and requires [vistasoft](https://github.com/vistalab/vistasoft). 
 ##### Installation
 1. Download [LiFE](https://github.com/vistalab/life).
-2. Download [vistasfot](https://github.com/vistalab/vistasoft).
+2. Download [vistasoft](https://github.com/vistalab/vistasoft).
 3. [Start MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
 4. Add LiFE and vistasoft to the [matlab search path](http://www.mathworks.com/help/matlab/ref/addpath.html).
 
