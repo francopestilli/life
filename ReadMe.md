@@ -1,20 +1,22 @@
 # Linear Fascicle Evaluation (LiFE)
 #
 
-#### Large-scale evaluation method for white-matter connectomes.
+### Large-scale evaluation and statistical inference method for white-matter connectomes.
+###
+
+#### Copyright 2013-2014   |   [Franco Pestilli](www.francopestilli.com)   |   pestillifranco@gmail.com
 ####
 
-#### Copyright 2013-2014   |   [Franco Pestilli](francopestilli.com)   |   pestillifranco@gmail.com
-####
+### Application.
+* Evaluate the evidence supporting white-matter connectomes generated using [magnetic resonance diffusion imaging](http://en.wikipedia.org/wiki/Diffusion_MRI) and [computational tractography ](http://en.wikipedia.org/wiki/Tractography).
 
-### Applications.
-* Evaluating the evidence supporting white-matter connectomes generated using [magnetic resonance diffusion imaging](http://en.wikipedia.org/wiki/Diffusion_MRI) and [computational tractography ](http://en.wikipedia.org/wiki/Tractography).
-
-* Performing statistical inference on white-matter connectomes: Compare white-matter connectomes, show the evidence for white-matter tracts and connections between brain areas.
+* Performe statistical inference on white-matter connectomes: Compare white-matter connectomes, show the evidence for white-matter tracts and connections between brain areas.
 ###
 
 ### Dependencies.
-LiFE is based on [MatLab](http://www.mathworks.com/products/matlab/) and requires [vistasoft](https://github.com/vistalab/vistasoft) and [Matlab Brain Anatomy (MBA)](https://github.com/francopestilli/mba) for anatomical visualization. 
+1. [MatLab](http://www.mathworks.com/products/matlab/).
+2. [vistasoft](https://github.com/vistalab/vistasoft).
+3. [Matlab Brain Anatomy (MBA)](https://github.com/francopestilli/mba).
 ###
 
 ### Installation.
