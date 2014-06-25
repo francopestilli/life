@@ -9,14 +9,14 @@ LiFE is intended for:
 
 * Performing statistical inference on white-matter connectomes: Compare white-matter connectomes, show the evidence for white-matter tracts and connections between brain areas.
 
-##### Copyright 2013-2014  |  [Franco Pestilli](francopestilli.com)  |  pestillifranco@gmail.com
+##### Copyright 2013-2014   |   [Franco Pestilli](francopestilli.com)   |   pestillifranco@gmail.com
 
 
 The most current stable code release can be found [here](https://github.com/vistalab/life/releases/tag/v0.1.1)
 
 If you use this software please cite: Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle evaluation (LIFE) of white matter connectomes. Poster presentation at the Organization for Human Brain Mapping Annual Meeting, Seattle, WA, June 2013.
 
-##### LiFE is based on [MatLab](http://www.mathworks.com/products/matlab/) and requires [vistasoft](https://github.com/vistalab/vistasoft) and MatLab Brain Anatomy ([MBA](https://github.com/francopestilli/mba)) for visualization. 
+##### LiFE is based on [MatLab](http://www.mathworks.com/products/matlab/) and requires [vistasoft](https://github.com/vistalab/vistasoft) and [Matlab Brain Anatomy (MBA)](https://github.com/francopestilli/mba) for anatomical visualization. 
 
 ##### Installation
 1. Download [LiFE](https://github.com/vistalab/life).
