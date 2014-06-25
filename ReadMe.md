@@ -4,7 +4,7 @@
 ### Large-scale evaluation and statistical inference method for white-matter connectomes.
 ###
 
-#### Copyright 2013-2014   |   [Franco Pestilli](www.francopestilli.com)   |   pestillifranco@gmail.com
+#### Copyright 2013-2014   |   [Franco Pestilli](http://www.francopestilli.com)   |   pestillifranco@gmail.com
 ####
 
 ### Application.
