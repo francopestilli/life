@@ -26,5 +26,5 @@ If you use this software please cite: Pestilli F., Yeatman J.D., Rokem A., Kay K
 5. Add LiFE and vistasoft to the [matlab search path](http://www.mathworks.com/help/matlab/ref/addpath.html).
 
 ##### Demos and Examples
-Examples scripts to get sarted can be found in:
+Examples scripts to get started can be found in:
   life/Pestilli_etal_manuscript/
