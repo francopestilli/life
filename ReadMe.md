@@ -17,7 +17,7 @@
 1. [MatLab](http://www.mathworks.com/products/matlab/).
 2. [vistasoft](https://github.com/vistalab/vistasoft).
 3. [Matlab Brain Anatomy (MBA)](https://github.com/francopestilli/mba).
-###
+
 
 ### Installation.
 1. Download [LiFE](https://github.com/vistalab/life).
@@ -25,7 +25,7 @@
 3. Download [MBA](https://github.com/francopestilli/mba).
 4. [Start MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
 5. Add LiFE and vistasoft to the [matlab search path](http://www.mathworks.com/help/matlab/ref/addpath.html).
-###
+
 
 ### Documentation, demos and Examples.
 Examples scripts to get started can be found in:
