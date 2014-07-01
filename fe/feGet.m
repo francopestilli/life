@@ -11,7 +11,8 @@ function val = feGet(fe,param,varargin)
 %              a match in the coords
 %
 %
-% Franco & Brian (c) Stanford Vista Team 2012
+% Copyright (2013-2014), Franco Pestilli & Brian Wandell, 
+%  Stanford University, pestillifranco@gmail.com.
 %
 %
 %---------- List of arguments ----
@@ -407,7 +408,7 @@ function val = feGet(fe,param,varargin)
 %
 % End of feGet.m parameters, 
 % 
-% Franco Pestilli (c) Stanford Vista Team 2012
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
    
 val = [];
 
