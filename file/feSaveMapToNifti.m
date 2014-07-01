@@ -1,11 +1,10 @@
 function feSaveMapToNifti(fe,mapType, niftiName)
-%
 % Saves a parameter map to file from an fe structure.
 %
 % feSaveMapToNifti(fe,mapType, niftiName)
 %
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Generate the requested map and save it to volume.
 map = feValues2volume((feGetRep(fe, mapType)),feGet(fe,'roi coords'),feGetRep(fe,'map size'));
