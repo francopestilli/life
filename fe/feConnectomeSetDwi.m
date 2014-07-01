@@ -1,5 +1,4 @@
 function fe = feConnectomeSetDwi(fe,dwiFileName,isrepeat)
-%
 % Set all the field necessary to store the DWI measurements.
 %
 % This can be used for the dwi measurements use to build the model as well
@@ -18,8 +17,7 @@ function fe = feConnectomeSetDwi(fe,dwiFileName,isrepeat)
 % fe = feConnectomeSetDwi(fe,dwiFileName,1); % Set the repeated measure
 %                                            % data
 %
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Check inputs
 if notDefined('isrepeat'), isrepeat=0;end
