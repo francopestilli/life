@@ -1,18 +1,20 @@
-function fe = s_fe_fit()
+function fe = s_pestilli_etal_Figures_4_5()
 %
-% This function llustrates how to:
-%  - initialize a LIFE structure from a candidate connectome
-%  - Generate an optimized connectome from a cadidate connectome using the
-%  LIFE strustrue
+% This function:
+%  - Identifies al the fibers between two ROIs from a whole-brain conenctome
+%  - Combines them with fibers tracted between the two ROIs 
+%  - Generates an optimized connectome from a candidate connectome using 
+%  LIFE method
+%  - Performs a virtual lesion
 %
-%  fe = s_fe_fit()
+%  fe = s_pestilli_etal_Figures_4_5()
 % 
 % INPUTS:  none
 % OUTPUTS: fe structure the optimized life structure
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright 2013-2014 Franco Pestilli Stanford University pestillifranco@gmail.com.
 
-% Get the base directory for the data
+%% Get the base directory for the data
 datapath = pestilliDataPath;
 
 % Build the file names for the diffusion data, the anatomical MR, the fiber
@@ -29,30 +31,16 @@ feFileName    = 'fe_culled_subject1_scan1_2mm_150dir_b2000';
 % Intialize a local matlab cluster if the parallel toolbox is available.
 feOpenLocalCluster;
 
-% Initialize the Connectome
+%% Initialize the Connectome
 fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepeat,t1File);
 
-% Fit the model and cull. This will take some time...
-fe = feConnectomeCull(fe);
+%% Fit the model and cull. This will take some time...
+fe = feSet(fe,'fit',feFitModel(fe,'bbnnls'));
 
-% Fastest way to cull the connectome
-% fe = feSet(fe,'fit',feFitModel(feGet(fe,'mfiber'),feGet(fe,'dsigdemeaned'),'bbnnls'));
-
-% Save it
+%% Save it
 feConnectomeSave(fe);
 
-% Make a plot of the weights:
-w = feGet(fe,'fiber weights');
-figName = sprintf('Fascicle weights');
-mrvNewGraphWin(figName);
-[y,x] = hist(w(w>0),logspace(-4,-.3,50));
-semilogx(x,y)
-set(gca,'tickdir','out','fontsize',16,'box','off')
-title('fascicle weights','fontsize',16)
-ylabel('number of fascicles','fontsize',16)
-xlabel('fascicle weight','fontsize',16)
-
-% Make a plot of the RMSE:
+%% Make a plot of the RMSE:
 rmse   = feGet(fe,'vox rmse');
 rmsexv = feGetRep(fe,'vox rmse');
 figName = sprintf('RMSE');
@@ -67,10 +55,10 @@ plot(x,y,'r-')
 set(gca,'tickdir','out','fontsize',16,'box','off')
 title('Root-mean squared error distribution across voxels','fontsize',16)
 ylabel('number of voxels','fontsize',16)
-xlabel('rmse','fontsize',16)
+xlabel('rmse (scanner units)','fontsize',16)
 legend({'RMSE fitted data set','RMSE cross-validated'},'fontsize',16)
 
-% Make a plot of the RMSE Ratio:
+%% Make a plot of the RMSE Ratio:
 R   = feGetRep(fe,'voxrmseratio');
 figName = sprintf('RMSE RATIO');
 mrvNewGraphWin(figName);
@@ -83,6 +71,16 @@ title('Root-mean squared error Ratio','fontsize',16)
 ylabel('number of voxels','fontsize',16)
 xlabel('R_{rmse}','fontsize',16)
 
+%% Make a plot of the weights:
+w = feGet(fe,'fiber weights');
+figName = sprintf('Fascicle weights');
+mrvNewGraphWin(figName);
+[y,x] = hist(w(w>0),logspace(-4,-.3,50));
+semilogx(x,y)
+set(gca,'tickdir','out','fontsize',16,'box','off')
+title('fascicle weights','fontsize',16)
+ylabel('number of fascicles','fontsize',16)
+xlabel('fascicle weight','fontsize',16)
 
 return
 

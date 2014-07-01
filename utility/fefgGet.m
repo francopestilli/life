@@ -201,19 +201,19 @@ switch strrep(lower(param),' ','')
       fList = 1:nFibers;
     end
     
-    % Pull out the coordinates and floor them.  These are in image
+    % Pull out the coordinates and ceil them.  These are in image
     % space.
     nFibers = length(fList);
     val = cell(1,nFibers);
     if nFibers == 1
-      val = floor(fg.fibers{fList(1)}');
+      val = ceil(fg.fibers{fList(1)}')+1;
 
     else
       % Handling parallel processing
       poolwasopen=1; % if a matlabpool was open already we do not open nor close one
       if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
       parfor ii=1:nFibers
-        val{ii} = floor(fg.fibers{fList(ii)}');
+        val{ii} = ceil(fg.fibers{fList(ii)}')+1;
       end
       if ~poolwasopen, matlabpool close; end
     end
@@ -226,7 +226,7 @@ switch strrep(lower(param),' ','')
     % Returns the unique image coordinates of all the fibers as an Nx3
     % matrix of integers.
     % val = round(horzcat(fg.fibers{:})'); 
-    val = floor(horzcat(fg.fibers{:})');
+    val = ceil(horzcat(fg.fibers{:})')+1;
     val = unique(val,'rows');
   
     case {'allimagecoords'}
@@ -237,7 +237,7 @@ switch strrep(lower(param),' ','')
     % Returns all image coordinates of all the fibers as an Nx3
     % matrix of integers.
     % val = round(horzcat(fg.fibers{:})'); 
-    val = floor(horzcat(fg.fibers{:})');
+    val = ceil(horzcat(fg.fibers{:})')+1;
     
   case {'uniqueacpccoords'}
     %   coords = fefgGet(fg,'unique acpc coords');
