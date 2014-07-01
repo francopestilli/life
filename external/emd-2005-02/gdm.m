@@ -1,6 +1,6 @@
 function [f] = gdm(F1, F2, Func)
+% GDM   Ground distance matrix between two signatures.
 %
-% GDM   Ground distance matrix between two signatures
 %    [F] = GDM(F1, F2, FUNC) is the ground distance matrix between
 %    two signatures whose feature vectors are given in F1 and F2.
 %    FUNC is a function which computes the ground distance between
