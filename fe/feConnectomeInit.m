@@ -1,4 +1,4 @@
-function fe = feConnectomeInit(dwiFile,dtFile,fgFileName,feFileName,savedir,dwiFileRepeated,anatomyFile,varargin)
+function fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepeated,anatomyFile,varargin)
 %
 % Initialize a new connectome (fe) structure. 
 %
@@ -9,15 +9,7 @@ function fe = feConnectomeInit(dwiFile,dtFile,fgFileName,feFileName,savedir,dwiF
 %
 % Example: 
 %
-%   baseDir    = fullfile(mrvDataRootPath,'diffusion','sampleData');
-%   dtFile     = fullfile(baseDir,'dti40','dt6.mat');
-%   dwiFile    = fullfile(baseDir,'raw','dwi.nii.gz');
-%   fgFileName = fullfile(baseDir,'fibers','leftArcuate.pdb');
-%   fe         = feConnectomeInit(dwiFile,dtFile,fgFileName);
-% 
-%   fe         = feConnectomeInit(dwiFile,dtFile,fgFileName,'name','test');
-%
-% Franco (c) 2012 Stanford VISTA Team.
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Handling parallel processing
 poolwasopen=1; % if a matlabpool was open already we do not open nor close one
@@ -31,14 +23,11 @@ if notDefined('savedir'),  savedir = fullfile(fileparts(dtFile),'LiFE');
 end
 fe = feSet(fe,'savedir',savedir);
 
-% Get the xforms. 
-if isstruct(dtFile), dt = dtFile; clear dtFile
-else                 dt = dtiLoadDt6(dtFile);
-end
-fe = feSet(fe,'dtfile',dtFile);
-fe = feSet(fe, 'img2acpc xform', dt.xformToAcpc);
-fe = feSet(fe, 'acpc2img xform', inv(dt.xformToAcpc));
-clear dt
+% Set the xforms (transformations from diffusion data to acpc)
+tempNi = niftiRead(dwiFile);
+fe = feSet(fe, 'img2acpc xform', tempNi.qto_xyz);
+fe = feSet(fe, 'acpc2img xform', inv(tempNi.qto_xyz));
+clear tempNi
 
 % Set up the fe name
 if isstruct(fgFileName),  n  = fgFileName.name;

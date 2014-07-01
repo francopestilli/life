@@ -4,6 +4,9 @@ function val = fefgGet(fg,param,varargin)
 %  val = fefgGet(fg,param,varargin)
 %
 %
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+%
 %------------
 % Returns the length of each fiber in the fiber group
 % flen = fefgGet(fg,'length')
@@ -97,8 +100,8 @@ function val = fefgGet(fg,param,varargin)
 %
 % See also: dwiGet/Set, fgCreate; fgSet
 %
-% Franco (c) Stanford VISTA Team 2012
-
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 val = [];
 
 switch strrep(lower(param),' ','')
@@ -226,6 +229,16 @@ switch strrep(lower(param),' ','')
     val = floor(horzcat(fg.fibers{:})');
     val = unique(val,'rows');
   
+    case {'allimagecoords'}
+    %   coords = fefgGet(fgIMG,'all image coords');
+    %
+    % The fg input must be in IMG space.
+    %
+    % Returns all image coordinates of all the fibers as an Nx3
+    % matrix of integers.
+    % val = round(horzcat(fg.fibers{:})'); 
+    val = floor(horzcat(fg.fibers{:})');
+    
   case {'uniqueacpccoords'}
     %   coords = fefgGet(fg,'unique acpc coords');
     %
@@ -331,6 +344,100 @@ switch strrep(lower(param),' ','')
       end
     end
     fprintf('[%s] fiber/node pairing completed in: %2.3fs.\n',mfilename, toc)
+  
+  case {'voxel2fibers','fiberdensity'}
+    % voxel2FNpairs = fefgGet(fgImg,'fiber density',roiCoords);
+    %
+    % The return is a cell array whose size is the number of voxels.
+    % The cell is a Nx1 matrix of fiber counts. How many fibers in each
+    % voxel.
+    %
+    fprintf('[%s] Computing fiber density in each voxel...\n',mfilename)
+   
+    if (length(varargin) < 1), 
+      roiCoords = fefgGet(fg,'uniqueimagecoords');
+      fprintf('[%s] Computing white-matter volume ROI from fibers coordinates.\n',mfilename) 
+      fprintf('          Assuming fiber coordinates in IMG space.\n')
+    else
+      roiCoords = varargin{1};
+    end
+    
+    if length(varargin) < 2
+      % We assume the fg and the ROI coordinates are in the same
+      % coordinate frame.
+      tic,nodes2voxels= fefgGet(fg,'nodes 2 voxels',roiCoords);
+    else nodes2voxels = varargin{2};
+    end
+    
+    nCoords      = size(roiCoords,1);
+    nFibers      = fefgGet(fg,'nFibers');
+    voxelsInFG   = fefgGet(fg,'voxels in fg',nodes2voxels);      
+
+    tic, fibersInVox = cell(1,nCoords);
+    for thisFiber=1:nFibers
+      voxelsInFiber = voxelsInFG{thisFiber};   % A few voxels, in a list
+      
+      % Then add a row for each (fiber,node) pairs that pass through
+      % the voxels for this fiber.
+      for jj=1:length(voxelsInFiber)
+        thisVoxel = voxelsInFiber(jj);
+        % Print out roi coord and fiber coord to verify match
+        % roiCoords(thisVoxel,:)
+        % fg.fibers{thisFiber}(:,nodesInFiber(jj))
+        % Would horzcat be faster?
+        fibersInVox{thisVoxel} = cat(1,fibersInVox{thisVoxel},thisFiber);
+      end
+    end
+    
+    % Now create the fiber density, the unique fibers in each voxel
+    val = zeros(length(fibersInVox),1);
+    for ivx = 1:length(fibersInVox)
+      val(ivx) = length(unique(fibersInVox{ivx}));
+    end
+    
+    fprintf('[%s] fiber density completed in: %2.3fs.\n',mfilename, toc)
+  
+  case {'uniquefibersinvox'}
+    % uniquefvx = fefgGet(fgImg,'uniquefibrsinvox',roiCoords);
+    %
+    % The return is a vector whose size is the number of voxels containing
+    % the unique fibers in each voxel
+    %
+    fprintf('[%s] Computing the unique fibers in each voxel...\n',mfilename)
+    tic
+    if (length(varargin) < 1), error('Requires the roiCoords.');
+    else
+      roiCoords = varargin{1};
+      nCoords   = size(roiCoords,1);
+    end
+    
+    % We assume the fg and the ROI coordinates are in the same
+    % coordinate frame.
+    nodes2voxels    = fefgGet(fg,'nodes 2 voxels',roiCoords);
+    
+    nFibers      = fefgGet(fg,'nFibers');
+    voxelsInFG   = fefgGet(fg,'voxels in fg',nodes2voxels);      
+
+    fibersInVox = cell(1,nCoords);
+    for thisFiber=1:nFibers
+      voxelsInFiber = voxelsInFG{thisFiber};   % A few voxels, in a list
+      
+      % Then add a row for each (fiber,node) pairs that pass through
+      % the voxels for this fiber.
+      if ~isempty(voxelsInFiber)
+          for jj=1:length(voxelsInFiber)
+              thisVoxel = voxelsInFiber(jj);
+              fibersInVox{thisVoxel} = cat(1,fibersInVox{thisVoxel},thisFiber);
+          end
+      end
+    end
+    
+    % Now create find the unique fibers in each voxel
+    val = cell(length(fibersInVox),1);
+    for ivx = 1:length(fibersInVox)
+      val{ivx} = (unique(fibersInVox{ivx}));
+    end
+    fprintf('[%s] done computing unique fibers in each voxel: %2.3fs.\n',mfilename, toc)
 
   case {'nodesinvoxels'}
     % nodesInVoxels = fefgGet(fg,'nodes in voxels',nodes2voxels);
@@ -506,7 +613,7 @@ switch strrep(lower(param),' ','')
       dt = dtiLoadDt6(varargin{1});
     end
     
-    % Get the dt6 tensors for each node in eahc fiber.
+    % Get the dt6 tensors for each node in each fiber.
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
     xform   = inv(dt.xformToAcpc);
@@ -603,9 +710,9 @@ switch strrep(lower(param),' ','')
   case {'md'}
     % Compute the Mean Diffusivity for all the fibers in the fiber group.
     % Requires a dt structure.
-    % fa = fefgGet(fg,'md',dt)
-    % fa = fefgGet(fg,'md',eigenvals)
-    % fa = fefgGet(fg,'md',dtFileName)
+    % md = fefgGet(fg,'md',dt)
+    % md = fefgGet(fg,'md',eigenvals)
+    % md = fefgGet(fg,'md',dtFileName)
 
     if (~isstruct(varargin{1}) || ischar(varargin{1})) && ~iscell(varargin{1})
       % A dti structue was passed.
@@ -627,9 +734,9 @@ switch strrep(lower(param),' ','')
   case {'ad'}
     % Compute the Axial Diffusivity for all the fibers in the fiber group.
     % Requires a dt structure.
-    % fa = fefgGet(fg,'ad',dt)
-    % fa = fefgGet(fg,'ad',eigenvals)
-    % fa = fefgGet(fg,'ad',dtFileName)
+    % ad = fefgGet(fg,'ad',dt)
+    % ad = fefgGet(fg,'ad',eigenvals)
+    % ad = fefgGet(fg,'ad',dtFileName)
 
     if (~isstruct(varargin{1}) || ischar(varargin{1})) && ~iscell(varargin{1}) 
       % A dti structue was passed.
@@ -651,9 +758,9 @@ switch strrep(lower(param),' ','')
   case {'rd'}
     % Compute the Radial Diffusivity for all the fibers in the fiber group.
     % Requires a dt structure.
-    % fa = fefgGet(fg,'rd',dt)
-    % fa = fefgGet(fg,'rd',eigenvals)
-    % fa = fefgGet(fg,'rd',dtFileName)
+    % rd = fefgGet(fg,'rd',dt)
+    % rd = fefgGet(fg,'rd',eigenvals)
+    % rd = fefgGet(fg,'rd',dtFileName)
 
     if (~isstruct(varargin{1}) || ischar(varargin{1})) && ~iscell(varargin{1}) 
       % A dti structue was passed.

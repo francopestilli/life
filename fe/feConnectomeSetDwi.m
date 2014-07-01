@@ -18,7 +18,8 @@ function fe = feConnectomeSetDwi(fe,dwiFileName,isrepeat)
 % fe = feConnectomeSetDwi(fe,dwiFileName,1); % Set the repeated measure
 %                                            % data
 %
-% Franco (c) Stanford VISTA Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Check inputs
 if notDefined('isrepeat'), isrepeat=0;end
@@ -34,17 +35,6 @@ fe  = feSet(fe, sprintf('dwi%sfile',tag),dwiFileName);
 % load the dwi data
 dwi = feGet(fe, sprintf('dwi%s',tag));
 
-% Extract the dwi signal at the coordinates of the connectome
-fe  = feSet(fe, sprintf('diffusion signal image %s',tag), ...
-            dwiGet(dwi, 'diffusion signal image',feGet(fe,'roi coords')));
-          
-% Extract the non-diffusion direction signal at the coordinates of the
-% conenctome
-fe  = feSet(fe, sprintf('S0 image %s',tag), ...
-            dwiGet(dwi, 'S0 image',feGet(fe,'roi coords')));
-
-          if length(isrepeat)>1, keyboard;end
-
 % Store the bvecs, bvals and the indices for the new file.
 fe  = feSet(fe, sprintf('diffusion bvecs %s',tag), ...
             dwiGet(dwi, 'diffusion bvecs'));
@@ -52,6 +42,17 @@ fe  = feSet(fe, sprintf('diffusion bvals %s',tag), ...
             dwiGet(dwi, 'diffusion bvals'));
 fe  = feSet(fe, sprintf('bvecs indices %s',tag),   ...
             dwiGet(dwi, 'diffusionimagenums'));
+
+% Extract the dwi signal at the coordinates of the connectome
+fe  = feSet(fe, sprintf('diffusion signal image %s',tag), ...
+            dwiGet(dwi, 'diffusion signal image',feGet(fe,'roi coords')) );
+          
+% Extract the non-diffusion direction signal at the coordinates of the
+% conenctome
+fe  = feSet(fe, sprintf('S0 image %s',tag), ...
+            dwiGet(dwi, 'S0 image',feGet(fe,'roi coords')));
+
+if length(isrepeat)>1, keyboard;end
           
 % Here I set the dimensions of the dwi file so that I have that
 % available everytime when creating a map of parameters.

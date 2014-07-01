@@ -26,7 +26,8 @@ function fe = feConnectomeSelectFibers(fe, fibersToKeep,recomputeFibersInfo)
 %
 % See also:  fgExtract
 %
-% Franco (c) Stanford Vista Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 if notDefined('recomputeFibersInfo'),recomputeFibersInfo=0;end
 fprintf('[%s], Selecting fibers from the full Connectome...\n',mfilename)

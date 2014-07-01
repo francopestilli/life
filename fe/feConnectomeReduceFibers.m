@@ -1,7 +1,7 @@
-function fe = feConnectomeReduceFibers(fe, fibersToKeep,reduceVoxels)
+function [fe, removedFibers] = feConnectomeReduceFibers(fe, fibersToKeep)
 % Deletes a set of fibers from the signal and the M matrix.
 %
-%   fe = feConnectomeDeleteFibers(fe,fibersToKeep,[reduceVoxels])
+%   [fe, removedFibers] = feConnectomeDeleteFibers(fe,fibersToKeep)
 %
 % Inputs:
 %   - fe, an fe structure, see feCreate.m, and v_lifeExample.m
@@ -13,41 +13,47 @@ function fe = feConnectomeReduceFibers(fe, fibersToKeep,reduceVoxels)
 % Example:
 %   fibersToKeep = 1:50;
 %   feConnectomeReduceFibers(fe, fibersToKeep)
-% Franco (c) Stanford Vista Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
-if notDefined('reduceVoxels'), reduceVoxels=0;end
+% Return the indices to the fibers removed from the connectome
+removedFibers = find(~fibersToKeep);
 
-% Delete fibers' columns from the model
-fe.life.Mfiber = fe.life.Mfiber(:,fibersToKeep);
-
-% Collect the voxels that need to be deleted. By looking at the voxels that
-% after removing the fibers have no prediction left in the rows of Mfiber.
-usedVoxels = feGet(fe,'used voxels');
-nUsed = feGet(fe,'n used voxels');
-voxelsToKeep = false(nUsed,1);   % Indicator variable
-parfor vv = 1:nUsed   % For each voxel
-    
-  % Find the signals for every direction (rows) and every kept fiber (cols)
-  % in this voxel.
-  thisVoxSig = fe.life.Mfiber(feGet(fe,'voxel rows',usedVoxels(vv)),:);  
-  
-  % If the entries are not all zero, keep the voxel
-  if ~isequal(thisVoxSig(:),zeros(numel(thisVoxSig),1))
-      voxelsToKeep(vv) = true;
-  end
+if all(fibersToKeep==0)
+    fe.life.Mfiber = sparse(size(fe.life.Mfiber,1),size(fe.life.Mfiber,2));
+else
+    % Delete fibers' columns from the model
+    fe.life.Mfiber = fe.life.Mfiber(:,fibersToKeep);
 end
 
-% Set the subset of tensors, the one only for the left-over fibers
-if ~isempty(fe.life.tensors)
-  fe.life.fibers.tensors = feGet(fe,'tensors subset',fibersToKeep);
+% Clear the fields that depend o the original fiber group. These are:
+% (1) The fit of the model.
+if isfield(fe.life,'fit') && ~isempty(fe.life.fit)
+    fe.life.fit.weights         = fe.life.fit.weights(fibersToKeep);
+    fe.life.fit.results.nParams = sum(fibersToKeep);
+end
+if isfield(fe.life,'voxfit') && ~isempty(fe.life.voxfit)
+    fe.life.voxfit = [];
+end
+% The field 'fibers' containing some statistics obtained from the original
+% fg
+if isfield(fe.life,'fibers') && ~isempty(fe.life.fibers.tensors)
+    fe.life.fibers.tensors = [];
+    fe.life.fibers.total   = [];
+    fe.life.fibers.unique  = [];
 end
 
-% Take care of the field fe.life.fibers
-
-% Re-set all the fields in fe given the changes in the voxels number given
-% by the changes in the fibers number
-if reduceVoxels
-  fe = feConnectomeReduceVoxels(fe,voxelsToKeep);
+% The actual fiber group.
+if all(fibersToKeep==0)
+    fe = feSet(fe,'fg img',fgCreate('all fibers were deleted',fe.fg.name,'img'));
+else
+    % feExtract requires indices to each fibers and does not accept logical
+    % inuts. Here we make sure we are passing indices not a logical vector.
+    if (length(unique(fibersToKeep)) == 2)
+        if   (all(unique(fibersToKeep) == [0, 1]'))
+            fibersToKeep = find(fibersToKeep);end
+    end
+    fe = feSet(fe,'fg img',fgExtract(feGet(fe,'fibers img'),fibersToKeep,'keep'));
 end
 
 return

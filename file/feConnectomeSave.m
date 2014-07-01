@@ -13,7 +13,8 @@ function fName = feConnectomeSave(fe,varargin)
 %
 % See also, feConnectomeBuild.m, feConnectomeInit.m
 %
-% Franco (c) Stanford VISTA Team 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 if ~isempty(feGet(fe,'savedir')) && ~exist(feGet(fe,'savedir'),'dir'), 
   mkdir(feGet(fe,'savedir')); 

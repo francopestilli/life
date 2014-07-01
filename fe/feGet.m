@@ -354,10 +354,23 @@ function val = feGet(fe,param,varargin)
 % res = feGet(fe, 'res sig full voxfit',coords);
 % res = feGet(fe, 'res sig full voxfit',voxelIndex);
 %---------
+% Fiber density statistics.
+% Computes the fiber density (how many fibers in each voxel)
+% We compute the following values:
+% (1) The number of fibers in each voxel
+% (2) The number of unique fibers with non-zero weights
+% (3) The sum of the weights in each voxel
+% (4) The mean of the weights in each voxel
+% (5) The variance of the weigths in each voxel
+% pSig = feGet(fe,'fiberdensity');
+%---------
 % Given an VOI or a set of indices to voxels returns the indices of the matching voxels inside the big
 % volume, which ordinarily represents the full connectome.
 % voxelIndices = feGet(fe,'voxelsindices',coords)
+%                IMPORTANT: Size(coords) must be Nx3;
 % voxelIndices = feGet(fe,'voxelsindices',voxelIndices)
+%                IMPORTANT: Indices MUST be a column vector for this
+%                code to work. Size(voxelIndices) = Nx1;
 %---------
 % Given an VOI finds the indices of the matching voxels inside the big
 % volume, which ordinarily represents the full connectome.
@@ -473,6 +486,12 @@ switch param
     % dwiFile = feGet(fe,'dwifile')
     val = fe.path.dwifile;
     
+  case 'dwifilerep'
+    %  Load the diffusion weighted data.
+    %
+    % dwiFile = feGet(fe,'dwifilerep')
+    val = fe.path.dwifilerep;
+ 
   case 'savedir'
     %  Directory where the LiFe structes are saved by defualt.
     %
@@ -521,7 +540,8 @@ switch param
     voxelIndices = feGet(fe,'voxelsindices',varargin);
     val = fe.life.diffusion_signal_img(voxelIndices,:) - repmat(mean(fe.life.diffusion_signal_img(voxelIndices,:), 2),1,nBvecs);
     keyboard
-    % THis seems to be worng
+    % THis seems to be wrong
+    
   case {'b0signalimage','b0vox'}
     % Get the diffusion signal at 0 diffusion weighting (B0) for this voxel
     %
@@ -555,7 +575,15 @@ switch param
     %
     % coords = feGet(fe,'roi coords')
     val = fe.roi.coords;
-    
+  
+  case {'roicoordssubset'}
+    % Return the coordinates of the VOI comprised in the connectome.
+    % Always in image space.
+    %
+    % coords = feGet(fe,'roi coords')
+    val = feGet(fe,'roi coords');
+    val = val(varargin{1},:);
+  
   case {'nroivoxels','nvoxels'}
     % Number of voxels in the connectome/VOI.
     %
@@ -715,9 +743,11 @@ switch param
     % val = feGet(fe,'n nodes');
     % val = feGet(fe,'n nodes',voxelsIndices);
     % val = feGet(fe,'n nodes',coords);
-    [val, ~] = cellfun(@size,fe.life.voxel2FNpair);
-    val      = val(feGet(fe,'voxelsindices',varargin));
-    
+    if ~isempty(fe.life.voxel2FNpair)
+        [val, ~] = cellfun(@size,fe.life.voxel2FNpair);
+        val      = val(feGet(fe,'voxelsindices',varargin));
+    end
+
   case {'numberofuniquefibersbyvoxel','uniquefnum'}
     % Return the total number of fibers for all the voxels or in a set of
     % voxels
@@ -939,6 +969,88 @@ switch param
       val = val(feGet(fe,'voxel rows',feGet(fe,'voxelsindices',varargin)));
     end
     
+  case {'uniquefibersindicesinroi'}
+    % Find the unique fibers indices in the FE roi.
+    % Thisis necessary sometimes after changing the number of voxels in an
+    % FE structure, as it is performed by feConnectomeReduceVoxels.m
+    %
+    % FibInRoi = feGet(fe,'uniquefibersinroi');
+    
+    % Get all the unique fibers in each voxel
+    uniquefvx = fefgGet(feGet(fe,'fibers img'), ...
+                        'uniquefibersinvox',     ...
+                        feGet(fe,'roi coords'));
+    val = [];
+    for ivx = 1:length(uniquefvx)
+        val = [val; uniquefvx{ivx}];
+    end
+    val = unique(val);
+    
+  case {'weightsinroi'}
+    % Find the weights of the fibers in a specified volume.
+    %
+    % We compute the following values:   
+    % (1) The number of unique fibers in the volume
+    % (2) The weights for the fibers in the roi
+    %
+    % wFibInRoi = feGet(fe,'weightsinroi');
+    
+    % Get all the unique fibers in each voxel
+    FibInRoi = feGet(fe,'uniquefibersindicesinroi');
+   
+    % extract the fber weights obtained in a LiFE fit
+    w   = feGet(fe,'fiber weights');
+    
+    % Return only the ones for the fibers in this roi
+    val = w(unique( FibInRoi ));
+    
+  case {'fiberdensity'}
+    % Fiber density statistics.
+    %
+    % Computes the fiber density (how many fibers in each voxel)
+    % 
+    % We compute the following values:   
+    % (1) The number of fibers in each voxel
+    % (2) The number of unique fibers with non-zero weights
+    % (3) The sum of the weights in each voxel
+    % (4) The mean of the weights in each voxel
+    % (5) The variance of the weigths in each voxel
+    %
+    % pSig = feGet(fe,'fiberdensity');
+    
+    % Get the unique fibers in each voxel
+    uniquefvx = fefgGet(feGet(fe,'fibers img'), ...
+                        'uniquefibersinvox',     ...
+                        feGet(fe,'roi coords'));
+                      
+    % extract the fber weights obtained in a LiFE fit
+    w = feGet(fe,'fiber weights');
+    
+    % Compute the fiber density in three wasy:
+    % (1) The number of fibers in each voxel
+    % (2) The number of unique fibers with non-zero weights
+    % (3) The sum of the weights in each voxel
+    % (4) The mean of the weights in each voxel
+    % (5) The variance of the weigths in each voxel
+    val = nan(length(uniquefvx),5);
+    for ivx = 1:length(uniquefvx)
+        
+      % Number of fibers in each voxel
+      val(ivx,1) = length(uniquefvx{ivx});
+      
+      % Number of fibers in ech voxel with non-zero weight
+      val(ivx,2) = length(uniquefvx{ivx}(w(uniquefvx{ivx}) > 0));
+  
+      % Sum of fiber weights in each voxel
+      val(ivx,3) = sum(w(uniquefvx{ivx}));
+         
+      % Mean of fiber weights in each voxel
+      val(ivx,4) = nanmedian(w(uniquefvx{ivx}));
+      
+      % Var of fibers in each voxel
+      val(ivx,5) = nanvar(w(uniquefvx{ivx}));
+    end
+    
   case {'psigfibertest'}
     % Predicted signal (demeaned) with a subset of fibers' weights set to 0.
     % This can be used to test the loss in RMSE for the connectome when a
@@ -1094,7 +1206,7 @@ switch param
     % R2 = feGet(fe,'explained variance')
     val = 100 * feGet(fe,'total r2');
     
-  case {'totalrmse'}
+  case {'rmsetotal','totalrmse'}
     % Root mean squared error of the LiFE fit to the whole data
     %
     % rmse = feGet(fe,'rmse')
@@ -1295,7 +1407,7 @@ switch param
     measured  = feGet(fe,'dsigdemeaned by voxel');
     predicted = feGet(fe,'pSig f vox');
     val       = sqrt(mean((measured - predicted).^2,1));
-    val       = val(feGet(fe,'return voxel indices',varargin));
+    val       = val(feGet(fe,'voxelsindices',varargin));
    
   case {'voxelrmsevoxelwise','voxrmsevoxelwise'}
     % A volume of RMSE values optained with the voxel-wise (voxelwise) fit.
@@ -1307,7 +1419,7 @@ switch param
     predicted = feGet(fe,'pSig f voxel wise by voxel');
    
     val       = sqrt(mean((measured - predicted).^2,1));
-    val       = val(feGet(fe,'return voxel indices',varargin));
+    val       = val(feGet(fe,'voxelsindices',varargin));
 
   case {'voxelrmsetest','voxrmsetest'}
     % A volume of RMSE values with a subset of fibers' weights set to 0.
@@ -1321,7 +1433,7 @@ switch param
     val       = sqrt(mean((measured - predicted).^2,1));
     
     if length(varargin) == 2
-      val       = val(feGet(fe,'return voxel indices',varargin));
+      val       = val(feGet(fe,'voxelsindices',varargin));
     end
     
   case {'residualsignalfibervoxel','resfibervox'}
@@ -1390,6 +1502,8 @@ switch param
     %
     % voxelIndices = feGet(fe,'voxelsindices',coords)
     % voxelIndices = feGet(fe,'voxelsindices',voxelIndices)
+    %                IMPORTANT: Indices MUST be a column vector for this
+    %                code to work.
     %
     % coords is a Nx3 set of coordinates in image space
     % voxelIndices is a vector of 1's and 0's, there is a one for each
@@ -1482,7 +1596,7 @@ switch param
   otherwise
     help('feGet')
     fprintf('[feGet] Unknown parameter << %s >>...\n',param);
-    return
+    keyboard
 end
 
 end % END MAIN FUNCTION

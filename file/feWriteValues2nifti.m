@@ -14,13 +14,14 @@ function ni = feWriteValues2nifti(stats,fileName,xForm2Acpc)
 % Example:
 %    feWriteValues2nifti(fd,'fiberDensity_of_some_roi',xform)
 %
-% Franco (c) 2012 Stanford VISTA Team 
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Create the nifti structure
 ni  = niftiCreate('data',stats, ...
     'qto_xyz',xForm2Acpc, ...
     'fname',fileName, ...
-    'nifti_type',class(stats));
+    'data_type',class(stats));
 
 % Write the file.  Saved as a nii.gz
 niftiWrite(ni)

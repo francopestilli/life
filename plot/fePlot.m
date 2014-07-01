@@ -1,4 +1,3 @@
-
 function [uData, g] = fePlot(fe,plotType,varargin)
 % Gateway routine for plotting from the fascicle evaluation (fe) struct
 %
@@ -12,7 +11,8 @@ function [uData, g] = fePlot(fe,plotType,varargin)
 %
 %   fePlot(fe,'dsig measured');
 %
-% Franco (c) Stanford VISTA Team, 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 %
 %-----------
 % Plot the fiber group in a matlab 3D mesh.
@@ -39,6 +39,9 @@ function [uData, g] = fePlot(fe,plotType,varargin)
 %-----------
 %
 %-----------
+%
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 if notDefined('fe'),       error('''fe'' structure required.'); end
 if notDefined('plotType'), error('plotType required'); end
 
@@ -51,6 +54,220 @@ plotType = mrvParamFormat(plotType);
 
 % Find the plot
 switch plotType
+  case {'2dhistogram'}
+      % Makes a 2D density map.
+      uData.x  = feGetRep(fe,varargin{1});
+      uData.y  = feGetRep(fe,varargin{2});
+      uData.ax.min   = min([uData.x,uData.y]);
+      uData.ax.max   = max([uData.x,uData.y]);
+      uData.ax.res   = 100;
+      uData.ax.bins  = linspace(uData.ax.min,uData.ax.max,uData.ax.res);
+      ymap = hist3([uData.x;uData.y]',{uData.ax.bins, uData.ax.bins});
+      uData.sh = imagesc(flipud(ymap));
+      colormap(flipud(hot)); 
+      view(0,90);
+      axis('square')
+      
+  case {'wmvolume'}
+    % get the fiber density
+    mmpVx = feGet(fe,'xform img 2 acpc');
+    mmpVx = mmpVx(1:3,1:3);
+    mmpVx = diag(mmpVx);
+    vxNum = size(feGet(fe,'roi coords'),1);
+    connectomeVol = vxNum*prod(mmpVx);% in mm^3
+        
+    % Total WM volume in the original ROI
+    testVol = '/azure/scr1/frk/rois/life_right_occipital_example_large_no_cc_smaller.mat';
+    ROI = dtiReadRoi(testVol);
+    vxNum    = size(unique(floor(mrAnatXformCoords(feGet(fe,'xform acpc 2 img'),ROI.coords)),'rows'),1);
+    totWMvol = vxNum*prod(mmpVx);% in mm^3
+    uData = connectomeVol/totWMvol*100;
+    close(g)
+
+    g(1) = mrvNewGraphWin(sprintf('%s_percentWMVolume',feGet(fe,'name')));
+    set(gcf,'color','w')
+    
+    % Volume of the ROI
+    h = bar(uData,'r');
+    set(gca,'ylim',[60 120],'xlim',[.5 1.5])
+    ylabel('Percent white-matter volume')
+    title(sprintf('Percent volume: %2.2f',uData))
+    set(gca,  'ytick',[60 80 100 120], ...
+      'box','off','tickDir','out')
+    
+    g(2) = mrvNewGraphWin(sprintf('%s_WMVolume',feGet(fe,'name')));
+    set(gcf,'color','w')
+    
+    % Volume of the ROI
+    h = bar([totWMvol, connectomeVol],'r');
+    set(gca,'ylim',[0 46000],'xlim',[0 3])
+    ylabel('White-matter volume (mm^3)')
+    title(sprintf('Volume: total %6.0fmm^3, connectome %6.0fmm^3',totWMvol,connectomeVol))
+    set(gca,  'ytick',[0 46000/2 46000], ...
+        'xticklabel',{'Total WM','Connectome'}, ...
+        'box','off','tickDir','out')
+    
+  case {'fiberdensitymap'}
+    % Select a slice of brain in sagittal vie.
+    % only Sagittal view is implemented
+    if isempty(varargin),  slice = 30;
+    else slice = varargin{1}; end
+    if ~isempty(varargin) && length(varargin)==2
+        fd = varargin{2};
+    else
+        % get the fiber density
+        fd = (feGet(fe,'fiber density'));
+    end
+    
+    close(g)
+    g(1) = mrvNewGraphWin(sprintf('%s_FiberDensityMapFull',feGet(fe,'name')));
+    set(gcf,'color','w')   
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),fd(:,1)',feGet(fe,'roiCoords'));
+    maxfd = nanmax(img(:)); % This will be used tonormalize the fiber density plots
+    surf(((fliplr(img(:,:,slice)./maxfd)'*255)),...
+      'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    axis off; axis equal;
+    set(gca,'ylim',[75 95],'xlim',[40 65])
+    view(0,-90)
+    
+    cmap = colormap(jet(255));
+    colorbar('ytick',[.25*size(cmap,1) .5*size(cmap,1) .75*size(cmap,1) size(cmap,1)],'yticklabel', ...
+        {num2str(ceil(maxfd/8)) num2str(ceil(maxfd/4)) ...
+        num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
+    
+    % Fiber density after life
+    g(2) = mrvNewGraphWin(sprintf('%s_FiberDensityMapLiFE',feGet(fe,'name')));
+    set(gcf,'color','w')
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,2))',feGet(fe,'roiCoords'));
+    surf(fliplr(img(:,:,slice)./maxfd)'*255,...
+        'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    axis off; axis equal;
+    set(gca,'ylim',[75 95],'xlim',[40 65])
+    % set(gca,'ylim',[100 130],'xlim',[50 85])
+    
+    %set(gca,'ylim',[70 100],'xlim',[40 65])
+    view(0,-90)
+    
+    cmap = colormap(jet(255));
+    colorbar('ytick',[.25*size(cmap,1) .5*size(cmap,1) .75*size(cmap,1) size(cmap,1)],'yticklabel', ...
+        {num2str(ceil(maxfd/8)) num2str(ceil(maxfd/4)) ...
+        num2str(ceil(maxfd/2)) num2str(ceil(maxfd))},'tickdir','out')
+    
+    % Weigth density (sum of weights)
+    g(3) = mrvNewGraphWin(sprintf('%s_SumOfWeightsMapLiFE',feGet(fe,'name')));
+    set(gcf,'color','w')
+    img = feReplaceImageValues(nan(feGet(fe,'map size')),(fd(:,3))',feGet(fe,'roiCoords'));
+    maxw = nanmax(img(:)); % This will be used tonormalize the fiber density plots
+    minw = nanmin(img(:)); % This will be used tonormalize the fiber density plots
+    surf(fliplr(img(:,:,slice+10)./maxw)'*255,...
+        'facecolor','texture','faceAlpha',1,'edgealpha',0,'CDataMapping','Direct');
+    axis off; axis equal;
+    set(gca,'ylim',[75 95],'xlim',[40 65])
+    %set(gca,'ylim',[70 100],'xlim',[40 65])
+    %set(gca,'ylim',[100 130],'xlim',[50 85])
+    view(0,-90)
+    
+    cmap = colormap(jet(255));
+    colorbar('ytick',[0 .5*size(cmap,1) size(cmap,1)],'yticklabel', ...
+      {num2str(minw)  num2str(maxw/2)  num2str(maxw)},'tickdir','out')
+    
+  case {'fiberdensityhist'}
+    % get the fiber density
+    fd = feGet(fe,'fiber density');
+    close(g)
+
+    g(1) = mrvNewGraphWin(sprintf('%s_FiberDensityHistFull_&_LiFE',feGet(fe,'name')));
+    set(gcf,'color','w')
+    
+    % Fiber density before life
+    edges = logspace(.5,3.2,100);
+    linspace()
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    uData.full = histc(fd(:,1),edges)/size(fd,1)*100;
+    h = bar(uData.full,'r');
+    set(h,'edgecolor','r','linewidth',.01)
+    set(get(h,'Children'),'FaceAlpha',.5,'EdgeAlpha',.5)
+    
+    % Fiber density after life
+    hold on
+    uData.life = histc(fd(:,2),edges)/size(fd,1)*100;
+    h = bar(uData.life,'b');
+    set(h,'edgecolor','b','linewidth',.01)
+    set(get(h,'Children'),'FaceAlpha',.35,'EdgeAlpha',.35)
+    set(gca,'ylim',[0 3],'xlim',[1 100])
+    ticks = get(gca,'xtick'); 
+    ylabel('Percent white-matter volume')
+    xlabel('Number of fibers per voxel')
+    set(gca,  'ytick',[0 1 2 3], ...
+      'xticklabel', ceil(centers(ticks-1)) ,...
+      'box','off','tickDir','out','xscale','lin')
+    
+    % Weigth density (sum of weights)
+    g(2) = mrvNewGraphWin(sprintf('%s_SumOfWeightsHistLiFE',feGet(fe,'name')));
+    set(gcf,'color','w')
+    edges = logspace(-7,0,100);
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    y = histc(fd(:,3),edges)/size(fd,1)*100;
+    h = bar(y,'k');
+    set(h,'edgecolor','k','linewidth',.01)
+    ylabel('Percent white-matter volume')
+    xlabel('Sum of fascicles'' contribution to the voxel signal')
+    set(gca,'ylim',[0 ceil(max(y))],'xlim',[.5 100])
+    ticks = get(gca,'xtick');
+    set(gca, 'ytick',[0 ceil(max(y))./2 ceil(max(y))], ...
+      'xticklabel', ceil(1000000*centers(ticks-1))/1000000 ,...
+      'box','off','tickDir','out','xscale','lin')
+    
+    % Weight density (mean of weights)
+    g(3) = mrvNewGraphWin(sprintf('%s_MedianWeightsHistLiFE',feGet(fe,'name')));
+    set(gcf,'color','w')
+    edges = logspace(-7,0,100);
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    y = histc(fd(:,4),edges)/size(fd,1)*100;
+    h = bar(y,'k');
+    set(h,'edgecolor','k','linewidth',.01)
+    ylabel('Percent white-matter volume')
+    xlabel('Mean fascicles'' contribution to the voxel signal')
+      set(gca,'ylim',[0 ceil(max(y))],'xlim',[.5 100])
+    ticks = get(gca,'xtick');
+    set(gca, 'ytick',[0 ceil(max(y))./2 ceil(max(y))], ...
+      'xticklabel', ceil(1000000*centers(ticks-1))/1000000 ,...
+      'box','off','tickDir','out','xscale','lin')
+
+    % Weight density (var of weights)
+    g(4) = mrvNewGraphWin(sprintf('%s_VarianceWeightsHistLiFE',feGet(fe,'name')));
+    set(gcf,'color','w')
+    edges = logspace(-7,0,100);
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    y = histc(fd(:,5),edges)/size(fd,1)*100;
+    h = bar(y,'k');
+    set(h,'edgecolor','k','linewidth',.01)
+    ylabel('Percent white-matter volume')
+    xlabel('Variance of fascicles'' contribution to the voxel signal')
+    set(gca,'ylim',[0 ceil(max(y))],'xlim',[.5 100])
+    ticks = get(gca,'xtick');
+    set(gca, 'ytick',[0 ceil(max(y))./2 ceil(max(y))], ...
+      'xticklabel', ceil(1000000*centers(ticks-1))/1000000 ,...
+      'box','off','tickDir','out','xscale','lin')
+    
+  case {'rmseratiohistogram'}
+    % Weigth density after life
+    set(gcf,'color','w')
+    R = (feGet(fe,'rmseratio'));
+ 
+    edges = logspace(-.3,.6,100);
+    centers = sqrt(edges(1:end-1).*edges(2:end));
+    y = histc(R,edges)/length(R)*100;
+    h = bar(y,'k');
+    set(h,'edgecolor','k','linewidth',.01)
+    ylabel('Percent white-matter volume')
+    xlabel('R_{rmse}')
+    set(gca,'ylim',[0 6],'xlim',[.5 100])
+    ticks = get(gca,'xtick');
+    set(gca, 'ytick',[0 3 6], ...
+      'xticklabel', ceil(100*centers(ticks-1))/100 ,...
+      'box','off','tickDir','out','xscale','lin')
+    
   case {'map','maprep'}
     % Generate the requested map and save it to volume.
     if (length(plotType) > 3)

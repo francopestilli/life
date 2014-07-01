@@ -17,7 +17,8 @@ function fg = feClipFibersToVolume(fg,coords,maxVolDist)
 %
 % SEE ALSO: feClipFiberNodes.m, feConnectomePreprocess.m
 % 
-% Franco (c) 2012 Stanford Vista Team. 
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Handling parallel processing
 poolwasopen = 1; % if a matlabpool was open already we do not open nor close one

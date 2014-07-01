@@ -4,7 +4,8 @@ function fg_file = feConnectomeWrite(fe,saveDir,fileType)
 %
 % fg_file = feConnectomeWrite(fe,[saveDir],[fileType])
 %
-% Franco (c) Stanford VISTA 2012
+%
+% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 
 % Default directory for saving the fiber group is the LIFE folder where the
 % the fe structure is saved by default.
