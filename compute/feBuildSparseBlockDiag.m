@@ -31,7 +31,7 @@ function A = feBuildSparseBlockDiag(nBvecs,nVoxels, values)
 %           (8,3) 1
 %           (9,3) 1
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 if notDefined('values'),values = ones(1,nVoxels);end
 
