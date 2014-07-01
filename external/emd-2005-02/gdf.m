@@ -1,6 +1,6 @@
 function [E] = gdf(V1, V2)
+% GDF   Ground distance between two vectors.
 %
-% GDF   Ground distance between two vectors
 %    [E] = GDF(F1, F2) is the ground distance between two feature vectors.
 %
 %    Example:
