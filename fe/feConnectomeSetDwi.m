@@ -1,5 +1,5 @@
 function fe = feConnectomeSetDwi(fe,dwiFileName,isrepeat)
-% Set all the field necessary to store the DWI measurements.
+% Set all the fields necessary to store the DWI measurements.
 %
 % This can be used for the dwi measurements use to build the model as well
 % as for those used as a second repeat.
