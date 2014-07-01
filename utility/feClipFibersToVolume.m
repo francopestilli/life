@@ -1,5 +1,4 @@
 function [fg, kept] = feClipFibersToVolume(fg,coords,maxVolDist)
-%
 % Clip fibers to be constrained withint a Volume.
 %
 %  function fibers = feClipFibersToVolume(fibers,coords,maxVolDist)
@@ -22,7 +21,7 @@ function [fg, kept] = feClipFibersToVolume(fg,coords,maxVolDist)
 % SEE ALSO: feClipFiberNodes.m, feConnectomePreprocess.m
 % 
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Handling parallel processing
 poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
