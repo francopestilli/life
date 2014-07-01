@@ -1,11 +1,9 @@
 function val = fefgGet(fg,param,varargin)
-%Get values from a fiber group structure
+% Get values from a fiber group structure
 %
 %  val = fefgGet(fg,param,varargin)
 %
-%
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 %
 %------------
 % Returns the length of each fiber in the fiber group
@@ -98,10 +96,9 @@ function val = fefgGet(fg,param,varargin)
 %      'tensors'     - Tensors for each node
 %
 %
-% See also: dwiGet/Set, fgCreate; fgSet
+% See also: fgCreate; fgSet
 %
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 val = [];
 
 switch strrep(lower(param),' ','')
