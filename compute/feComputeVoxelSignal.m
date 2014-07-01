@@ -4,7 +4,7 @@ function voxDSig = feComputeVoxelSignal(fe,voxIndex)
 %
 %   voxDSig = feComputeVoxelSignal(fe,voxelIndex)
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Extract information regarding, voxels, signal and fibers.
 S0                = feGet(fe,'b0signalimage',   voxIndex);  % non diffusion-weighted signal
