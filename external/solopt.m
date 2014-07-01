@@ -1,5 +1,5 @@
 function options = solopt(varargin)
-% SOLOPT  --  Creates a default options structure
+% SOLOPT  --  Creates a default options structure for BBNNLS
 %
 % OPTIONS = SOLOPT
 %
