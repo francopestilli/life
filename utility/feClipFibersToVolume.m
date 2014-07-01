@@ -1,5 +1,5 @@
 function [fg, kept] = feClipFibersToVolume(fg,coords,maxVolDist)
-% Clip fibers to be constrained withint a Volume.
+% Clip fibers to be constrained within a Volume.
 %
 %  function fibers = feClipFibersToVolume(fibers,coords,maxVolDist)
 %
