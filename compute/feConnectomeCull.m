@@ -1,11 +1,10 @@
 function [fe, cull] = feConnectomeCull(fe,display)
-%
-% fe = feConnectomeCull(fe)
-%
 % Fits a connectome over and over by removing the fibers that make no
 % contribution to the diffusion signal at each iteration.
 %
-% Copyright Franco Pestilli, Stanford University 2014
+%   fe = feConnectomeCull(fe)
+%
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 if notDefined('display'); display.cull = false;end
 
