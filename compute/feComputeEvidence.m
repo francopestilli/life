@@ -1,10 +1,5 @@
 function se = feComputeEvidence(rmse1,rmse2)
-%
 % Computes a series of distance metrics between two RMSE distribtions.
-%
-%
-% Copyright Franco Pestilli Stanford University 2014
-%
 %
 % Compute summary statistics on to characterize the lesion,:
 % We compute:
@@ -12,6 +7,8 @@ function se = feComputeEvidence(rmse1,rmse2)
 % - The Kullback-Leibler Divergence
 % - Jeffrey's Divergence
 % - The Eath Mover's distance
+%
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Prepare the distribution of errors and the histograms describing the
 % erros.
