@@ -1,5 +1,5 @@
 function Q = feComputeCanonicalDiffusion(fibers,dParms)
-% Calculate a tensor for forward modeling at each point of each fiber
+% Calculate a tensor for forward modeling at each point of each fiber.
 %
 %  Q = feComputeCanonicalDiffusion(fibers,dParms)
 %
@@ -22,7 +22,7 @@ function Q = feComputeCanonicalDiffusion(fibers,dParms)
 %
 % See also: feConnectomeInit.m v_lifeExample.m
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Preallocate
 nFibers = length(fibers); % The number of Fibers.
