@@ -23,7 +23,7 @@ function val = feGetRep(fe,param,varargin)
 %
 %
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 %
 %---------- List of arguments ----
 % Name of the current fe structure.
@@ -191,7 +191,7 @@ function val = feGetRep(fe,param,varargin)
 % End of feGetRep.m parameters, 
 % 
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 val = [];
 
