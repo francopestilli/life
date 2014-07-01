@@ -1,125 +1,97 @@
 function s_pestilli_etal_figure_7()
+%% Comparison between two tractography model.
 %
-% This function llustrates how to:
-%  - initialize a LIFE structure from a candidate connectome
-%  - Generate an optimized connectome from a cadidate connectome using the
-%  LIFE strustrue
+%  This function illustrates how to:
+%  - Compute the Room-Mean-Square-Error (RMSE) from precomputed LiFE structures.
+%  - Compare the RMSE of two different tractography models. In this example
+%    we show how to compare a Probabilistic and a Deterministic
+%    tractogrpahy model.
+%  - We show how to use the LiFE software to compute the "Strength of evidence" and
+%    the "Earth Movers Distance" to assess the difference in RMSE between
+%    two tractography models.
 %
-%  fe = s_pestilli_etal_figure_7()
+% The example shows that for this brain and tractography model the
+% Probabilitic tractorgrpahy model generates smaller error; it predicts the
+% diffusion measuments better than the Deterministic.
 % 
-% INPUTS:  none
-% OUTPUTS: fe structure the optimized life structure
+% Results similar to the ones in reproduced in this exmple are reported in
+% Fig. 7 of Pestilli et al. UNDER REVIEW.
 %
-% Copyright 2013-2014 Franco Pestilli Stanford University pestillifranco@gmail.com.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com
 
 % Get the base directory for the data
 datapath = pestilliDataPath;
 
-
-%% Load two pre-culled connectomes
+%% Load two pre-computed connectomes generated using Probabilistic and Deterministic tractography.
 %
 feProbFileName = 'subject1_life_culled_2mm_150dir_b2000_probabilistic_lmax8_diffModAx100Rd0.mat';
 feDetFileName  = 'subject1_life_culled_2mm_150dir_b2000_tensor_diffModAx100Rd0.mat';
 
+fprintf('Loading precomputed LiFE models for probabilistic (P) and deterministic (D) connectomes...\n')
 p = load(fullfile(datapath,'life_structures',feProbFileName));
 d = load(fullfile(datapath,'life_structures',feDetFileName)); 
 
-% Extract the RMSE, R_rmse and the coordinates of the white matter
+%% Extract the RMSE of the LiFE model for each connectome in each white-matter voxel.
+% We compute the RMSE for each individual voxel within the White-matter.
+fprintf('Computing Root-Mean-Square-Error (RMSE) for each brain voxel and tractography model..\n')
 p.rmse   = feGetRep(p.fe,'vox rmse');
-p.rrmse  = feGetRep(p.fe,'vox rmse ratio');
-p.coords = feGet(   p.fe,'roi coords');
-
 d.rmse   = feGetRep(d.fe, 'vox rmse');
-d.rrmse  = feGetRep(d.fe, 'vox rmse ratio');
-d.coords = feGet(   d.fe, 'roi coords');
 
-
-%% Find the common coordinates between the two connectomes
+%% Find the common coordinates between the two connectomes.
+% The two tractography method might have passed through slightly different
+% voxels. Here we find the voxels where both models passed. We will compare
+% the error only in these common voxels. There are more coordinates in the
+% Prob connectome, because the tracking fills up more White-matter. 
 %
-% There are more coordinates in the Prob conectome, because the tracking
-% fills up more White-matter.
+% So, hereafter:
 %
-% So, first we find the indices in the probabilistic connectome of the
-% coordinate in the deterministic conenctome.
+% - First we find the indices in the probabilistic connectome of the
+% coordinate in the deterministic connectome. But there are some of the
+% coordinates in the Deterministic conectome that are NOT in the
+% Probabilistic connectome.
 %
-% But there are some of the coordinates in the Deterministic conectome that
-% are NOT in the Probabilistic connectome.
-% 
-% So, second we find the indices in the Deterministic connectome of the
+% - Second we find the indices in the Deterministic connectome of the
 % subset of coordinates in the Probabilistic connectome found in the
 % previous step.
+%
+% - Third we find the common voxels. These allow us to find the rmse for
+% the same voxels.
 
-% First we find the coordinates in the Probabilistic conectome that are
-% also in the Deterministic connectome.
+fprintf('Finding common brain coordinates between P and D connectomes...\n')
+p.coords = feGet(   p.fe,'roi coords');
+d.coords = feGet(   d.fe, 'roi coords');
 prob.coordsIdx = ismember(p.coords,d.coords,'rows');
-
-% Second we find the coordinates in the Deterministic connectome that are
-% also in the Probabilistic connectome.
 prob.coords   = p.coords(prob.coordsIdx,:);
 det.coordsIdx = ismember(d.coords,prob.coords,'rows');
 det.coords    = d.coords(det.coordsIdx,:);
-
-% What we really need is detCoordsIdx and probCoordsIdx. These allow us to
-% find the common voxel indices in rmse and rrmse, etc.
 prob.rmse  = p.rmse( prob.coordsIdx);
-prob.rrmse = p.rrmse(prob.coordsIdx);
-
-det.rmse  = d.rmse( det.coordsIdx);
-det.rrmse = d.rrmse(det.coordsIdx);
+det.rmse   = d.rmse( det.coordsIdx);
 
 
-%% RMSE scatter-density plot of  Probabilistic and Deterministic
+%% Compare the RMSE of the Probabilistic and Deterministic models using a scatter-density plot. 
 scatterPlotRMSE(det,prob)
 
+%% Compare the RMSE of the two models using the Stregth-of-evidence and the Earth Movers Distance.
+se = feComputeEvidence(p.rmse,d.rmse);
 
-%% Make a statisitcal test. To show that the Probabilistic model is better
-% than the deterministic model when using all the voxels.
-nmontecarlo = 5;
-nboots      = 1000;
-nbins       = 200;
-sizeWith    = length(det.rmse);
-nullDistributionP = nan(nboots,nmontecarlo);
-nullDistributionD = nan(nboots,nmontecarlo);
-y = nan(nbins,nmontecarlo);woy = y;
+%% Show the strength of evidence in favor of Probabilistic versus Deterministic tractography. 
+% Plot the distributions of resampled mean RMSE used to compute the strength of
+% evidence (S). 
+distributionPlotStrengthOfEvidence(se.s.unlesioned_e,se.s.lesioned_e,se.s.mean,se.s.std,se.s.unlesioned.xbins, se.s.lesioned.xbins)
 
-% Repeat the bootstrap several times
-for inm = 1:nmontecarlo
-    % Bootstrap the mean RMSE
-    parfor ibt = 1:nboots
-        nullDistributionP(ibt,inm) = mean(randsample(prob.rmse, sizeWith,true));      
-        nullDistributionD(ibt,inm) = mean(randsample(det.rmse, sizeWith,true));
-    end
-    
-    % Distribution probabilistic
-    [y(:,inm),xhis] = hist(nullDistributionP(:,inm),linspace(22,34,200));
-    y(:,inm) = y(:,inm)./sum(y(:,inm));
-    
-    % Distribution deterministic
-    [woy(:,inm),woxhis] = hist(nullDistributionD(:,inm),linspace(22,34,200));
-    woy(:,inm) = woy(:,inm)./sum(woy(:,inm));
-end
-y_m = mean(y,2);
-y_e = [y_m, y_m] + 2*[-std(y,[],2),std(y,[],2)];
+%% Show the RMSE distributions for Probabilistic deterministic tractography. 
+%% Compare the distributions using the Earth Movers Distance.  
+% Plot the distributions of RMSE for the two models and report the Earth
+% Movers Distance between the distributions
 
-ywo_m = mean(woy,2);
-ywo_e = [ywo_m, ywo_m] + 2*[-std(woy,[],2),std(woy,[],2)];
+distributionPlotEarthMoversDistance(se.nolesion,se.lesion,se.em)
 
+end % End main function
 
-%% Compute the strength of evidence.
-dprime = diff([mean(nullDistributionP,1);mean(nullDistributionD,1)]) ...
-               ./sqrt(sum([std(nullDistributionP,[],1);std(nullDistributionD,[],1)].^2,1));
-
-           
-%% Plot the null distribution and the empirical difference
-distributionPlotRMSE(y_e,ywo_e,dprime,xhis,woxhis)
-
-
-end
-
-%------------------------------------%
+%% Helper functions used for plotting
 function scatterPlotRMSE(det,prob)
 figNameRmse = sprintf('prob_vs_det_rmse_common_voxels_map');
-fhRmseMap = mrvNewGraphWin(figNameRmse);
+mrvNewGraphWin(figNameRmse);
 [ymap,x]  = hist3([det.rmse;prob.rmse]',{[10:1:70], [10:1:70]});
 ymap = ymap./length(prob.rmse);
 sh   = imagesc(flipud(log10(ymap)));
@@ -136,8 +108,8 @@ set(gca, ...
     'fontsize',16,'visible','on')
 hold on
 plot3([1 length(x{1})],[length(x{1}) 1],[max(ymap(:)) max(ymap(:))],'k-','linewidth',1)
-ylabel('Deterministic_{rmse}','fontsize',12)
-xlabel('Probabilistic_{rmse}','fontsize',12)
+ylabel('Deterministic_{rmse}','fontsize',16)
+xlabel('Probabilistic_{rmse}','fontsize',16)
 cb = colorbar;
 tck = get(cb,'ytick');
 set(cb,'yTick',[min(tck)  mean(tck) max(tck)], ...
@@ -148,36 +120,49 @@ set(cb,'yTick',[min(tck)  mean(tck) max(tck)], ...
     'fontsize',16,'visible','on')
 end
 
-%---------------------------------------%
-function distributionPlotRMSE(y_e,ywo_e,dprime,xhis,woxhis)
-
-h1.ylim  = [0 0.6];
-h1.xlim  = [22,34];
-h1.ytick = [0 0.3 0.6];
-h1.xtick = [28 30 32 34];
-h2.ylim  = [0 0.4];
-h2.xlim  = [28,32];
-h2.ytick = [0 0.2 0.4];
-h2.xtick = [28 30 32];
+function distributionPlotStrengthOfEvidence(y_e,ywo_e,dprime,std_dprime,xhis,woxhis)
 histcolor{1} = [0 0 0];
 histcolor{2} = [.95 .6 .5];
-
-figName = sprintf('Test_PROB_DET_model_rmse_mean_HIST');
-fh = mrvNewGraphWin(figName);
+figName = sprintf('Strength_of_Evidence_test_PROB_vs_DET_model_rmse_mean_HIST');
+mrvNewGraphWin(figName);
 patch([xhis,xhis],y_e(:),histcolor{1},'FaceColor',histcolor{1},'EdgeColor',histcolor{1});
 hold on
 patch([woxhis,woxhis],ywo_e(:),histcolor{2},'FaceColor',histcolor{2},'EdgeColor',histcolor{2}); 
 set(gca,'tickdir','out', ...
         'box','off', ...
-        'ylim',[0 .6], ... 
+        'ticklen',[.025 .05], ...
+        'ylim',[0 .2], ... 
         'xlim',[28 34], ...
         'xtick',[28 30 32 34], ...
-        'ytick',[0 .3 .6], ...
+        'ytick',[0 .1 .2], ...
         'fontsize',16)
 ylabel('Probability','fontsize',16)
 xlabel('rmse','fontsize',16')
 
-title(sprintf('Strength of evidence:\n mean %2.3f - std %2.3f',mean(dprime),std(dprime)), ...
+title(sprintf('Strength of evidence:\n mean %2.3f - std %2.3f',dprime,std_dprime), ...
     'FontSize',16)
+legend({'Probabilistic','Deterministic'})
+end
+
+
+function distributionPlotEarthMoversDistance(prob,det,em)
+histcolor{1} = [0 0 0];
+histcolor{2} = [.95 .6 .5];
+figName = sprintf('EMD_PROB_DET_model_rmse_mean_HIST');
+mrvNewGraphWin(figName);
+plot(prob.xhist,prob.hist,'r-','color',histcolor{1},'linewidth',4);
+hold on
+plot(det.xhist,det.hist,'r-','color',histcolor{2},'linewidth',4); 
+set(gca,'tickdir','out', ...
+        'box','off', ...
+        'ticklen',[.025 .05], ...
+        'ylim',[0 .12], ... 
+        'xlim',[0 95], ...
+        'xtick',[0 45 90], ...
+        'ytick',[0 .06 .12], ...
+        'fontsize',16)
+ylabel('Proportion white-matter volume','fontsize',16)
+xlabel('RMSE (raw MRI scanner units)','fontsize',16')
+title(sprintf('Earth Movers Distance: %2.3f (raw scanner units)',em.mean),'FontSize',16)
 legend({'Probabilistic','Deterministic'})
 end

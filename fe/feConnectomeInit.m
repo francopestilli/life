@@ -19,7 +19,7 @@ if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
 fe = feCreate;
 
 % Set the based dir for fe, this dire will be used 
-if notDefined('savedir'),  savedir = fullfile(fileparts(dtFile),'LiFE');
+if notDefined('savedir'),  savedir = fullfile(fileparts(fgFileName),'life');
 end
 fe = feSet(fe,'savedir',savedir);
 
