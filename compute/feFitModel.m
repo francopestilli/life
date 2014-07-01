@@ -12,17 +12,19 @@ function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)
 % M:     The microtrack difusion model matrix, constructed
 %        by feConnectomeBuildModel.m
 %
-% fitMethod: it can be set to 'lsqnonneg' or 'stochastic gradient descent',
-% 'sgd'
+% fitMethod: 
+%  - 'bbnnls' - DEFAULT and best solver.
+%  - 'lsqnonneg' 
+%  - 'stochastic gradient descent', 'sgd'
+%  -
 %
 % See also: feCreate.m, feConnectomeBuildModel.m, feGet.m, feGet.
 %
 % Example:
-%  See v_lifeExample.m
 %
-% Franco (c) 2012 Stanford VISTA Team
-
-% ** Notes **
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
+%
+% Notes about the LiFE model:
 %
 % The rows of the M matrix are nVoxels*nBvecs. We are going to predict the
 % diffusion signal in each voxel for each direction.
@@ -34,7 +36,6 @@ function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)
 % In addition to M, we typically return dSig, which is the signal measured
 % at each voxel in each direction.  These are extracted from the dwi data
 % and knowledge of the roiCoords.
-%
 
 % fit the model, by selecting the proper toolbox.
 switch fitMethod
