@@ -11,8 +11,7 @@ function [fe, indicesFibersKept] = feConnectomeReduceVoxels(fe,voxelsToKeep)
 %
 %  Example:
 %
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Get the indices to each voxels' signal
 vxRows = feGet(fe,'voxelrows',voxelsToKeep);
