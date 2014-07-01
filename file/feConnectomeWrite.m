@@ -1,11 +1,10 @@
 function fg_file = feConnectomeWrite(fe,saveDir,fileType)
-%
 % Writes the Connectome (the fiber group, fe.fg) taking care of the coordinate system. 
 %
 % fg_file = feConnectomeWrite(fe,[saveDir],[fileType])
 %
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Default directory for saving the fiber group is the LIFE folder where the
 % the fe structure is saved by default.
