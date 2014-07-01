@@ -1,5 +1,4 @@
 function nodesToKeep = feClipFiberNodes(fiber,coords, maxVolDistance)
-%
 % Clip a fiber to be constrained inside a predefiend volume (x,y,z
 % coordinates).
 % 
@@ -19,7 +18,7 @@ function nodesToKeep = feClipFiberNodes(fiber,coords, maxVolDistance)
 % SEE ALSO: feClipFibersToVolume.m, feConnectomePreprocess.m
 %
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Compute the squared distance between each node on fiber ii and the
 % nearest roi coordinate
