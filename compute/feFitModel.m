@@ -6,19 +6,19 @@ function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)
 %
 %  fit = mctDiffusionModelFit(M,dSig,fitMethod)
 %
-% dSig:  The diffusion weighted signa measured at each
+% dSig:  The diffusion weighted signal measured at each
 %        voxel in each direction. These are extracted from 
-%        the dwi data at some roi coordinates.
-% M:     The microtrack difusion model matrix, constructed
+%        the dwi data at some white-matter coordinates.
+% M:     The LiFE difusion model matrix, constructed
 %        by feConnectomeBuildModel.m
 %
 % fitMethod: 
-%  - 'bbnnls' - DEFAULT and best solver.
-%  - 'lsqnonneg' 
-%  - 'stochastic gradient descent', 'sgd'
-%  -
+%  - 'bbnnls' - DEFAULT and best, faster large-scale solver.
+%  - 'lsqnonneg' - MatLab defaoult non-negative least-square solver (SLOW)
+%  - 'sgd', 'sgdnn' - Stochastic gradient descent.
+%  - 'sgdl1','sgdl1nn' - Stochastic gradient descent with L1 constrain on weights.
 %
-% See also: feCreate.m, feConnectomeBuildModel.m, feGet.m, feGet.
+% See also: feCreate.m, feConnectomeBuildModel.m, feGet.m, feSet.m
 %
 % Example:
 %
