@@ -1,4 +1,7 @@
 function [f, fval] = test(varargin)
+% Test function for MatLab EMD. 
+%
+%
 
 % Images
 if nargin == 0
