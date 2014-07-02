@@ -116,7 +116,7 @@ prob.w      = feGet(fe,'fiber weights');
 [fh(2), ~] = plotHistRrmse(prob);
 
 %% (1.9) Plot a histogram of the fitted fascicle weights. 
-[fh(3), ~] = plotHistWeigths(prob);
+[fh(3), ~] = plotHistWeights(prob);
 fe = feConnectomeInit(dwiFile,fgFileName,feFileName,[],dwiFileRepeat,t1File);
 
 %% Extract the coordinates of the white-matter voxels
@@ -178,7 +178,7 @@ det.w      = feGet(fe,'fiber weights');
 [fh(2), ~] = plotHistRrmse(det);
 
 %% (2.9) Plot a histogram of the fitted fascicle weights. 
-[fh(3), ~] = plotHistWeigths(det);
+[fh(3), ~] = plotHistWeights(det);
 
 %% Extract the coordinates of the white-matter voxels.
 % We will use this later to compare probabilistic and deterministic models.
@@ -274,7 +274,7 @@ xlabel('R_{rmse}','fontsize',16);
 legend({sprintf('Distribution of R_{rmse}'),sprintf('Median R_{rmse}')});
 end
 
-function [fh, w] = plotHistWeigths(info)
+function [fh, w] = plotHistWeights(info)
 % Make a plot of the weights:
 
 w       = info.w;
