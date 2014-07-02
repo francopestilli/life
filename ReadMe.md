@@ -26,11 +26,10 @@ Standard tractography can use diffusion measurements from a living brain to gene
 
 ### Getting started.
 [Demo MatLab File](http://vistalab.github.io/life/doc/Pestilli_etal_manuscript/life_demo.html)
-
 [Demo Results](http://vistalab.github.io/life/html/life_demo.html)
 
 
-### [Stable code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
+### [Stable code release.](https://github.com/vistalab/life/releases/tag/v0.1.1)
 
 ### How to cite LiFE.
 If you use this software please cite: Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle evaluation (LIFE) of white matter connectomes. Poster presentation at the Organization for Human Brain Mapping Annual Meeting, Seattle, WA, June 2013.
