@@ -23,10 +23,7 @@ if notDefined('display'),
 end
 if notDefined('refitConnectome'), refitConnectome = 0;end
 
-% Handling parallel processing
-poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
-
+feOpenLocalCluster
 tic,fprintf('\n[%s] Performing the lesion (removing fascicles from the connectome)... ',mfilename)
 if ~islogical( fascicleIndices )
     nfibers = feGet(feNoLesion,'nfibers');
@@ -219,6 +216,5 @@ if display.evidence
     set(gca,'box','off','xlim',[0 2], 'ylim',[0 ceil(se.j.mean)], ...
         'tickdir', 'out', 'ticklength', [0.025 0])
 end
-if ~poolwasopen, matlabpool close; end
 
 end

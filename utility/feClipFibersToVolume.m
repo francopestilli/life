@@ -23,9 +23,6 @@ function [fg, kept] = feClipFibersToVolume(fg,coords,maxVolDist)
 %
 % Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
-% Handling parallel processing
-poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
-if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
 fibers    = fg.fibers;
 
 % Make sure the coordinates were passed with the expected dimesnions
@@ -49,7 +46,5 @@ kept = (~cellfun('isempty',fg.fibers));
 if sum(kept) < length(kept)
 fg           = fgExtract(fg,kept,'keep');
 end
-
-if ~poolwasopen, matlabpool close; end
 
 end % Main function

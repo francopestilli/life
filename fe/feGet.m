@@ -1086,20 +1086,14 @@ switch param
     if ~isempty(varargin)
       nVoxels = feGet(fe,'nvoxels');
       w = feGet(fe,'fiber weights test voxel wise',varargin{1}); % Weights with a subset set to 0
-      % Handling parallel processing
-      poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-      if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
       val = cell(nVoxels,1);
       for ivox = 1:nVoxels        
         % Predict the signal.
         val{ivox} = feGet(fe,'Mfiber',ivox)*w(ivox,:)';
       end
       
-      % Handling parallel processing.
-      if ~poolwasopen, matlabpool close; end
-      fprintf('done in %2.3fminutes.\n',toc/60)
-      
-      % Reorganize the signal into a vector
+     feOpenLocalCluster
+     % Reorganize the signal into a vector
       val = vertcat(val{:})';
       
       % Now select a subset of voxels if requested
