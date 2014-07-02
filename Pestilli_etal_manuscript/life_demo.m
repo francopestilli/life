@@ -1,8 +1,6 @@
 function [fh, fe] = life_demo()
 %% Example of initialization and fitting of the LiFE model
-%
 % This demo function illustrates how to:
-%
 %  - A - Set up a LiFE structure, identified as 'fe' (fascicle evaluation) in
 %  the code below. This model contains a prediction of the diffusion
 %  measurements in each white-matter voxel given by the fascicles contained
@@ -13,7 +11,6 @@ function [fh, fe] = life_demo()
 %  fascicles in in each voxels are combined to generate a global connectome
 %  prediciton for the diffusion signal in large sets of white matter
 %  voxels.
-%
 %  - B - Fit the LiFE model to compute the weights associated to each fascicle
 %  in the connectome. Fascicles in the conenctome contribute differently to
 %  predicting the diffusion signal in each voxel. First of all, fascicles
@@ -35,16 +32,13 @@ function [fh, fe] = life_demo()
 %  is used to evaluate the model prediction quality, compare different
 %  tractography models and to perform statistical inference on the on
 %  properties of the connectomes.
-%  
 %  - C - Compare two different connectome models. This demo will show how to
 %  compare two different conenctome models by using the diffusion
 %  prediction error (the Root-Mean-Squared Error, RMSE). We report the
 %  example of two conenctomes one generated using Constrained-spherical
 %  deconvolution (CSD) and probabilistic tractography the other using a
-%  tensor model and deterministic tractography.
-%
+%  tensor model and deterministic tractography
 %  - D - Not Implemented : Performs a virtual lesion.
-%
 %  - Note - The example connectomes used for this demo comprise a portion
 %  of the right occiptial lobe of an individual human brain. LiFE utilizes
 %  large-scale methods to solve the foward model. The software allows for
@@ -125,13 +119,13 @@ prob.w      = feGet(fe,'fiber weights');
 [fh(3), ~] = plotHistWeigths(prob);
 fe = feConnectomeInit(dwiFile,fgFileName,feFileName,[],dwiFileRepeat,t1File);
 
-% We extract the coordinates of the white-matter voxels, we will use this
-% later to compare probabilistic and deterministic models.
+%% Extract the coordinates of the white-matter voxels
+% We will use this later to compare probabilistic and deterministic models.
 p.coords = feGet(fe,'roi coords');
 clear fe
 
 %% (2) Evaluate the Deterministic tensor-based connectome.
-% We will now analyze the TENSOR-based probabilistic tractography
+% We will now analyze the tensor-based Deterministic tractography
 % connectome.
 det.tractography = 'Deterministic';
 fgFileName    = fullfile(lifeDemoDataPath('tractography'), ...
@@ -186,8 +180,8 @@ det.w      = feGet(fe,'fiber weights');
 %% (2.9) Plot a histogram of the fitted fascicle weights. 
 [fh(3), ~] = plotHistWeigths(det);
 
-% We extract the coordinates of the white-matter voxels, we will use this
-% later to compare probabilistic and deterministic models.
+%% Extract the coordinates of the white-matter voxels.
+% We will use this later to compare probabilistic and deterministic models.
 d.coords = feGet( fe, 'roi coords');
 clear fe
 
@@ -242,7 +236,7 @@ fh(6) = distributionPlotEarthMoversDistance(se);
 
 end
 
-% ---------- Local  Functions ----------- %
+% ---------- Local Plot Functions ----------- %
 function [fh, rmse, rmsexv] = plotHistRMSE(info)
 % Make a plot of the RMSE:
 rmse   = info.rmse;
