@@ -38,7 +38,6 @@ function [fh, fe] = life_demo()
 %  example of two conenctomes one generated using Constrained-spherical
 %  deconvolution (CSD) and probabilistic tractography the other using a
 %  tensor model and deterministic tractography
-%  - D - Not Implemented : Performs a virtual lesion.
 %  - Note - The example connectomes used for this demo comprise a portion
 %  of the right occiptial lobe of an individual human brain. LiFE utilizes
 %  large-scale methods to solve the foward model. The software allows for
@@ -58,16 +57,16 @@ function [fh, fe] = life_demo()
 feOpenLocalCluster;
 
 %% Build the file names for the diffusion data, the anatomical MRI.
-dwiFile       = fullfile(lifeDemoDataPath('diffusion'),'pestilli_etal_life_demo_scan1_subject1_b2000_150dirs_stanford.nii.gz');
-dwiFileRepeat = fullfile(lifeDemoDataPath('diffusion'),'pestilli_etal_life_demo_scan2_subject1_b2000_150dirs_stanford.nii.gz');
-t1File        = fullfile(lifeDemoDataPath('anatomy'),  'pestilli_etal_life_demo_anatomy_t1w_stanford.nii.gz');
+dwiFile       = fullfile(lifeDemoDataPath('diffusion'),'life_demo_scan1_subject1_b2000_150dirs_stanford.nii.gz');
+dwiFileRepeat = fullfile(lifeDemoDataPath('diffusion'),'life_demo_scan2_subject1_b2000_150dirs_stanford.nii.gz');
+t1File        = fullfile(lifeDemoDataPath('anatomy'),  'life_demo_anatomy_t1w_stanford.nii.gz');
 
 %% (1) Evaluate the Probabilistic CSD-based connectome.
 % We will analyze first the CSD-based probabilistic tractography
 % connectome.
 prob.tractography = 'Probabilistic';
 fgFileName    = fullfile(lifeDemoDataPath('tractography'), ...
-                'pestilli_et_al_life_demo_mrtrix_csd_lmax10_probabilistic.mat');
+                'life_demo_mrtrix_csd_lmax10_probabilistic.mat');
 
 % The final connectome and data astructure will be saved with this name:
 feFileName    = 'life_build_model_demo_CSD_PROB';
@@ -129,7 +128,7 @@ clear fe
 % connectome.
 det.tractography = 'Deterministic';
 fgFileName    = fullfile(lifeDemoDataPath('tractography'), ...
-                'pestilli_et_al_life_demo_mrtrix_tensor_deterministic.mat');
+                'life_demo_mrtrix_tensor_deterministic.mat');
 
 % The final connectome and data astructure will be saved with this name:
 feFileName    = 'life_build_model_demo_TENSOR_DET';
