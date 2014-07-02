@@ -9,18 +9,24 @@ function feOpenLocalCluster
 % Initialize a local matlab cluster to speed up some of the processes.
 if exist('matlabpool','file')
    try 
-     if (matlabpool('size') == 0), 
-        if exist('parcluster','file')
+     if (matlabpool('size') == 0)
+        if (exist('parcluster','file') == 2)
            c = parcluster;
            c.NumWorkers = 12;
+           t = tempname;
+           OK = mkdir(t);
+           if OK
+              c.JobStorageLocation = t;
+           end
+           matlabpool(c);
         else
            matlabpool open;     
         end
      else
-        disp('[feOpenLocalCluster] Found Matlab parallel cluster open, not intializing.')
+        % disp('[feOpenLocalCluster] Found Matlab parallel cluster open, not intializing.')
      end
-   catch
-     disp('[feOpenLocalCluster] Cannot find the Matlab parallel toolbox, not intializing a cluster.')
+   catch ME
+     error('[feOpenLocalCluster] Cannot find the Matlab parallel toolbox, not intializing a cluster.')
      disp('[feOpenLocalCluster] Many computations will be substantially slower, without the parallel toolbox.')
    end
 else
