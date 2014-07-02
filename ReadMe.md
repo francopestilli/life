@@ -30,10 +30,12 @@ Standard tractography can use diffusion measurements from a living brain to gene
 ### [Documentation.](http://vistalab.github.io/life/doc/)
 ###
 
-### Demo.
-[LiFE Demo MatLab File](http://vistalab.github.io/life/doc/Pestilli_etal_manuscript/life_demo.html)
-[LiFE Demo Results](http://vistalab.github.io/life/html/life_demo.html)
+### Getting started.
 ###
+[Demo MatLab File](http://vistalab.github.io/life/doc/Pestilli_etal_manuscript/life_demo.html)
+
+[Demo Results](http://vistalab.github.io/life/html/life_demo.html)
+
 
 ### [Stable code release](https://github.com/vistalab/life/releases/tag/v0.1.1)
 ###
