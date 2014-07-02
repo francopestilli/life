@@ -1,9 +1,5 @@
 function [se, fig,  feLesion,  feNoLesion, newFascicleIndices, indicesFibersKept, commonCoords] = ...
           feVirtualLesion(feNoLesion, fascicleIndices, display, refitConnectome)
-%
-% [se, fh,  feLesion,  feNoLesion, newFascicleIndices, indicesFibersKept, commonCoords] = ...
-%           feVirtualLesion(feNoLesion, fascicleIndices, refitConnectome, display)
-%
 % Perform a virtual lesion.
 % - Remove a set of fascicles from a whole-brain connectome
 % - Find the fascicle's path-neighborhood (the set of fascicles that share the same voxels)
@@ -12,7 +8,12 @@ function [se, fig,  feLesion,  feNoLesion, newFascicleIndices, indicesFibersKept
 %   error useful for the lesion test.
 % - Compute a series of statistics on the lesioned connectome.
 %
-% Copyright Franco Pestilli Stanford University 2014
+% 
+% [se, fh,  feLesion,  feNoLesion, newFascicleIndices, indicesFibersKept, commonCoords] = ...
+%           feVirtualLesion(feNoLesion, fascicleIndices, refitConnectome, display)
+%
+% 
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 if notDefined('display'),   
     display.tract = 0;
