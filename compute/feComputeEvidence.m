@@ -44,7 +44,9 @@ se.j.std   = nan;
 % Note: This can be very slow and my require large amounts of memory for more than 1000 voxels
 fprintf('[%s] Computing the Earth Mover''s distance... \n',mfilename)
 se.em.name = sprintf('Earth Mover''s distance: http://en.wikipedia.org/wiki/Earth_mover''s_distance');
-if (exist('emd_mex.m','file') == 2) % Using Rubinov c-code fastest
+
+try
+%if (exist('emd_mex.m','file') == 2) % Using Rubinov c-code fastest
     pairwiseDist = zeros(size(se.lesion.xhist,2));
     for i=1:size(se.nolesion.xhist,2)
         for j=1:size(se.lesion.xhist,2)
@@ -52,7 +54,8 @@ if (exist('emd_mex.m','file') == 2) % Using Rubinov c-code fastest
         end
     end
     tmp_em = emd_mex(se.nolesion.hist,se.lesion.hist,pairwiseDist);
-else
+catch ME %else
+    fprintf('[%s] Cannot find compiled c-code for Earth Movers Distance.\nUsing the slower and less reliable MatLab implementation.',mfilename)
     [~,tmp_em] = emd(se.nolesion.xhist',se.lesion.xhist',se.nolesion.hist',se.lesion.hist',@gdf);
 end
 se.em.mean = tmp_em;
