@@ -1,8 +1,10 @@
 # Linear Fascicle Evaluation (LiFE)
 #
 
-### Large-scale evaluation and statistical inference method for white-matter connectomes.
+### Large-scale method for evaluation and statistical inference method for white-matter connectomes.
 ###
+
+##### http://vistalab.github.io/life/
 
 #### Copyright 2013-2014   |   [Franco Pestilli](http://www.francopestilli.com)   |   pestillifranco@gmail.com
 ####
