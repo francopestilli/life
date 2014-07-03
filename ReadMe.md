@@ -36,27 +36,27 @@ Learn how LiFE works by using [life_demo.m](http://vistalab.github.io/life/doc/s
 2. UNZIP/UNTAR the file.
 3. Add the life folder to your matlab search path. To do so in the MatLab prompt type: 
 ```
->> addpath(genpath(‘/my/path/to/the/life/folder/'))
+   >> addpath(genpath(‘/my/path/to/the/life/folder/'))
 ```
 1. Download the VISTASOFT repository from the TAR/ZIP files linked [here](https://github.com/vistalab/vistasoft/archive/master.zip).
 2. UNZIP/UNTAR the file.
 3. Add the VISTASOFT folder to your matlab search path. To do so in the MatLab prompt type: 
 ```
->> addpath(genpath(‘/my/path/to/the/VISTASOFT/folder/'))
+   >> addpath(genpath(‘/my/path/to/the/VISTASOFT/folder/'))
 ```
 1. Download the LiFE demo data set from the repository [here](http://purl.stanford.edu/cs392kv3054).
 3. UNZIP/UNTAR the file.
 3. Add the unzipped/untarred Data folder to your matlab search path. To do so in the MatLab prompt type:
 ```
->> addpath(genpath(‘/my/path/to/the/life_data_demo/folder/'))
+   >> addpath(genpath(‘/my/path/to/the/life_data_demo/folder/'))
 ```
 * In the matlab prompt type: 
 ```
->>  edit life_demo
+  >>  edit life_demo
 ```
-*Read the description of the calculations in the documentation inside the file, life_demo.m and in the matlab prompt type: 
+* Read the description of the calculations in the documentation inside the file, life_demo.m and in the matlab prompt type: 
 ```
->>  life_demo
+  >>  life_demo
 ```
 
 This final step will run the life_demo code. The code will perform the operations described [here](http://vistalab.github.io/life/html/life_demo.html). 
