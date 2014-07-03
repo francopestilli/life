@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>LiFE - Linear Fascicle Evaluation by francopestilli</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/francopestilli/life">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/francopestilli/life/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/francopestilli/life/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>LiFE - Linear Fascicle Evaluation</h1>
+          <p>Evaluation and statistical inference for living connectomes.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/francopestilli">francopestilli</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <p>Standard tractography can use diffusion measurements from a living brain to generate a large collection of candidate white-matter fascicles; the connectome. Linear Fascicle Evaluation (LiFE) takes any connectome and uses a forward modelling approach to predict diffusion measurements in the same brain. LiFE predicts the measured diffusion signal using the orientation of the fascicles present in a connectome. LiFE uses the difference between the measured and predicted diffusion signals to measure prediction error. The connectome model prediction error is used to compute two metrics to evaluate the evidence supporting properties of the connectome. One metric -the strength of evidence - compares the mean prediction error between alternative hypotheses. The second metric - the earth movers distance - compares full distributions of prediction error. These metrics can be used for: 1. Comparing tractography algorithms 2. Evaluating the quality of tractography solutions for individual brains or group of brains and 3. Testing hypotheses about white-matter tracts and connections.</p>
+
+<h3>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License.</h3>
+
+<h4>
+<a name="copyright-2013-2014-franco-pestilli-pestillifrancogmailcom" class="anchor" href="#copyright-2013-2014-franco-pestilli-pestillifrancogmailcom"><span class="octicon octicon-link"></span></a>Copyright (2013-2014), Franco Pestilli, <a href="mailto:pestillifranco@gmail.com">pestillifranco@gmail.com</a>
+</h4>
+
+<h3>
+<a name="application" class="anchor" href="#application"><span class="octicon octicon-link"></span></a>Application.</h3>
+
+<ul>
+<li><p>Evaluate the evidence supporting white-matter connectomes generated using <a href="http://en.wikipedia.org/wiki/Diffusion_MRI">magnetic resonance diffusion imaging</a> and <a href="http://en.wikipedia.org/wiki/Tractography">computational tractography </a>.</p></li>
+<li><p>Perform statistical inference on white-matter connectomes: Compare white-matter connectomes, show the evidence for white-matter tracts and connections between brain areas.</p></li>
+</ul><h3>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation.</h3>
+
+<ol>
+<li>Download <a href="https://github.com/vistalab/life">LiFE</a>.</li>
+<li>Download <a href="https://github.com/vistalab/vistasoft">vistasoft</a>.</li>
+<li>Download <a href="https://github.com/francopestilli/mba">MBA</a>.</li>
+<li>
+<a href="http://www.mathworks.com/help/matlab/startup-and-shutdown.html">Start MatLab</a>.</li>
+<li>Add LiFE and vistasoft to the <a href="http://www.mathworks.com/help/matlab/ref/addpath.html">matlab search path</a>.</li>
+</ol><h3>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies.</h3>
+
+<ol>
+<li>
+<a href="http://www.mathworks.com/products/matlab/">MatLab</a>.</li>
+<li>
+<a href="https://github.com/vistalab/vistasoft">vistasoft</a>.</li>
+<li>
+<a href="https://github.com/francopestilli/mba">Matlab Brain Anatomy (MBA)</a>.</li>
+</ol><h3>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>
+<a href="http://vistalab.github.io/life/doc/">Documentation</a>.</h3>
+
+<h3>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started.</h3>
+
+<ol>
+<li>
+<a href="http://vistalab.github.io/life/doc/Pestilli_etal_manuscript/life_demo.html">Demo MatLab File</a>.</li>
+<li>
+<a href="http://vistalab.github.io/life/html/life_demo.html">Demo Results</a>.</li>
+<li>
+<a href="http://purl.stanford.edu/cs392kv3054">Demo data</a>.</li>
+</ol><h3>
+<a name="stable-code-release" class="anchor" href="#stable-code-release"><span class="octicon octicon-link"></span></a>
+<a href="https://github.com/vistalab/life/releases/tag/v0.2">Stable code release</a>.</h3>
+
+<h3>
+<a name="how-to-cite-life" class="anchor" href="#how-to-cite-life"><span class="octicon octicon-link"></span></a>How to cite LiFE.</h3>
+
+<p>Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle evaluation (LIFE) of white matter connectomes. Poster presentation at the Organization for Human Brain Mapping Annual Meeting, Seattle, WA, June 2013.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
