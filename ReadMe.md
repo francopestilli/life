@@ -19,10 +19,8 @@ Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle eval
 
 ### Installation.
 1. Download [LiFE](https://github.com/vistalab/life).
-2. Download [vistasoft](https://github.com/vistalab/vistasoft).
-3. Download [MBA](https://github.com/francopestilli/mba).
-4. [Start MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
-5. Add LiFE and vistasoft to the [matlab search path](http://www.mathworks.com/help/matlab/ref/addpath.html).
+2. [Start MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
+3. Add LiFE and vistasoft to the [matlab search path](http://www.mathworks.com/help/matlab/ref/addpath.html).
 
 ### Dependencies.
 * [MatLab](http://www.mathworks.com/products/matlab/).
@@ -32,34 +30,41 @@ Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle eval
 ### Getting started.
 Learn how LiFE works by using [life_demo.m](http://vistalab.github.io/life/doc/scripts/life_demo.html) in [MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
 
+#### Download [LiFE](https://github.com/vistalab/life).
 1. Download the LiFE repository from the TAR/ZIP files linked [here](https://github.com/vistalab/life/archive/v0.2.zip).
 2. UNZIP/UNTAR the file.
 3. Add the life folder to your matlab search path. To do so in the MatLab prompt type: 
 ```
    >> addpath(genpath('/my/path/to/the/life/folder/'))
 ```
+
+#### Download [vistasoft](https://github.com/vistalab/vistasoft).
 1. Download the VISTASOFT repository from the TAR/ZIP files linked [here](https://github.com/vistalab/vistasoft/archive/master.zip).
 2. UNZIP/UNTAR the file.
 3. Add the VISTASOFT folder to your matlab search path. To do so in the MatLab prompt type: 
 ```
    >> addpath(genpath('/my/path/to/the/VISTASOFT/folder/'))
 ```
-1. Download the LiFE demo data set from the repository [here](http://purl.stanford.edu/cs392kv3054).
+
+#### Download [LiFE Data Demo](http://purl.stanford.edu/cs392kv3054)
+1. Download the LiFE demo data set from the repository [here](https://stacks.stanford.edu/file/druid:cs392kv3054/life_demo_data.tar.gz).
 3. UNZIP/UNTAR the file.
 3. Add the unzipped/untarred Data folder to your matlab search path. To do so in the MatLab prompt type:
 ```
    >> addpath(genpath('/my/path/to/the/life_data_demo/folder/'))
 ```
-* In the matlab prompt type: 
+
+#### Read the [life_demo documentaion](http://vistalab.github.io/life/doc/scripts/life_demo.html)
+Read the description of the calculations in the documentation inside the file, life_demo.m by typing the following in the matlab prompt: 
 ```
   >>  edit life_demo
 ```
-* Read the description of the calculations in the documentation inside the file, life_demo.m and in the matlab prompt type: 
+
+#### Run the [life_demo code](https://github.com/vistalab/life/blob/master/scripts/life_demo.m)
+This final step will run the life_demo code. The code will perform the operations described [here](http://vistalab.github.io/life/html/life_demo.html). 
 ```
   >>  life_demo
 ```
-
-This final step will run the life_demo code. The code will perform the operations described [here](http://vistalab.github.io/life/html/life_demo.html). 
-
 life_demo.m runs in about 30 minutes on a modern Intel processor with 8GB of RAM. This code has been tested with MatLab 2012b on Ubuntu 12.10 and Mac OSX 10.9.
+
 
