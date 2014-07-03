@@ -54,7 +54,7 @@ Learn about LiFE by using [life_demo.m](http://vistalab.github.io/life/doc/scrip
    >> addpath(genpath('/my/path/to/the/life_data_demo/folder/'))
 ```
 
-### 4. Read the [life_demo documentaion](http://vistalab.github.io/life/doc/scripts/life_demo.html).
+### 4. Read the [life_demo documentation](http://vistalab.github.io/life/doc/scripts/life_demo.html).
 Read the description of the calculations in the documentation inside the file, life_demo.m by typing the following in the matlab prompt: 
 ```
   >>  edit life_demo
