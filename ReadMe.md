@@ -30,7 +30,7 @@ Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle eval
 ## Getting started.
 Learn about LiFE by using [life_demo.m](http://vistalab.github.io/life/doc/scripts/life_demo.html) in [MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
 
-##### 1. Download [LiFE](https://github.com/vistalab/life).
+### 1. Download [LiFE](https://github.com/vistalab/life).
 * Download the LiFE repository from the TAR/ZIP files linked [here](https://github.com/vistalab/life/archive/v0.2.zip).
 * UNZIP/UNTAR the file.
 * Add the life folder to your matlab search path. To do so in the MatLab prompt type: 
@@ -38,7 +38,7 @@ Learn about LiFE by using [life_demo.m](http://vistalab.github.io/life/doc/scrip
    >> addpath(genpath('/my/path/to/the/life/folder/'))
 ```
 
-##### 2. Download [vistasoft](https://github.com/vistalab/vistasoft).
+### 2. Download [vistasoft](https://github.com/vistalab/vistasoft).
 * Download the VISTASOFT repository from the TAR/ZIP files linked [here](https://github.com/vistalab/vistasoft/archive/master.zip).
 * UNZIP/UNTAR the file.
 * Add the VISTASOFT folder to your matlab search path. To do so in the MatLab prompt type: 
@@ -46,7 +46,7 @@ Learn about LiFE by using [life_demo.m](http://vistalab.github.io/life/doc/scrip
    >> addpath(genpath('/my/path/to/the/VISTASOFT/folder/'))
 ```
 
-##### 3. Download [LiFE Data Demo](http://purl.stanford.edu/cs392kv3054).
+### 3. Download [LiFE Data Demo](http://purl.stanford.edu/cs392kv3054).
 * Download the LiFE demo data set from the repository [here](https://stacks.stanford.edu/file/druid:cs392kv3054/life_demo_data.tar.gz).
 * UNZIP/UNTAR the file.
 * Add the unzipped/untarred Data folder to your matlab search path. To do so in the MatLab prompt type:
@@ -54,13 +54,13 @@ Learn about LiFE by using [life_demo.m](http://vistalab.github.io/life/doc/scrip
    >> addpath(genpath('/my/path/to/the/life_data_demo/folder/'))
 ```
 
-##### 4. Read the [life_demo documentaion](http://vistalab.github.io/life/doc/scripts/life_demo.html).
+### 4. Read the [life_demo documentaion](http://vistalab.github.io/life/doc/scripts/life_demo.html).
 Read the description of the calculations in the documentation inside the file, life_demo.m by typing the following in the matlab prompt: 
 ```
   >>  edit life_demo
 ```
 
-##### 5. Run the [life_demo code](https://github.com/vistalab/life/blob/master/scripts/life_demo.m).
+### 5. Run the [life_demo code](https://github.com/vistalab/life/blob/master/scripts/life_demo.m).
 This final step will run the life_demo code. The code will perform the operations described [here](http://vistalab.github.io/life/html/life_demo.html). 
 ```
   >>  life_demo
