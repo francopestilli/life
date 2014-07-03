@@ -26,7 +26,7 @@ if exist('matlabpool','file')
         % disp('[feOpenLocalCluster] Found Matlab parallel cluster open, not intializing.')
      end
    catch ME
-     sprintf('[feOpenLocalCluster] Problem intializing the cluster: \n\n %s.\n', ME.message)
+     fprintf('\n[feOpenLocalCluster] Problem intializing the cluster: \n\n %s.\n', ME.message)
      disp('[feOpenLocalCluster] Many computations will be substantially slower, without the parallel toolbox.')
    end
 else
