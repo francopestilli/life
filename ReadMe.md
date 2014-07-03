@@ -30,35 +30,31 @@ Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle eval
 * [Matlab Brain Anatomy (MBA)](https://github.com/francopestilli/mba).
 
 ### Getting started.
-Learn about how LiFE works by using [life_demo.m](http://vistalab.github.io/life/doc/scripts/life_demo.html).
+Learn about how LiFE works by using [life_demo.m](http://vistalab.github.io/life/doc/scripts/life_demo.html). To try life_demo.m and [MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html), please follow the following steps:
 
-To try life_demo.mplease follow the following steps:
-
-1.  Start MatLab (preferably without java, this can be performed by typing the following command in a unix prompt: $ matlab -nojvm), this step might depend on your OS and software environment.
-2. Download the LiFE repository from the TAR/ZIP files linked [here](https://github.com/vistalab/life/archive/v0.2.zip).
-3. UNZIP/UNTAR the file.
-4. Add the life folder to your matlab search path. To do so in the MatLab prompt type: 
+1. Download the LiFE repository from the TAR/ZIP files linked [here](https://github.com/vistalab/life/archive/v0.2.zip).
+2. UNZIP/UNTAR the file.
+3. Add the life folder to your matlab search path. To do so in the MatLab prompt type: 
 ```
 >> addpath(genpath(‘/my/path/to/the/life/folder/'))
 ```
-5. Download the VISTASOFT repository from the TAR/ZIP files linked [here](https://github.com/vistalab/vistasoft/archive/master.zip).
-6. UNZIP/UNTAR the file.
-7. Add the VISTASOFT folder to your matlab search path. To do so in the MatLab prompt type: 
+1. Download the VISTASOFT repository from the TAR/ZIP files linked [here](https://github.com/vistalab/vistasoft/archive/master.zip).
+2. UNZIP/UNTAR the file.
+3. Add the VISTASOFT folder to your matlab search path. To do so in the MatLab prompt type: 
 ```
 >> addpath(genpath(‘/my/path/to/the/VISTASOFT/folder/'))
 ```
-8. Download the LiFE demo data set from the repository [here](http://purl.stanford.edu/cs392kv3054).
-9. UNZIP/UNTAR the file.
-10. Add the unzipped/untarred Data folder to your matlab search path. To do so in the MatLab prompt type:
+1. Download the LiFE demo data set from the repository [here](http://purl.stanford.edu/cs392kv3054).
+3. UNZIP/UNTAR the file.
+3. Add the unzipped/untarred Data folder to your matlab search path. To do so in the MatLab prompt type:
 ```
 >> addpath(genpath(‘/my/path/to/the/life_data_demo/folder/'))
 ```
-11. In the matlab prompt type: 
+* In the matlab prompt type: 
 ```
 >>  edit life_demo
 ```
-12. Read the description of the calculations in the documentation inside the file, life_demo.m.
-13. In the matlab prompt type: 
+*Read the description of the calculations in the documentation inside the file, life_demo.m and in the matlab prompt type: 
 ```
 >>  life_demo
 ```
