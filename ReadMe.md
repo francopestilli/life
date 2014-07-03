@@ -33,6 +33,7 @@ Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle eval
 Learn about how LiFE works by using [life_demo.m](http://vistalab.github.io/life/doc/scripts/life_demo.html).
 
 To try life_demo.mplease follow the following steps:
+
 1.  Start MatLab (preferably without java, this can be performed by typing the following command in a unix prompt: $ matlab -nojvm), this step might depend on your OS and software environment.
 2. Download the LiFE repository from the TAR/ZIP files linked [here](https://github.com/vistalab/life/archive/v0.2.zip).
 3. UNZIP/UNTAR the file.
