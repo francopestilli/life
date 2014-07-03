@@ -46,8 +46,13 @@ function [fh, fe] = life_demo()
 %  to allow for testing the code within a few minutes requiring only about
 %  10GB of computer RAM and standard hardaware. This code has been tested
 %  with: 
+%
 %   - Ubuntu 12.04.4 LTS (Precise) 
 %   - 2.6Ghz i7 Processor and 24GB of RAM.
+%   - MatLab Version: 8.0.0.783 (R2012b)
+%
+%   - Mac OSX 10.9
+%   - 1.8 Ghz i5 Processor and 8GB of RAM
 %   - MatLab Version: 8.0.0.783 (R2012b)
 %
 % Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
