@@ -30,7 +30,7 @@ Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle eval
 * [Matlab Brain Anatomy (MBA)](https://github.com/francopestilli/mba).
 
 ### Getting started.
-Learn about how LiFE works by using [life_demo.m](http://vistalab.github.io/life/doc/scripts/life_demo.html). To try life_demo.m and [MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html), please follow the following steps:
+Learn about how LiFE works by using [life_demo.m](http://vistalab.github.io/life/doc/scripts/life_demo.html) in [MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
 
 1. Download the LiFE repository from the TAR/ZIP files linked [here](https://github.com/vistalab/life/archive/v0.2.zip).
 2. UNZIP/UNTAR the file.
