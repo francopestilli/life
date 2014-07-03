@@ -20,7 +20,7 @@ Pestilli F., Yeatman J.D., Rokem A., Kay K.N., Wandell B.A. Linear fascicle eval
 ### Installation.
 1. Download [LiFE](https://github.com/vistalab/life).
 2. [Start MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
-3. Add LiFE and vistasoft to the [matlab search path](http://www.mathworks.com/help/matlab/ref/addpath.html).
+3. Add LiFE to the [matlab search path](http://www.mathworks.com/help/matlab/ref/addpath.html).
 
 ### Dependencies.
 * [MatLab](http://www.mathworks.com/products/matlab/).
