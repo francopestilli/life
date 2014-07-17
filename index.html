@@ -35,7 +35,6 @@
           <p>Evaluation and statistical inference for living connectomes.</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/francopestilli">francopestilli</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
 
         <p>Standard tractography can use diffusion measurements from a living brain to generate a large collection of candidate white-matter fascicles; the connectome. Linear Fascicle Evaluation (LiFE) takes any connectome and uses a forward modelling approach to predict diffusion measurements in the same brain. LiFE predicts the measured diffusion signal using the orientation of the fascicles present in a connectome. LiFE uses the difference between the measured and predicted diffusion signals to measure prediction error. The connectome model prediction error is used to compute two metrics to evaluate the evidence supporting properties of the connectome. One metric -the strength of evidence - compares the mean prediction error between alternative hypotheses. The second metric - the earth movers distance - compares full distributions of prediction error. These metrics can be used for: 1. Comparing tractography algorithms 2. Evaluating the quality of tractography solutions for individual brains or group of brains and 3. Testing hypotheses about white-matter tracts and connections.</p>
@@ -87,7 +86,7 @@
 </ul><h2>
 <a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started.</h2>
 
-<p>Learn about LiFE by using <a href="http://vistalab.github.io/life/doc/scripts/life_demo.html">life_demo.m</a> in <a href="http://www.mathworks.com/help/matlab/startup-and-shutdown.html">MatLab</a>.</p>
+<p>Learn more about LiFE by using <a href="http://vistalab.github.io/life/doc/scripts/life_demo.html">life_demo.m</a> in <a href="http://www.mathworks.com/help/matlab/startup-and-shutdown.html">MatLab</a>.</p>
 
 <h3>
 <a name="1-download-life" class="anchor" href="#1-download-life"><span class="octicon octicon-link"></span></a>1. <a href="https://github.com/vistalab/life">Download LiFE</a>.</h3>
@@ -135,11 +134,21 @@
 <pre><code>  &gt;&gt;  life_demo
 </code></pre>
 
-<p>life_demo.m runs in about 30 minutes on a modern Intel processor with 8GB of RAM. This code has been tested with MatLab 2012b on Ubuntu 12.10 and Mac OSX 10.9.</p>
-      </section>
+<hr>
+<span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
 
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-15645039-4");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
   </body>
 </html>
