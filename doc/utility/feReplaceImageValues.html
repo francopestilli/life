@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feReplaceImageValues</title>
+  <meta name="keywords" content="feReplaceImageValues">
+  <meta name="description" content="Takes a 3/4D image (img, like a dwi data file) and">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">utility</a> &gt; feReplaceImageValues.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for utility&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feReplaceImageValues
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Takes a 3/4D image (img, like a dwi data file) and</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function img = feReplaceImageValues(img,vals,coords,indexes) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Takes a 3/4D image (img, like a dwi data file) and 
+ replaces the values of the image at the coordinates (coords)
+ with the values in vals.
+ 
+   img  = feReplaceImageValues(img,vals,coords,indexes) 
+
+ img:     img volume.
+ vals:    A list of N values that will be placed into the img volume
+ coords:  Nx3 matrix of coordinates in the volume.
+
+ indexes is a subset of the 4th dimension of img if img is a 4D file. For
+ example it helsp addressing the diffusion directions and not the b0
+ images in the data set. Default is 1:size(img,4).
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function img = feReplaceImageValues(img,vals,coords,indexes)</a>
+0002 <span class="comment">% Takes a 3/4D image (img, like a dwi data file) and</span>
+0003 <span class="comment">% replaces the values of the image at the coordinates (coords)</span>
+0004 <span class="comment">% with the values in vals.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%   img  = feReplaceImageValues(img,vals,coords,indexes)</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% img:     img volume.</span>
+0009 <span class="comment">% vals:    A list of N values that will be placed into the img volume</span>
+0010 <span class="comment">% coords:  Nx3 matrix of coordinates in the volume.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% indexes is a subset of the 4th dimension of img if img is a 4D file. For</span>
+0013 <span class="comment">% example it helsp addressing the diffusion directions and not the b0</span>
+0014 <span class="comment">% images in the data set. Default is 1:size(img,4).</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0017 
+0018 <span class="comment">% If index is not passed, then copy the data into all of the slots in the</span>
+0019 <span class="comment">% 4th dimension</span>
+0020 <span class="keyword">if</span> notDefined(<span class="string">'indexes'</span>),   indexes = 1:size(img,4); <span class="keyword">end</span>
+0021 <span class="keyword">if</span> ~( length(indexes) &lt;= size(img,4) )
+0022   error(<span class="string">'Image and vals do not have the same size.'</span>)
+0023 <span class="keyword">end</span>
+0024 
+0025 <span class="keyword">if</span> ~( size(vals,2) == size(coords,1) )
+0026   error(<span class="string">'Vals and coords do not have the same size.'</span>)
+0027 <span class="keyword">end</span>
+0028 
+0029 <span class="keyword">if</span> ~( length(indexes) == size(vals,1) )
+0030   error(<span class="string">'Image and vals do not have the same size.'</span>)
+0031 <span class="keyword">end</span>
+0032 
+0033 <span class="keyword">for</span> ic = 1:size(coords,1)
+0034   img(coords(ic,1),coords(ic,2),coords(ic,3),indexes)   = vals(:,ic);
+0035 <span class="keyword">end</span>
+0036 
+0037 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

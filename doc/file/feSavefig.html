@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feSavefig</title>
+  <meta name="keywords" content="feSavefig">
+  <meta name="description" content="Saves a figure for publishing purpose.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">file</a> &gt; feSavefig.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for file&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feSavefig
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Saves a figure for publishing purpose.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function figDir = feSavefig(h,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Saves a figure for publishing purpose.
+
+  function figDir = savefig(h,varargin)
+ 
+ INPUTS: Must be pairs, e.g., 'name',value
+  
+   figName  - the name of the figure file. 
+              Default: sprintf('feFig_%s',get(h,'Name'))
+   figDir   - Name of the subfolder where to save this figure.
+              Default: current dir ('.')
+   figType  - fig, eps, jpg, png
+              Default: 'png' fastest smallest file, low resolution.
+   verbose  - display on screen the print command being invoked.
+ 
+ NOTES:
+   This function invokes a series of print commands:
+   print(h, '-cmyk', '-painters','-depsc2','-tiff','-r500', '-noui', 'figureName')
+
+ EXAMPLE:
+   feSavefig(figureHandle,'verbose','yes','figName','myfig','figDir','/path/to/fig/folder/');
+
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function figDir = feSavefig(h,varargin)</a>
+0002 <span class="comment">% Saves a figure for publishing purpose.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  function figDir = savefig(h,varargin)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% INPUTS: Must be pairs, e.g., 'name',value</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%   figName  - the name of the figure file.</span>
+0009 <span class="comment">%              Default: sprintf('feFig_%s',get(h,'Name'))</span>
+0010 <span class="comment">%   figDir   - Name of the subfolder where to save this figure.</span>
+0011 <span class="comment">%              Default: current dir ('.')</span>
+0012 <span class="comment">%   figType  - fig, eps, jpg, png</span>
+0013 <span class="comment">%              Default: 'png' fastest smallest file, low resolution.</span>
+0014 <span class="comment">%   verbose  - display on screen the print command being invoked.</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% NOTES:</span>
+0017 <span class="comment">%   This function invokes a series of print commands:</span>
+0018 <span class="comment">%   print(h, '-cmyk', '-painters','-depsc2','-tiff','-r500', '-noui', 'figureName')</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% EXAMPLE:</span>
+0021 <span class="comment">%   feSavefig(figureHandle,'verbose','yes','figName','myfig','figDir','/path/to/fig/folder/');</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0025 
+0026 <span class="comment">% set up default variables:</span>
+0027 figName           = sprintf(<span class="string">'feFig_%s'</span>,get(h,<span class="string">'Name'</span>)); <span class="comment">% the name of the figure file</span>
+0028 figDir            = <span class="string">'.'</span>; <span class="comment">% the subfolder where to save this figure</span>
+0029 figType           = <span class="string">'png'</span>;
+0030 verbose           = <span class="string">'yes'</span>; <span class="comment">% 'yes', 'no', display on screen what it is going on</span>
+0031 
+0032 <span class="keyword">if</span> ~isempty(varargin)
+0033   <span class="keyword">if</span> mod(length(varargin),2), error(<span class="string">'varargin must be pairs'</span>); <span class="keyword">end</span>
+0034   <span class="keyword">for</span> ii=1:2:(length(varargin)-1)
+0035     eval(sprintf(<span class="string">'%s = ''%s'';'</span>,varargin{ii}, varargin{ii+1}));
+0036   <span class="keyword">end</span>
+0037 <span class="keyword">end</span>
+0038 
+0039 <span class="comment">% make the figure dir if it does not exist:</span>
+0040 <span class="keyword">if</span> ~isdir(figDir), mkdir(figDir);<span class="keyword">end</span>
+0041 
+0042 <span class="comment">% Create a print command that will save the figure</span>
+0043 <span class="keyword">switch</span> figType
+0044   <span class="keyword">case</span> {<span class="string">'png'</span>}
+0045     printCommand = <span class="keyword">...</span>
+0046     sprintf(<span class="string">'print(%s, ''-painters'',''-dpng'', ''-noui'', ''%s'')'</span>, <span class="keyword">...</span>
+0047     num2str(h),fullfile(figDir,figName));
+0048   
+0049   <span class="keyword">case</span> {<span class="string">'jpg'</span>}
+0050     printCommand = <span class="keyword">...</span>
+0051     sprintf(<span class="string">'print(%s, ''-djpeg95'',''-r500'', ''-noui'', ''%s'')'</span>, <span class="keyword">...</span>
+0052     num2str(h),fullfile(figDir,figName));
+0053 
+0054   <span class="keyword">case</span> {<span class="string">'eps'</span>}
+0055     printCommand = <span class="keyword">...</span>
+0056     sprintf(<span class="string">'print(%s, ''-cmyk'', ''-painters'',''-depsc2'',''-tiff'',''-r500'' , ''-noui'', ''%s'')'</span>, <span class="keyword">...</span>
+0057     num2str(h),fullfile(figDir,figName));
+0058   
+0059   <span class="keyword">case</span> {<span class="string">'fig'</span>}
+0060     printCommand = <span class="keyword">...</span>
+0061     sprintf(<span class="string">'saveas(%s, ''%s'', ''fig'')'</span>, num2str(h),figName);
+0062     
+0063   <span class="keyword">otherwise</span>
+0064     error(<span class="string">'[%s] Cannot save figure with type set to: %s'</span>, mfilename,figType)
+0065 <span class="keyword">end</span>
+0066 
+0067 <span class="keyword">if</span> strcmpi(verbose,<span class="string">'yes'</span>)
+0068  fprintf(<span class="string">'[%s] Saving eps figure %s/%s\nUsing command: \n%s...\n'</span>, <span class="keyword">...</span>
+0069  mfilename,figDir,figName,printCommand);
+0070 <span class="keyword">end</span>
+0071 
+0072 <span class="comment">% Do the printing here:</span>
+0073 eval(printCommand);
+0074 
+0075 <span class="comment">% Delete output if it was nto requested</span>
+0076 <span class="keyword">if</span> (nargout &lt; 1), clear figDir;<span class="keyword">end</span>
+0077 <span class="keyword">return</span>
+0078</pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of bbnnls</title>
+  <meta name="keywords" content="bbnnls">
+  <meta name="description" content="BBNNLS   -- Solve NNLS problems via SBB">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">external</a> &gt; bbnnls.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for external&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>bbnnls
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>BBNNLS   -- Solve NNLS problems via SBB</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function out = bbnnls(A, b, x0, opt) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> BBNNLS   -- Solve NNLS problems via SBB
+ 
+ WARNING Use at own risk!
+ NOTE --- guaranteed convergence phase: *REMOVED* for speedup!!
+ NOTE --- To speed up code further, *REMOVE* debugging part
+
+
+ function out = bbnnls(A, b, x0, opt)
+ Solve a bound-constrained least squares problem, 
+    min    0.5*||Ax-b||^2, s.t. x &gt;= 0
+
+
+ x0 -- Starting vector (useful for warm-starts).
+
+ OPT -- This structure contains important opt that control how the
+ optimization procedure runs. To obtain a default structure the user can
+ use 'opt = solopt'. Use 'help solopt' to get a description of
+ what the individual opt mean.
+
+ Most important options to tune as: opt.tolg, opt.maxit
+
+
+ OUT contains the solution and other information about the optimization or
+ info indicating whether the method succeeded or failed.
+
+ See also: <a href="solopt.html" class="code" title="function options = solopt(varargin)">solopt</a>, bcls
+
+ Version 1.1 (c) 2010 Suvrit Sra, Dongmin Kim
+
+ Released under the GNU General Public License
+ For details on license and terms please see http://www.gnu.org/copyleft/gpl.html</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [step out] = computeBBStep(A, b, out)</a></li><li><a href="#_sub2" class="code">function [f g] = funcGrad(A, b, x)</a></li><li><a href="#_sub3" class="code">function [v pg] = checkTermination(options, out)</a></li><li><a href="#_sub4" class="code">function showStatus(out, options)</a></li><li><a href="#_sub5" class="code">function r = setTermReason(t)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function out = bbnnls(A, b, x0, opt)</a>
+0002 <span class="comment">% BBNNLS   -- Solve NNLS problems via SBB</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% WARNING Use at own risk!</span>
+0005 <span class="comment">% NOTE --- guaranteed convergence phase: *REMOVED* for speedup!!</span>
+0006 <span class="comment">% NOTE --- To speed up code further, *REMOVE* debugging part</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% function out = bbnnls(A, b, x0, opt)</span>
+0010 <span class="comment">% Solve a bound-constrained least squares problem,</span>
+0011 <span class="comment">%    min    0.5*||Ax-b||^2, s.t. x &gt;= 0</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% x0 -- Starting vector (useful for warm-starts).</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% OPT -- This structure contains important opt that control how the</span>
+0017 <span class="comment">% optimization procedure runs. To obtain a default structure the user can</span>
+0018 <span class="comment">% use 'opt = solopt'. Use 'help solopt' to get a description of</span>
+0019 <span class="comment">% what the individual opt mean.</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% Most important options to tune as: opt.tolg, opt.maxit</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% OUT contains the solution and other information about the optimization or</span>
+0025 <span class="comment">% info indicating whether the method succeeded or failed.</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% See also: solopt, bcls</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% Version 1.1 (c) 2010 Suvrit Sra, Dongmin Kim</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">% Released under the GNU General Public License</span>
+0032 <span class="comment">% For details on license and terms please see http://www.gnu.org/copyleft/gpl.html</span>
+0033 
+0034 
+0035     fgx = @(x) <a href="#_sub2" class="code" title="subfunction [f g] = funcGrad(A, b, x)">funcGrad</a>(A,b, x); <span class="comment">% function to compute obj and grad</span>
+0036 
+0037     <span class="comment">% do some initialization for maintaining statistics</span>
+0038     out.iter = 0;
+0039     out.iterTimes = nan*ones(opt.maxit,1);
+0040     out.objTimes  = nan*ones(opt.maxit,1);
+0041     out.pgTimes   = nan*ones(opt.maxit,1);
+0042     out.trueError = nan*ones(opt.maxit,1);
+0043     out.startTime = tic;
+0044     out.status = <span class="string">'Failure'</span>;
+0045 
+0046     <span class="comment">% HINT: Very important for overall speed is to have a good x0</span>
+0047     out.x      = x0;
+0048     out.refx   = x0;
+0049     [out.refobj, out.grad]   = fgx(out.x);
+0050     out.oldg   = out.grad;
+0051     out.refg   = out.oldg;
+0052 
+0053 
+0054     <span class="comment">%% Begin the main algorithm</span>
+0055     <span class="keyword">if</span> (opt.verbose)
+0056        fprintf(<span class="string">'Running: **** SBB-NNLS ****\n\n'</span>);
+0057        fprintf(<span class="string">'Iter   \t     Obj\t\t  ||pg||_inf\t\t ||x-x*||\n'</span>);
+0058        fprintf(<span class="string">'-------------------------------------------------------\n'</span>);
+0059     <span class="keyword">end</span>
+0060 
+0061     objectives = zeros(opt.maxit,1);
+0062     <span class="comment">%f = figure;</span>
+0063     <span class="keyword">while</span> 1
+0064         out.iter = out.iter + 1;
+0065 
+0066         <span class="comment">% HINT: edit checkTermination to determine good criterion for yourself!</span>
+0067         [termReason, out.pgTimes(out.iter)] = <a href="#_sub3" class="code" title="subfunction [v pg] = checkTermination(options, out)">checkTermination</a>(opt, out);
+0068         <span class="keyword">if</span> (termReason &gt; 0), <span class="keyword">break</span>; <span class="keyword">end</span>
+0069 
+0070         <span class="comment">% HINT: computeBBStep is the one to implement most carefully</span>
+0071         [step out] = <a href="#_sub1" class="code" title="subfunction [step out] = computeBBStep(A, b, out)">computeBBStep</a>(A, b, out);
+0072         out.x = out.x - step * out.grad;
+0073         out.oldg = out.grad;
+0074         
+0075         <span class="comment">% HINT: projection step: can replace the 0 by an epsilon to truncate</span>
+0076         <span class="comment">% values close to 0</span>
+0077         out.x(out.x &lt; 0) = 0;
+0078 
+0079         [out.obj out.grad] = fgx(out.x);
+0080         
+0081         objectives(out.iter) = out.obj;
+0082 <span class="comment">%         clf;</span>
+0083 <span class="comment">%         plot(objectives);</span>
+0084 <span class="comment">%         title('Objective ||Ax-b||^2');</span>
+0085 <span class="comment">%         xlabel('Iteration');</span>
+0086 <span class="comment">%         ylabel('Objective');</span>
+0087 <span class="comment">%         drawnow;</span>
+0088         
+0089         <span class="comment">% HINT: can remove, as this is just for statistics</span>
+0090         out.objTimes (out.iter) = out.obj;
+0091         out.iterTimes(out.iter) = toc(out.startTime);
+0092         
+0093         <span class="comment">% HINT: for debugging, to see how result develops if true x* is known</span>
+0094         <span class="keyword">if</span> (opt.truex), out.trueError(out.iter) = norm(opt.xt-out.x); <span class="keyword">end</span>
+0095         <span class="keyword">if</span> (opt.verbose)
+0096             fprintf(<span class="string">'%04d\t %E\t%E\t%E\n'</span>, out.iter, out.obj, out.pgTimes(out.iter), out.trueError(out.iter)); 
+0097         <span class="keyword">end</span>
+0098     <span class="keyword">end</span> <span class="comment">% of while</span>
+0099 
+0100     <span class="comment">%%  Final statistics and wrap up</span>
+0101     out.time = toc(out.startTime);
+0102     out.status = <span class="string">'Success'</span>;
+0103     out.termReason = <a href="#_sub5" class="code" title="subfunction r = setTermReason(t)">setTermReason</a>(termReason);
+0104 <span class="keyword">end</span>
+0105 
+0106 <span class="comment">% Compute BB step; for SBB also modifies out.oldg, and this change must be</span>
+0107 <span class="comment">% passed back to the calling routine, else it will fail!</span>
+0108 <a name="_sub1" href="#_subfunctions" class="code">function [step out] = computeBBStep(A, b, out)</a>
+0109     
+0110     <span class="comment">% HINT: Can tune the x==0 to replace it by an epsilon to do TUNING</span>
+0111     gp = find(out.x == 0 &amp; out.grad &gt; 0);
+0112     out.oldg(gp) = 0;
+0113 
+0114     Ag = A*out.oldg; <span class="comment">% A*oldg</span>
+0115     
+0116     <span class="comment">% HINT: In my experience, the falling alternating steps perform better</span>
+0117     <span class="keyword">if</span> (mod(out.iter, 2) == 0)
+0118         step = (out.oldg' * out.oldg) / (Ag' * Ag);
+0119     <span class="keyword">else</span>
+0120         numer = Ag' * Ag;
+0121         Ag = A'*Ag; <span class="comment">%</span>
+0122         Ag(gp) = 0;
+0123         step = numer / (Ag' * Ag);
+0124     <span class="keyword">end</span>
+0125 <span class="keyword">end</span>
+0126 
+0127 <span class="comment">% compute obj function and gradient --- requires good implementation of A*x</span>
+0128 <span class="comment">% and A'*y for appropriate x and y</span>
+0129 <a name="_sub2" href="#_subfunctions" class="code">function [f g] = funcGrad(A, b, x)</a>
+0130     Ax = A*x - b;
+0131     f = 0.5*norm(Ax)^2;
+0132     <span class="keyword">if</span> (nargout &gt; 1)
+0133         g = A'*Ax;
+0134     <span class="keyword">end</span>
+0135 <span class="keyword">end</span>
+0136 
+0137 <span class="comment">% check various termination criteria; return norm of pg</span>
+0138 <span class="comment">% the strictest is norm of pg</span>
+0139 <span class="comment">% HINT: for speedup, use maybe just opt.tolo or some other criterion that</span>
+0140 <span class="comment">% you like.</span>
+0141 <a name="_sub3" href="#_subfunctions" class="code">function [v pg] = checkTermination(options, out)</a>
+0142     <span class="comment">% pgnorm limit -- need to check this first of all</span>
+0143     gp = find( (out.x ~= 0 | out.grad &lt; 0));
+0144 
+0145     pg = norm(out.grad(gp), <span class="string">'inf'</span>);
+0146     <span class="keyword">if</span> (pg &lt; options.tolg), v=8; <span class="keyword">return</span>; <span class="keyword">end</span>
+0147 
+0148     <span class="comment">% First check if we are doing termination based on running time</span>
+0149     <span class="keyword">if</span> (options.time_limit)
+0150         out.time = etime(clock, out.start_time);
+0151         <span class="keyword">if</span> (out.time &gt;= options.maxtime)
+0152             v = 1;
+0153             <span class="keyword">return</span>;
+0154         <span class="keyword">end</span>
+0155     <span class="keyword">end</span>
+0156 
+0157     <span class="comment">% Now check if we are doing break by tolx</span>
+0158     <span class="keyword">if</span> (options.use_tolx)
+0159         <span class="keyword">if</span> (norm(out.x-out.oldx)/norm(out.oldx) &lt; options.tolx)
+0160             v = 2;
+0161             <span class="keyword">return</span>;
+0162         <span class="keyword">end</span>
+0163     <span class="keyword">end</span>
+0164 
+0165     <span class="comment">% Are we doing break by tolo (tol obj val)</span>
+0166     <span class="keyword">if</span> (options.use_tolo &amp;&amp; out.iter &gt; 2)
+0167         delta = abs(out.objTimes(out.iter-1)-out.objTimes(out.iter-2));
+0168         <span class="keyword">if</span> (delta &lt; options.tolo)
+0169             v = 3;
+0170             <span class="keyword">return</span>;
+0171         <span class="keyword">end</span>
+0172     <span class="keyword">end</span>
+0173 
+0174     <span class="comment">% Finally the plain old check if max iter has been achieved</span>
+0175     <span class="keyword">if</span> (out.iter &gt;= options.maxit)
+0176         v = 4;
+0177         <span class="keyword">return</span>;
+0178     <span class="keyword">end</span>
+0179 
+0180     <span class="comment">% KKT violation</span>
+0181     <span class="keyword">if</span> (options.use_kkt)
+0182         <span class="keyword">if</span> abs(out.x' * out.grad) &lt;= options.tolk
+0183             v = 7;
+0184             <span class="keyword">return</span>;
+0185         <span class="keyword">end</span>
+0186     <span class="keyword">end</span>
+0187 
+0188 
+0189     <span class="comment">% All is ok...</span>
+0190     v = 0;
+0191 <span class="keyword">end</span>
+0192 
+0193 <span class="comment">%% Prints status</span>
+0194 <a name="_sub4" href="#_subfunctions" class="code">function showStatus(out, options)</a>
+0195     <span class="keyword">if</span> (options.verbose)
+0196         fprintf(<span class="string">'.'</span>);
+0197         <span class="keyword">if</span> (mod(out.iter, 30) == 0)
+0198             fprintf(<span class="string">'\n'</span>);
+0199         <span class="keyword">end</span>
+0200     <span class="keyword">end</span>
+0201 <span class="keyword">end</span>
+0202 
+0203 <span class="comment">% String representation of termination</span>
+0204 <a name="_sub5" href="#_subfunctions" class="code">function r = setTermReason(t)</a>
+0205     <span class="keyword">switch</span> t
+0206       <span class="keyword">case</span> 1
+0207         r = <span class="string">'Exceeded time limit'</span>;
+0208       <span class="keyword">case</span> 2
+0209         r = <span class="string">'Relative change in x small enough'</span>;
+0210       <span class="keyword">case</span> 3
+0211         r = <span class="string">'Relative change in objvalue small enough'</span>;
+0212       <span class="keyword">case</span> 4
+0213         r = <span class="string">'Maximum number of iterations reached'</span>;
+0214       <span class="keyword">case</span> 5
+0215         r = <span class="string">'|x_t+1 - x_t|=0 or |grad_t+1 - grad_t| &lt; 1e-9'</span>;
+0216       <span class="keyword">case</span> 6
+0217         r = <span class="string">'Line search failed'</span>;
+0218       <span class="keyword">case</span> 7
+0219         r = <span class="string">'|x^T * grad| &lt; opt.pbb_gradient_norm'</span>;
+0220       <span class="keyword">case</span> 8
+0221         r = <span class="string">'|| grad ||_inf &lt; opt.tolg'</span>;
+0222       <span class="keyword">case</span> 100
+0223         r = <span class="string">'The active set converged'</span>;
+0224       <span class="keyword">otherwise</span>
+0225         r = <span class="string">'Undefined'</span>;
+0226     <span class="keyword">end</span>
+0227 <span class="keyword">end</span>
+0228</pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

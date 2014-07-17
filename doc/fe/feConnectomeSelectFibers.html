@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feConnectomeSelectFibers</title>
+  <meta name="keywords" content="feConnectomeSelectFibers">
+  <meta name="description" content="Deletes a set of fibers from the signal and the M matrix.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">fe</a> &gt; feConnectomeSelectFibers.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for fe&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feConnectomeSelectFibers
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Deletes a set of fibers from the signal and the M matrix.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function fe = feConnectomeSelectFibers(fe, fibersToKeep,recomputeFibersInfo) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Deletes a set of fibers from the signal and the M matrix.
+
+   fe = feConnectomeSelectFibers(fe,fibersToKeep,[recomputeFibersInfo=0])
+
+ The connectome select process builds the parameters inside of fe.life for
+ a selected set of fibers.  The parameters inside of fe.life that are
+ modified are
+
+   The M matrix
+   The fe.life.fibers entries
+
+ We store and keep the whole connectome in .fg.  But not all calculations
+ with the M matrix use all the fibers.  In some cases we run smaller
+ subsets.
+
+ Inputs:
+   fe                  - an fe structure, see feCreate.m, and v_lifeExample.m
+   fibersToKeep        - a list of indexes to the fibers to keep e.g., [1 10 100].
+   recomputeFibersInfo - recomputes the fibers' info this takes a long time. 
+                         So the default is not to recompute (0).
+
+ Example:
+   fibersToKeep = 1:50;
+   feConnectomeSelectFibers(fe, fibersToKeep)
+
+ See also:  fgExtract
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>	Get function for fascicle evaluation structure</li><li><a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>	Set fascicle evaluation parameters.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function fe = feConnectomeSelectFibers(fe, fibersToKeep,recomputeFibersInfo)</a>
+0002 <span class="comment">% Deletes a set of fibers from the signal and the M matrix.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   fe = feConnectomeSelectFibers(fe,fibersToKeep,[recomputeFibersInfo=0])</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% The connectome select process builds the parameters inside of fe.life for</span>
+0007 <span class="comment">% a selected set of fibers.  The parameters inside of fe.life that are</span>
+0008 <span class="comment">% modified are</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%   The M matrix</span>
+0011 <span class="comment">%   The fe.life.fibers entries</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% We store and keep the whole connectome in .fg.  But not all calculations</span>
+0014 <span class="comment">% with the M matrix use all the fibers.  In some cases we run smaller</span>
+0015 <span class="comment">% subsets.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% Inputs:</span>
+0018 <span class="comment">%   fe                  - an fe structure, see feCreate.m, and v_lifeExample.m</span>
+0019 <span class="comment">%   fibersToKeep        - a list of indexes to the fibers to keep e.g., [1 10 100].</span>
+0020 <span class="comment">%   recomputeFibersInfo - recomputes the fibers' info this takes a long time.</span>
+0021 <span class="comment">%                         So the default is not to recompute (0).</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% Example:</span>
+0024 <span class="comment">%   fibersToKeep = 1:50;</span>
+0025 <span class="comment">%   feConnectomeSelectFibers(fe, fibersToKeep)</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% See also:  fgExtract</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0030 
+0031 <span class="keyword">if</span> notDefined(<span class="string">'recomputeFibersInfo'</span>),recomputeFibersInfo=0;<span class="keyword">end</span>
+0032 fprintf(<span class="string">'[%s], Selecting fibers from the full Connectome...\n'</span>,mfilename)
+0033 
+0034 <span class="comment">% Change the name of the fe structure</span>
+0035 indx       = strfind(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'name'</span>),<span class="string">'-'</span>);
+0036 feFileName = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'name'</span>);
+0037 <span class="keyword">if</span> ~isempty(indx)
+0038   feFileName = feFileName((indx(end) + 1):end); <span class="comment">% Strip away any previous date-string tag.</span>
+0039 <span class="keyword">end</span>
+0040 feFileName = sprintf(<span class="string">'%s-%s'</span>, datestr(now,30),feFileName);
+0041 fe         = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe, <span class="string">'name'</span>,feFileName);
+0042 
+0043 <span class="comment">% Delete fibers' columns from the model.</span>
+0044 fe = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'Mfiber'</span>,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'mkeepfibers'</span>,fibersToKeep));
+0045 
+0046 <span class="comment">% Remove the fibers from the fiber group:</span>
+0047 fe = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'fg'</span>,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'fiberssubset'</span>,fibersToKeep));
+0048 
+0049 <span class="comment">% Take care of the field fe.life.fibers</span>
+0050 <span class="comment">% Set the subset of tensors, the one only for the left-over fibers</span>
+0051 <span class="keyword">if</span> ~isempty(fe.life.fibers.tensors)
+0052   fe = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'tensors'</span>,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'tensors'</span>,fibersToKeep));
+0053 <span class="keyword">end</span>
+0054 
+0055 <span class="comment">% Remove any fit or cross-validation</span>
+0056 fe = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'fit'</span>, []);
+0057 fe = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'xvalfit'</span>,[]);
+0058 
+0059 <span class="comment">% By default we do not recompute the fibers info.</span>
+0060 <span class="keyword">if</span> recomputeFibersInfo
+0061   <span class="comment">% We disregard fibers that have identical trajectories within the ROI.</span>
+0062   roi = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'roi coords'</span>);
+0063   fe  = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'voxel 2 fiber node pairs'</span>,fefgGet(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'fg'</span>),<span class="string">'v2fn'</span>,roi));
+0064   fe  = feGetConnectomeInfo(fe);
+0065 <span class="keyword">else</span>
+0066   <span class="comment">% this is done automatically by feSet:</span>
+0067   <span class="comment">% fe = feSet(fe,'voxel 2 fiber node pairs',[]);</span>
+0068   fe = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'index to unique fibers in each voxel'</span>,[]);
+0069   fe = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'number of unique fibers in each voxel'</span>, []);
+0070   fe = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'number of total fibers in each voxel'</span>, []);
+0071   fe = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(fe,<span class="string">'index of total fibers in each voxel'</span>, []);
+0072 <span class="keyword">end</span>
+0073 
+0074 <span class="keyword">return</span>
+0075</pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

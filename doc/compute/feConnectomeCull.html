@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feConnectomeCull</title>
+  <meta name="keywords" content="feConnectomeCull">
+  <meta name="description" content="Fits a connectome over and over by removing the fibers that make no">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">compute</a> &gt; feConnectomeCull.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for compute&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feConnectomeCull
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Fits a connectome over and over by removing the fibers that make no</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [fe, cull] = feConnectomeCull(fe,display) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Fits a connectome over and over by removing the fibers that make no
+ contribution to the diffusion signal at each iteration.
+
+   fe = feConnectomeCull(fe)
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feFitModel.html" class="code" title="function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)">feFitModel</a>	Fit the LiFE model.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [fe, cull] = feConnectomeCull(fe,display)</a>
+0002 <span class="comment">% Fits a connectome over and over by removing the fibers that make no</span>
+0003 <span class="comment">% contribution to the diffusion signal at each iteration.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%   fe = feConnectomeCull(fe)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0008 
+0009 <span class="keyword">if</span> notDefined(<span class="string">'display'</span>); display.cull = false;<span class="keyword">end</span>
+0010 
+0011 <span class="comment">% Initialize a structure containing the information abotu the culling</span>
+0012 cull.name = feGet(fe,<span class="string">'name'</span>);
+0013 cull.iter = 1;
+0014 cull.minwval = eps; <span class="comment">% (here we could have used 0 as thresholds, we use eps instead</span>
+0015                     <span class="comment">% in hopes to seepd things up)</span>
+0016 
+0017 <span class="comment">% Extract the connectome model and the signa for fitting.</span>
+0018 M    = feGet(fe,<span class="string">'mfiber'</span>);
+0019 dSig = feGet(fe,<span class="string">'dsigdemeaned'</span>);
+0020 fe   = feSet(fe,<span class="string">'fit'</span>,<a href="feFitModel.html" class="code" title="function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)">feFitModel</a>(M,dSig,<span class="string">'bbnnls'</span>));
+0021 
+0022 <span class="comment">% Count the number of fbers that make no contribution to the diffusion</span>
+0023 <span class="comment">% prediction (here we could have used 0 as thresholds, we use eps instead</span>
+0024 <span class="comment">% in hopes to seepd things up)</span>
+0025 sw   = sum(feGet(fe,<span class="string">'fiber weights'</span>) &lt;= cull.minwval);
+0026 
+0027 <span class="comment">% Update the culling structure given the results of the firts fit.</span>
+0028 cull.num2delete(cull.iter) = sw;
+0029 cull.numtotal(cull.iter)   = size(M,2);
+0030 cull.rmse(cull.iter)       = mean(feGet(fe,<span class="string">'vox rmse'</span>));
+0031 cull.rmse(cull.iter)       = mean(feGetRep(fe,<span class="string">'vox rmse'</span>));
+0032 cull.rrmse(cull.iter)      = mean(feGetRep(fe,<span class="string">'vox rmse ratio'</span>));
+0033 
+0034 <span class="comment">% Cull the connectome. We stop when no fibers have a contribution to the</span>
+0035 <span class="comment">% diffusion signal less than eps.</span>
+0036 <span class="keyword">while</span> (sw ~= 0)
+0037     fprintf(<span class="string">'Number of total %i and zero-weight %i fibers | culling...\n'</span>, <span class="keyword">...</span>
+0038         cull.numtotal(cull.iter),cull.num2delete(cull.iter))
+0039     M    = feGet(fe,<span class="string">'mfiber'</span>);
+0040     dSig = feGet(fe,<span class="string">'dsigdemeaned'</span>);
+0041     fe   = feSet(fe,<span class="string">'fit'</span>,<a href="feFitModel.html" class="code" title="function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)">feFitModel</a>(M,dSig,<span class="string">'bbnnls'</span>));
+0042     sw   = sum(feGet(fe,<span class="string">'fiber weights'</span>) &lt;= cull.minwval);
+0043     fe   = feConnectomeReduceFibers(fe, find((feGet(fe,<span class="string">'fiber weights'</span>) &gt; cull.minwval)));
+0044     cull.iter = cull.iter + 1;
+0045     cull.num2delete(cull.iter) = sw;
+0046     cull.numtotal(cull.iter)   = size(M,2);
+0047     cull.rmse(cull.iter)       = mean(feGet(fe,<span class="string">'vox rmse'</span>));
+0048     cull.rmse(cull.iter)       = mean(feGetRep(fe,<span class="string">'vox rmse'</span>));
+0049     cull.rrmse(cull.iter)      = mean(feGetRep(fe,<span class="string">'vox rmse ratio'</span>));
+0050 <span class="keyword">end</span>
+0051 
+0052 <span class="comment">% If display cull process</span>
+0053 <span class="keyword">if</span> display.cull
+0054 keyboard    
+0055 <span class="keyword">end</span>
+0056 
+0057 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

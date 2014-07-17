@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feValues2volume</title>
+  <meta name="keywords" content="feValues2volume">
+  <meta name="description" content="Create a 3D volume of sz and place vals at the coord positions">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">file</a> &gt; feValues2volume.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for file&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feValues2volume
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Create a 3D volume of sz and place vals at the coord positions</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function vol3d = feValues2volume(vals,coords,vSize) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Create a 3D volume of sz and place vals at the coord positions
+
+  vol3d = feValues2volume(stat,coords,vSize)
+
+ save the vals in the correct locations inside the image volume.
+
+ vals   -  N values to insert 
+ coords -  N x 3 matrix of coords, (not in acpc)
+ vSize  -  The size of the image volume 
+ 
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feSaveMapToNifti.html" class="code" title="function feSaveMapToNifti(fe,mapType, niftiName)">feSaveMapToNifti</a>	Saves a parameter map to file from an fe structure.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function vol3d = feValues2volume(vals,coords,vSize)</a>
+0002 <span class="comment">% Create a 3D volume of sz and place vals at the coord positions</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  vol3d = feValues2volume(stat,coords,vSize)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% save the vals in the correct locations inside the image volume.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% vals   -  N values to insert</span>
+0009 <span class="comment">% coords -  N x 3 matrix of coords, (not in acpc)</span>
+0010 <span class="comment">% vSize  -  The size of the image volume</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0014 
+0015 <span class="comment">% Check that we have a value for each coordinate.</span>
+0016 <span class="keyword">if</span> ~( length(vals) == size(coords,1) )
+0017   error(<span class="string">'vals (%d) and N coords mis-match (%d)'</span>, length(vals),size(coords,1))
+0018 <span class="keyword">end</span>
+0019 
+0020 <span class="comment">% Check that the coordinates are contained inside the volume</span>
+0021 <span class="keyword">if</span> all( vSize(1:3) &lt; max(coords) ) || all(min(coords) &lt; [1 1 1])
+0022   error(<span class="string">'Roi coordinates are out of range'</span>)
+0023 <span class="keyword">end</span>
+0024 
+0025 <span class="comment">% Initialize the volume to nan's</span>
+0026 vol3d = nan(vSize); 
+0027 
+0028 <span class="keyword">if</span> (length(vSize) == 3) <span class="comment">% This is a statistics that needs to be saved in 3D volume</span>
+0029   <span class="keyword">for</span> iv = 1:length(vals)
+0030     vol3d(coords(iv,1),coords(iv,2),coords(iv,3)) = vals(iv);
+0031   <span class="keyword">end</span>
+0032   
+0033 <span class="keyword">elseif</span> (length(vSize) == 4) <span class="comment">% This is signal that needs to be saved in 4D volume</span>
+0034   <span class="keyword">for</span> iv = 1:length(vals)
+0035     vol3d(coords(iv,1),coords(iv,2),coords(iv,3),:) = vals(:,iv)';
+0036   <span class="keyword">end</span>
+0037   
+0038 <span class="keyword">else</span>
+0039   error(<span class="string">'[%s] Volume dimensions mismatch'</span>,mfilename)
+0040 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

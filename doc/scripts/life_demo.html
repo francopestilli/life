@@ -1,0 +1,491 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of life_demo</title>
+  <meta name="keywords" content="life_demo">
+  <meta name="description" content="% Example of initialization and fitting of the LiFE model">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">scripts</a> &gt; life_demo.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for scripts&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>life_demo
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>% Example of initialization and fitting of the LiFE model</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [fh, fe] = life_demo() </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% Example of initialization and fitting of the LiFE model
+ This demo function illustrates how to:
+  - A - Set up a LiFE structure, identified as 'fe' (fascicle evaluation) in
+  the code below. This model contains a prediction of the diffusion
+  measurements in each white-matter voxel given by the fascicles contained
+  in a tractogrpahy solution, the connectome. Each fascicles makes a
+  prediction about the direction of diffusion in the set of voxels where
+  it travels through. The prediction is generated given the fascicle
+  orientation and position isndie the voxel. Predictions from multiple
+  fascicles in in each voxels are combined to generate a global connectome
+  prediciton for the diffusion signal in large sets of white matter
+  voxels.
+  - B - Fit the LiFE model to compute the weights associated to each fascicle
+  in the connectome. Fascicles in the conenctome contribute differently to
+  predicting the diffusion signal in each voxel. First of all, fascicles
+  make predictions about the diffusion only in voxels where they travel.
+  Secondly, some fascicles have paths that produce better diffusion
+  predictions than others. We use a least-square method to find the
+  contribution of each fascicle to the diffusion signal in the white
+  matter voxels where the fascicles travels. A single weight is assigned
+  to each fascicle representing the global contribution of the fasicle to
+  the signal of all the voxels along its path - we call this
+  fascicle-global. Because multiple fascicles exist in several voxels the
+  set of fascicles weights and fascicles predicitons represents the
+  connectome-global prediction of the diffusion signal within the entire
+  set of white matter voxels. Estimating the fascicle weights allows for
+  evaluating the quality of the tractography solution. Eliminating
+  fascicles that do not contribute to predicting the diffusion signal
+  (they have assigned a zreo-weight). Finaly, the root-mean-squared error
+  (RMSE) of the model to the diffusion data - the model prediction error -
+  is used to evaluate the model prediction quality, compare different
+  tractography models and to perform statistical inference on the on
+  properties of the connectomes.
+  - C - Compare two different connectome models. This demo will show how to
+  compare two different conenctome models by using the diffusion
+  prediction error (the Root-Mean-Squared Error, RMSE). We report the
+  example of two conenctomes one generated using Constrained-spherical
+  deconvolution (CSD) and probabilistic tractography the other using a
+  tensor model and deterministic tractography
+  - Note - The example connectomes used for this demo comprise a portion
+  of the right occiptial lobe of an individual human brain. LiFE utilizes
+  large-scale methods to solve the foward model. The software allows for
+  solving connectomes spanning the entire white-matter of idnvidual
+  brains. The size of the connectome on the test data set is small enought
+  to allow for testing the code within a few minutes requiring only about
+  10GB of computer RAM and standard hardaware. This code has been tested
+  with: 
+
+   - Ubuntu 12.04.4 LTS (Precise) 
+   - 2.6Ghz i7 Processor and 24GB of RAM.
+   - MatLab Version: 8.0.0.783 (R2012b)
+
+   - Mac OSX 10.9
+   - 1.8 Ghz i5 Processor and 8GB of RAM
+   - MatLab Version: 8.0.0.783 (R2012b)
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [fh, rmse, rmsexv] = plotHistRMSE(info)</a></li><li><a href="#_sub2" class="code">function [fh, R] = plotHistRrmse(info)</a></li><li><a href="#_sub3" class="code">function [fh, w] = plotHistWeights(info)</a></li><li><a href="#_sub4" class="code">function fh = scatterPlotRMSE(det,prob)</a></li><li><a href="#_sub5" class="code">function fh = distributionPlotStrengthOfEvidence(se)</a></li><li><a href="#_sub6" class="code">function fh = distributionPlotEarthMoversDistance(se)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [fh, fe] = life_demo()</a>
+0002 <span class="comment">%% Example of initialization and fitting of the LiFE model</span>
+0003 <span class="comment">% This demo function illustrates how to:</span>
+0004 <span class="comment">%  - A - Set up a LiFE structure, identified as 'fe' (fascicle evaluation) in</span>
+0005 <span class="comment">%  the code below. This model contains a prediction of the diffusion</span>
+0006 <span class="comment">%  measurements in each white-matter voxel given by the fascicles contained</span>
+0007 <span class="comment">%  in a tractogrpahy solution, the connectome. Each fascicles makes a</span>
+0008 <span class="comment">%  prediction about the direction of diffusion in the set of voxels where</span>
+0009 <span class="comment">%  it travels through. The prediction is generated given the fascicle</span>
+0010 <span class="comment">%  orientation and position isndie the voxel. Predictions from multiple</span>
+0011 <span class="comment">%  fascicles in in each voxels are combined to generate a global connectome</span>
+0012 <span class="comment">%  prediciton for the diffusion signal in large sets of white matter</span>
+0013 <span class="comment">%  voxels.</span>
+0014 <span class="comment">%  - B - Fit the LiFE model to compute the weights associated to each fascicle</span>
+0015 <span class="comment">%  in the connectome. Fascicles in the conenctome contribute differently to</span>
+0016 <span class="comment">%  predicting the diffusion signal in each voxel. First of all, fascicles</span>
+0017 <span class="comment">%  make predictions about the diffusion only in voxels where they travel.</span>
+0018 <span class="comment">%  Secondly, some fascicles have paths that produce better diffusion</span>
+0019 <span class="comment">%  predictions than others. We use a least-square method to find the</span>
+0020 <span class="comment">%  contribution of each fascicle to the diffusion signal in the white</span>
+0021 <span class="comment">%  matter voxels where the fascicles travels. A single weight is assigned</span>
+0022 <span class="comment">%  to each fascicle representing the global contribution of the fasicle to</span>
+0023 <span class="comment">%  the signal of all the voxels along its path - we call this</span>
+0024 <span class="comment">%  fascicle-global. Because multiple fascicles exist in several voxels the</span>
+0025 <span class="comment">%  set of fascicles weights and fascicles predicitons represents the</span>
+0026 <span class="comment">%  connectome-global prediction of the diffusion signal within the entire</span>
+0027 <span class="comment">%  set of white matter voxels. Estimating the fascicle weights allows for</span>
+0028 <span class="comment">%  evaluating the quality of the tractography solution. Eliminating</span>
+0029 <span class="comment">%  fascicles that do not contribute to predicting the diffusion signal</span>
+0030 <span class="comment">%  (they have assigned a zreo-weight). Finaly, the root-mean-squared error</span>
+0031 <span class="comment">%  (RMSE) of the model to the diffusion data - the model prediction error -</span>
+0032 <span class="comment">%  is used to evaluate the model prediction quality, compare different</span>
+0033 <span class="comment">%  tractography models and to perform statistical inference on the on</span>
+0034 <span class="comment">%  properties of the connectomes.</span>
+0035 <span class="comment">%  - C - Compare two different connectome models. This demo will show how to</span>
+0036 <span class="comment">%  compare two different conenctome models by using the diffusion</span>
+0037 <span class="comment">%  prediction error (the Root-Mean-Squared Error, RMSE). We report the</span>
+0038 <span class="comment">%  example of two conenctomes one generated using Constrained-spherical</span>
+0039 <span class="comment">%  deconvolution (CSD) and probabilistic tractography the other using a</span>
+0040 <span class="comment">%  tensor model and deterministic tractography</span>
+0041 <span class="comment">%  - Note - The example connectomes used for this demo comprise a portion</span>
+0042 <span class="comment">%  of the right occiptial lobe of an individual human brain. LiFE utilizes</span>
+0043 <span class="comment">%  large-scale methods to solve the foward model. The software allows for</span>
+0044 <span class="comment">%  solving connectomes spanning the entire white-matter of idnvidual</span>
+0045 <span class="comment">%  brains. The size of the connectome on the test data set is small enought</span>
+0046 <span class="comment">%  to allow for testing the code within a few minutes requiring only about</span>
+0047 <span class="comment">%  10GB of computer RAM and standard hardaware. This code has been tested</span>
+0048 <span class="comment">%  with:</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">%   - Ubuntu 12.04.4 LTS (Precise)</span>
+0051 <span class="comment">%   - 2.6Ghz i7 Processor and 24GB of RAM.</span>
+0052 <span class="comment">%   - MatLab Version: 8.0.0.783 (R2012b)</span>
+0053 <span class="comment">%</span>
+0054 <span class="comment">%   - Mac OSX 10.9</span>
+0055 <span class="comment">%   - 1.8 Ghz i5 Processor and 8GB of RAM</span>
+0056 <span class="comment">%   - MatLab Version: 8.0.0.783 (R2012b)</span>
+0057 <span class="comment">%</span>
+0058 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0059 
+0060 <span class="comment">% Intialize a local matlab cluster if the parallel toolbox is available.</span>
+0061 <span class="comment">% This helps speeding up computations espacially for large conenctomes.</span>
+0062 feOpenLocalCluster;
+0063 
+0064 <span class="comment">%% Build the file names for the diffusion data, the anatomical MRI.</span>
+0065 dwiFile       = fullfile(lifeDemoDataPath(<span class="string">'diffusion'</span>),<span class="string">'life_demo_scan1_subject1_b2000_150dirs_stanford.nii.gz'</span>);
+0066 dwiFileRepeat = fullfile(lifeDemoDataPath(<span class="string">'diffusion'</span>),<span class="string">'life_demo_scan2_subject1_b2000_150dirs_stanford.nii.gz'</span>);
+0067 t1File        = fullfile(lifeDemoDataPath(<span class="string">'anatomy'</span>),  <span class="string">'life_demo_anatomy_t1w_stanford.nii.gz'</span>);
+0068 
+0069 <span class="comment">%% (1) Evaluate the Probabilistic CSD-based connectome.</span>
+0070 <span class="comment">% We will analyze first the CSD-based probabilistic tractography</span>
+0071 <span class="comment">% connectome.</span>
+0072 prob.tractography = <span class="string">'Probabilistic'</span>;
+0073 fgFileName    = fullfile(lifeDemoDataPath(<span class="string">'tractography'</span>), <span class="keyword">...</span>
+0074                 <span class="string">'life_demo_mrtrix_csd_lmax10_probabilistic.mat'</span>);
+0075 
+0076 <span class="comment">% The final connectome and data astructure will be saved with this name:</span>
+0077 feFileName    = <span class="string">'life_build_model_demo_CSD_PROB'</span>;
+0078 
+0079 <span class="comment">%% (1.1) Initialize the LiFE model structure, 'fe' in the code below.</span>
+0080 <span class="comment">% This structure contains the forward model of diffusion based on the</span>
+0081 <span class="comment">% tractography solution. It also contains all the information necessary to</span>
+0082 <span class="comment">% compute model accuracry, and perform statistical tests. You can type</span>
+0083 <span class="comment">% help('feBuildModel') in the MatLab prompt for more information.</span>
+0084 fe = feConnectomeInit(dwiFile,fgFileName,feFileName,[],dwiFileRepeat,t1File);
+0085 
+0086 <span class="comment">%% (1.2) Fit the model.</span>
+0087 <span class="comment">% Hereafter we fit the forward model of tracrography using a least-squared</span>
+0088 <span class="comment">% method. The information generated by fitting the model (fiber weights</span>
+0089 <span class="comment">% etc) is then installed in the LiFE structure.</span>
+0090 fe = feSet(fe,<span class="string">'fit'</span>,feFitModel(feGet(fe,<span class="string">'mfiber'</span>),feGet(fe,<span class="string">'dsigdemeaned'</span>),<span class="string">'bbnnls'</span>));
+0091 
+0092 <span class="comment">%% (1.3) Extract the RMSE of the model on the fitted data set.</span>
+0093 <span class="comment">% We now use the LiFE structure and the fit to compute the error in each</span>
+0094 <span class="comment">% white-matter voxel spanned by the tractography model.</span>
+0095 prob.rmse   = feGet(fe,<span class="string">'vox rmse'</span>);
+0096 
+0097 <span class="comment">%% (1.4) Extract the RMSE of the model on the second data set.</span>
+0098 <span class="comment">% Here we show how to compute the cross-valdiated RMSE of the tractography</span>
+0099 <span class="comment">% model in each white-matter voxel. We store this information for later use</span>
+0100 <span class="comment">% and to save computer memory.</span>
+0101 prob.rmsexv = feGetRep(fe,<span class="string">'vox rmse'</span>);
+0102 
+0103 <span class="comment">%% (1.5) Extract the Rrmse.</span>
+0104 <span class="comment">% We show how to extract the ratio between the model prediction error</span>
+0105 <span class="comment">% (RMSE) and the test-retest reliability of the data.</span>
+0106 prob.rrmse  = feGetRep(fe,<span class="string">'vox rmse ratio'</span>);
+0107 
+0108 <span class="comment">%% (1.6) Extract the fitted weights for the fascicles.</span>
+0109 <span class="comment">% The following line shows how to extract the weight assigned to each</span>
+0110 <span class="comment">% fascicle in the connectome.</span>
+0111 prob.w      = feGet(fe,<span class="string">'fiber weights'</span>);
+0112 
+0113 <span class="comment">%% (1.7) Plot a histogram of the RMSE.</span>
+0114 <span class="comment">% We plot the histogram of  RMSE across white-mater voxels.</span>
+0115 [fh(1), ~, ~] = <a href="#_sub1" class="code" title="subfunction [fh, rmse, rmsexv] = plotHistRMSE(info)">plotHistRMSE</a>(prob);
+0116 
+0117 <span class="comment">%% (1.8) Plot a histogram of the RMSE ratio.</span>
+0118 <span class="comment">% As a reminder the Rrmse is the ratio between data test-retest reliability</span>
+0119 <span class="comment">% and model error (the quality of the model fit).</span>
+0120 [fh(2), ~] = <a href="#_sub2" class="code" title="subfunction [fh, R] = plotHistRrmse(info)">plotHistRrmse</a>(prob);
+0121 
+0122 <span class="comment">%% (1.9) Plot a histogram of the fitted fascicle weights.</span>
+0123 [fh(3), ~] = <a href="#_sub3" class="code" title="subfunction [fh, w] = plotHistWeights(info)">plotHistWeights</a>(prob);
+0124 fe = feConnectomeInit(dwiFile,fgFileName,feFileName,[],dwiFileRepeat,t1File);
+0125 
+0126 <span class="comment">%% Extract the coordinates of the white-matter voxels</span>
+0127 <span class="comment">% We will use this later to compare probabilistic and deterministic models.</span>
+0128 p.coords = feGet(fe,<span class="string">'roi coords'</span>);
+0129 clear fe
+0130 
+0131 <span class="comment">%% (2) Evaluate the Deterministic tensor-based connectome.</span>
+0132 <span class="comment">% We will now analyze the tensor-based Deterministic tractography</span>
+0133 <span class="comment">% connectome.</span>
+0134 det.tractography = <span class="string">'Deterministic'</span>;
+0135 fgFileName    = fullfile(lifeDemoDataPath(<span class="string">'tractography'</span>), <span class="keyword">...</span>
+0136                 <span class="string">'life_demo_mrtrix_tensor_deterministic.mat'</span>);
+0137 
+0138 <span class="comment">% The final connectome and data astructure will be saved with this name:</span>
+0139 feFileName    = <span class="string">'life_build_model_demo_TENSOR_DET'</span>;
+0140 
+0141 <span class="comment">%% (2.1) Initialize the LiFE model structure, 'fe' in the code below.</span>
+0142 <span class="comment">% This structure contains the forward model of diffusion based on the</span>
+0143 <span class="comment">% tractography solution. It also contains all the information necessary to</span>
+0144 <span class="comment">% compute model accuracry, and perform statistical tests. You can type</span>
+0145 <span class="comment">% help('feBuildModel') in the MatLab prompt for more information.</span>
+0146 fe = feConnectomeInit(dwiFile,fgFileName,feFileName,[],dwiFileRepeat,t1File);
+0147 
+0148 <span class="comment">%% (2.2) Fit the model.</span>
+0149 <span class="comment">% Hereafter we fit the forward model of tracrography using a least-squared</span>
+0150 <span class="comment">% method. The information generated by fitting the model (fiber weights</span>
+0151 <span class="comment">% etc) is then installed in the LiFE structure.</span>
+0152 fe = feSet(fe,<span class="string">'fit'</span>,feFitModel(feGet(fe,<span class="string">'mfiber'</span>),feGet(fe,<span class="string">'dsigdemeaned'</span>),<span class="string">'bbnnls'</span>));
+0153 
+0154 <span class="comment">%% (2.3) Extract the RMSE of the model on the fitted data set.</span>
+0155 <span class="comment">% We now use the LiFE structure and the fit to compute the error in each</span>
+0156 <span class="comment">% white-matter voxel spanned by the tractography model.</span>
+0157 det.rmse   = feGet(fe,<span class="string">'vox rmse'</span>);
+0158 
+0159 <span class="comment">%% (2.4) Extract the RMSE of the model on the second data set.</span>
+0160 <span class="comment">% Here we show how to compute the cross-valdiated RMSE of the tractography</span>
+0161 <span class="comment">% model in each white-matter voxel. We store this information for later use</span>
+0162 <span class="comment">% and to save computer memory.</span>
+0163 det.rmsexv = feGetRep(fe,<span class="string">'vox rmse'</span>);
+0164 
+0165 <span class="comment">%% (2.5) Extract the Rrmse.</span>
+0166 <span class="comment">% We show how to extract the ratio between the model prediction error</span>
+0167 <span class="comment">% (RMSE) and the test-retest reliability of the data.</span>
+0168 det.rrmse  = feGetRep(fe,<span class="string">'vox rmse ratio'</span>);
+0169 
+0170 <span class="comment">%% (2.6) Extract the fitted weights for the fascicles.</span>
+0171 <span class="comment">% The following line shows how to extract the weight assigned to each</span>
+0172 <span class="comment">% fascicle in the connectome.</span>
+0173 det.w      = feGet(fe,<span class="string">'fiber weights'</span>);
+0174 
+0175 <span class="comment">%% (2.7) Plot a histogram of the RMSE.</span>
+0176 <span class="comment">% We plot the histogram of  RMSE across white-mater voxels.</span>
+0177 [fh(1), ~, ~] = <a href="#_sub1" class="code" title="subfunction [fh, rmse, rmsexv] = plotHistRMSE(info)">plotHistRMSE</a>(det);
+0178 
+0179 <span class="comment">%% (2.8) Plot a histogram of the RMSE ratio.</span>
+0180 <span class="comment">% As a reminder the Rrmse is the ratio between data test-retest reliability</span>
+0181 <span class="comment">% and model error (the quality of the model fit).</span>
+0182 [fh(2), ~] = <a href="#_sub2" class="code" title="subfunction [fh, R] = plotHistRrmse(info)">plotHistRrmse</a>(det);
+0183 
+0184 <span class="comment">%% (2.9) Plot a histogram of the fitted fascicle weights.</span>
+0185 [fh(3), ~] = <a href="#_sub3" class="code" title="subfunction [fh, w] = plotHistWeights(info)">plotHistWeights</a>(det);
+0186 
+0187 <span class="comment">%% Extract the coordinates of the white-matter voxels.</span>
+0188 <span class="comment">% We will use this later to compare probabilistic and deterministic models.</span>
+0189 d.coords = feGet( fe, <span class="string">'roi coords'</span>);
+0190 clear fe
+0191 
+0192 <span class="comment">%% (3) Compare the quality of fit of Probabilistic and Deterministic connectomes.</span>
+0193 <span class="comment">%% (3.1) Find the common coordinates between the two connectomes.</span>
+0194 <span class="comment">%</span>
+0195 <span class="comment">% The two tractography method might have passed through slightly different</span>
+0196 <span class="comment">% white-matter voxels. Here we find the voxels where both models passed. We</span>
+0197 <span class="comment">% will compare the error only in these common voxels. There are more</span>
+0198 <span class="comment">% coordinates in the Prob connectome, because the tracking fills up more</span>
+0199 <span class="comment">% White-matter.</span>
+0200 <span class="comment">%</span>
+0201 <span class="comment">% So, hereafter:</span>
+0202 <span class="comment">% - First we find the indices in the probabilistic connectome of the</span>
+0203 <span class="comment">% coordinate in the deterministic connectome. But there are some of the</span>
+0204 <span class="comment">% coordinates in the Deterministic conectome that are NOT in the</span>
+0205 <span class="comment">% Probabilistic connectome.</span>
+0206 <span class="comment">%</span>
+0207 <span class="comment">% - Second we find the indices in the Deterministic connectome of the</span>
+0208 <span class="comment">% subset of coordinates in the Probabilistic connectome found in the</span>
+0209 <span class="comment">% previous step.</span>
+0210 <span class="comment">%</span>
+0211 <span class="comment">% - Third we find the common voxels. These allow us to find the rmse for</span>
+0212 <span class="comment">% the same voxels.</span>
+0213 fprintf(<span class="string">'Finding common brain coordinates between P and D connectomes...\n'</span>)
+0214 prob.coordsIdx = ismember(p.coords,d.coords,<span class="string">'rows'</span>);
+0215 prob.coords    = p.coords(prob.coordsIdx,:);
+0216 det.coordsIdx  = ismember(d.coords,prob.coords,<span class="string">'rows'</span>);
+0217 det.coords     = d.coords(det.coordsIdx,:);
+0218 prob.rmse      = prob.rmse( prob.coordsIdx);
+0219 det.rmse       = det.rmse( det.coordsIdx);
+0220 clear p d
+0221 
+0222 <span class="comment">%% (3.2) Make a scatter plot of the RMSE of the two tractography models</span>
+0223 fh(4) = <a href="#_sub4" class="code" title="subfunction fh = scatterPlotRMSE(det,prob)">scatterPlotRMSE</a>(det,prob);
+0224 
+0225 <span class="comment">%% (3.3) Compute the strength-of-evidence (S) and the Earth Movers Distance.</span>
+0226 <span class="comment">% Compare the RMSE of the two models using the Stregth-of-evidence and the</span>
+0227 <span class="comment">% Earth Movers Distance.</span>
+0228 se = feComputeEvidence(prob.rmse,det.rmse);
+0229 
+0230 <span class="comment">%% (3.4) Strength of evidence in favor of Probabilistic tractography.</span>
+0231 <span class="comment">% Plot the distributions of resampled mean RMSE</span>
+0232 <span class="comment">% used to compute the strength of evidence (S).</span>
+0233 fh(5) = <a href="#_sub5" class="code" title="subfunction fh = distributionPlotStrengthOfEvidence(se)">distributionPlotStrengthOfEvidence</a>(se);
+0234 
+0235 <span class="comment">%% (3.5) RMSE distributions for Probabilistic and Deterministic tractography.</span>
+0236 <span class="comment">% Compare the distributions using the Earth Movers Distance.</span>
+0237 <span class="comment">% Plot the distributions of RMSE for the two models and report the Earth</span>
+0238 <span class="comment">% Movers Distance between the distributions.</span>
+0239 fh(6) = <a href="#_sub6" class="code" title="subfunction fh = distributionPlotEarthMoversDistance(se)">distributionPlotEarthMoversDistance</a>(se);
+0240 
+0241 <span class="keyword">end</span>
+0242 
+0243 <span class="comment">% ---------- Local Plot Functions ----------- %</span>
+0244 <a name="_sub1" href="#_subfunctions" class="code">function [fh, rmse, rmsexv] = plotHistRMSE(info)</a>
+0245 <span class="comment">% Make a plot of the RMSE:</span>
+0246 rmse   = info.rmse;
+0247 rmsexv = info.rmsexv;
+0248 
+0249 figName = sprintf(<span class="string">'%s - RMSE'</span>,info.tractography);
+0250 fh = mrvNewGraphWin(figName);
+0251 [y,x] = hist(rmse,50);
+0252 plot(x,y,<span class="string">'k-'</span>);
+0253 hold on
+0254 [y,x] = hist(rmsexv,50);
+0255 plot(x,y,<span class="string">'r-'</span>);
+0256 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'fontsize'</span>,16,<span class="string">'box'</span>,<span class="string">'off'</span>);
+0257 title(<span class="string">'Root-mean squared error distribution across voxels'</span>,<span class="string">'fontsize'</span>,16);
+0258 ylabel(<span class="string">'number of voxels'</span>,<span class="string">'fontsize'</span>,16);
+0259 xlabel(<span class="string">'rmse (scanner units)'</span>,<span class="string">'fontsize'</span>,16);
+0260 legend({<span class="string">'RMSE fitted data set'</span>,<span class="string">'RMSE cross-validated'</span>},<span class="string">'fontsize'</span>,16);
+0261 <span class="keyword">end</span>
+0262 
+0263 <a name="_sub2" href="#_subfunctions" class="code">function [fh, R] = plotHistRrmse(info)</a>
+0264 <span class="comment">% Make a plot of the RMSE Ratio:</span>
+0265 
+0266 R       = info.rrmse;
+0267 figName = sprintf(<span class="string">'%s - RMSE RATIO'</span>,info.tractography);
+0268 fh      = mrvNewGraphWin(figName);
+0269 [y,x]   = hist(R,linspace(.5,4,50));
+0270 plot(x,y,<span class="string">'k-'</span>,<span class="string">'linewidth'</span>,2);
+0271 hold on
+0272 plot([median(R) median(R)],[0 1200],<span class="string">'r-'</span>,<span class="string">'linewidth'</span>,2);
+0273 plot([1 1],[0 1200],<span class="string">'k-'</span>);
+0274 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'fontsize'</span>,16,<span class="string">'box'</span>,<span class="string">'off'</span>);
+0275 title(<span class="string">'Root-mean squared error ratio'</span>,<span class="string">'fontsize'</span>,16);
+0276 ylabel(<span class="string">'number of voxels'</span>,<span class="string">'fontsize'</span>,16);
+0277 xlabel(<span class="string">'R_{rmse}'</span>,<span class="string">'fontsize'</span>,16);
+0278 legend({sprintf(<span class="string">'Distribution of R_{rmse}'</span>),sprintf(<span class="string">'Median R_{rmse}'</span>)});
+0279 <span class="keyword">end</span>
+0280 
+0281 <a name="_sub3" href="#_subfunctions" class="code">function [fh, w] = plotHistWeights(info)</a>
+0282 <span class="comment">% Make a plot of the weights:</span>
+0283 
+0284 w       = info.w;
+0285 figName = sprintf(<span class="string">'%s - Distribution of fascicle weights'</span>,info.tractography);
+0286 fh      = mrvNewGraphWin(figName);
+0287 [y,x]   = hist(w( w &gt; 0 ),logspace(-5,-.3,40));
+0288 semilogx(x,y,<span class="string">'k-'</span>,<span class="string">'linewidth'</span>,2)
+0289 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'fontsize'</span>,16,<span class="string">'box'</span>,<span class="string">'off'</span>)
+0290 title( <span class="keyword">...</span>
+0291     sprintf(<span class="string">'Number of fascicles candidate connectome: %2.0f\nNumber of fascicles in optimized connetome: %2.0f'</span> <span class="keyword">...</span>
+0292     ,length(w),sum(w &gt; 0)),<span class="string">'fontsize'</span>,16)
+0293 ylabel(<span class="string">'Number of fascicles'</span>,<span class="string">'fontsize'</span>,16)
+0294 xlabel(<span class="string">'Fascicle weight'</span>,<span class="string">'fontsize'</span>,16)
+0295 <span class="keyword">end</span>
+0296 
+0297 <a name="_sub4" href="#_subfunctions" class="code">function fh = scatterPlotRMSE(det,prob)</a>
+0298 figNameRmse = sprintf(<span class="string">'prob_vs_det_rmse_common_voxels_map'</span>);
+0299 fh = mrvNewGraphWin(figNameRmse);
+0300 [ymap,x]  = hist3([det.rmse;prob.rmse]',{[10:1:70], [10:1:70]});
+0301 ymap = ymap./length(prob.rmse);
+0302 sh   = imagesc(flipud(log10(ymap)));
+0303 cm   = colormap(flipud(hot)); view(0,90);
+0304 axis(<span class="string">'square'</span>)      
+0305 set(gca, <span class="keyword">...</span>
+0306     <span class="string">'xlim'</span>,[1 length(x{1})],<span class="keyword">...</span>
+0307     <span class="string">'ylim'</span>,[1 length(x{1})], <span class="keyword">...</span>
+0308     <span class="string">'ytick'</span>,[1 (length(x{1})/2) length(x{1})], <span class="keyword">...</span>
+0309     <span class="string">'xtick'</span>,[1 (length(x{1})/2) length(x{1})], <span class="keyword">...</span>
+0310     <span class="string">'yticklabel'</span>,[x{1}(end) x{1}(round(end/2)) x{1}(1)], <span class="keyword">...</span>
+0311     <span class="string">'xticklabel'</span>,[x{1}(1)   x{1}(round(end/2)) x{1}(end)], <span class="keyword">...</span>
+0312     <span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'ticklen'</span>,[.025 .05],<span class="string">'box'</span>,<span class="string">'off'</span>, <span class="keyword">...</span>
+0313     <span class="string">'fontsize'</span>,16,<span class="string">'visible'</span>,<span class="string">'on'</span>)
+0314 hold on
+0315 plot3([1 length(x{1})],[length(x{1}) 1],[max(ymap(:)) max(ymap(:))],<span class="string">'k-'</span>,<span class="string">'linewidth'</span>,1)
+0316 ylabel(<span class="string">'Deterministic_{rmse}'</span>,<span class="string">'fontsize'</span>,16)
+0317 xlabel(<span class="string">'Probabilistic_{rmse}'</span>,<span class="string">'fontsize'</span>,16)
+0318 cb = colorbar;
+0319 tck = get(cb,<span class="string">'ytick'</span>);
+0320 set(cb,<span class="string">'yTick'</span>,[min(tck)  mean(tck) max(tck)], <span class="keyword">...</span>
+0321     <span class="string">'yTickLabel'</span>,round(1000*10.^[min(tck),<span class="keyword">...</span>
+0322     mean(tck), <span class="keyword">...</span>
+0323     max(tck)])/1000, <span class="keyword">...</span>
+0324     <span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'ticklen'</span>,[.025 .05],<span class="string">'box'</span>,<span class="string">'on'</span>, <span class="keyword">...</span>
+0325     <span class="string">'fontsize'</span>,16,<span class="string">'visible'</span>,<span class="string">'on'</span>)
+0326 <span class="keyword">end</span>
+0327 
+0328 <a name="_sub5" href="#_subfunctions" class="code">function fh = distributionPlotStrengthOfEvidence(se)</a>
+0329 
+0330 y_e        = se.s.unlesioned_e;
+0331 ywo_e      = se.s.lesioned_e;
+0332 dprime     = se.s.mean;
+0333 std_dprime = se.s.std;
+0334 xhis       = se.s.unlesioned.xbins;
+0335 woxhis     = se.s.lesioned.xbins;
+0336 
+0337 histcolor{1} = [0 0 0];
+0338 histcolor{2} = [.95 .6 .5];
+0339 figName = sprintf(<span class="string">'Strength_of_Evidence_test_PROB_vs_DET_model_rmse_mean_HIST'</span>);
+0340 fh = mrvNewGraphWin(figName);
+0341 patch([xhis,xhis],y_e(:),histcolor{1},<span class="string">'FaceColor'</span>,histcolor{1},<span class="string">'EdgeColor'</span>,histcolor{1});
+0342 hold on
+0343 patch([woxhis,woxhis],ywo_e(:),histcolor{2},<span class="string">'FaceColor'</span>,histcolor{2},<span class="string">'EdgeColor'</span>,histcolor{2}); 
+0344 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>, <span class="keyword">...</span>
+0345         <span class="string">'box'</span>,<span class="string">'off'</span>, <span class="keyword">...</span>
+0346         <span class="string">'ticklen'</span>,[.025 .05], <span class="keyword">...</span>
+0347         <span class="string">'ylim'</span>,[0 .2], <span class="keyword">...</span><span class="comment"> </span>
+0348         <span class="string">'xlim'</span>,[min(xhis) max(woxhis)], <span class="keyword">...</span>
+0349         <span class="string">'xtick'</span>,[min(xhis) round(mean([xhis, woxhis])) max(woxhis)], <span class="keyword">...</span>
+0350         <span class="string">'ytick'</span>,[0 .1 .2], <span class="keyword">...</span>
+0351         <span class="string">'fontsize'</span>,16)
+0352 ylabel(<span class="string">'Probability'</span>,<span class="string">'fontsize'</span>,16)
+0353 xlabel(<span class="string">'rmse'</span>,<span class="string">'fontsize'</span>,16')
+0354 
+0355 title(sprintf(<span class="string">'Strength of evidence:\n mean %2.3f - std %2.3f'</span>,dprime,std_dprime), <span class="keyword">...</span>
+0356     <span class="string">'FontSize'</span>,16)
+0357 legend({<span class="string">'Probabilistic'</span>,<span class="string">'Deterministic'</span>})
+0358 <span class="keyword">end</span>
+0359 
+0360 <a name="_sub6" href="#_subfunctions" class="code">function fh = distributionPlotEarthMoversDistance(se)</a>
+0361 
+0362 prob = se.nolesion;
+0363 det  = se.lesion;
+0364 em   = se.em;
+0365 
+0366 histcolor{1} = [0 0 0];
+0367 histcolor{2} = [.95 .6 .5];
+0368 figName = sprintf(<span class="string">'EMD_PROB_DET_model_rmse_mean_HIST'</span>);
+0369 fh = mrvNewGraphWin(figName);
+0370 plot(prob.xhist,prob.hist,<span class="string">'r-'</span>,<span class="string">'color'</span>,histcolor{1},<span class="string">'linewidth'</span>,4);
+0371 hold on
+0372 plot(det.xhist,det.hist,<span class="string">'r-'</span>,<span class="string">'color'</span>,histcolor{2},<span class="string">'linewidth'</span>,4); 
+0373 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>, <span class="keyword">...</span>
+0374         <span class="string">'box'</span>,<span class="string">'off'</span>, <span class="keyword">...</span>
+0375         <span class="string">'ticklen'</span>,[.025 .05], <span class="keyword">...</span>
+0376         <span class="string">'ylim'</span>,[0 .12], <span class="keyword">...</span><span class="comment"> </span>
+0377         <span class="string">'xlim'</span>,[0 95], <span class="keyword">...</span>
+0378         <span class="string">'xtick'</span>,[0 45 90], <span class="keyword">...</span>
+0379         <span class="string">'ytick'</span>,[0 .06 .12], <span class="keyword">...</span>
+0380         <span class="string">'fontsize'</span>,16)
+0381 ylabel(<span class="string">'Proportion white-matter volume'</span>,<span class="string">'fontsize'</span>,16)
+0382 xlabel(<span class="string">'RMSE (raw MRI scanner units)'</span>,<span class="string">'fontsize'</span>,16')
+0383 title(sprintf(<span class="string">'Earth Movers Distance: %2.3f (raw scanner units)'</span>,em.mean),<span class="string">'FontSize'</span>,16)
+0384 legend({<span class="string">'Probabilistic'</span>,<span class="string">'Deterministic'</span>})
+0385 <span class="keyword">end</span>
+0386</pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

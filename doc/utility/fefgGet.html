@@ -1,0 +1,954 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of fefgGet</title>
+  <meta name="keywords" content="fefgGet">
+  <meta name="description" content="Get values from a fiber group structure">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">utility</a> &gt; fefgGet.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for utility&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>fefgGet
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Get values from a fiber group structure</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function val = fefgGet(fg,param,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Get values from a fiber group structure
+
+  val = fefgGet(fg,param,varargin)
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
+
+------------
+ Returns the length of each fiber in the fiber group
+ flen = fefgGet(fg,'length')
+------------
+ Compute the Westin shape parameters (linearity and planarity)
+ for all the fibers in the fiber group.
+ Requires a dt structure.
+ westin = fefgGet(fg,'westinshape',dt)
+ westin = fefgGet(fg,'westinshape',eigenvals)
+ westin = fefgGet(fg,'westinshape',dtFileName)
+-------------
+ Compute eigenvalues for the fibers in a fiber group.
+ It requires a dt structure.
+ eigenvals = fefgGet(fg,'eigenvals',dt)
+ eigenvals = fefgGet(fg,'eigenvals',dtFileName)
+-------------
+ Compute the 6 parameters for the tensors at each node in each fiber.
+ It requires a dt structure.
+ dt6 = fefgGet(fg,'eigenvals',dt)
+ dt6 = fefgGet(fg,'eigenvals',dtFileName)
+-------------
+ Compute the radial and axial ADC for all the fibers in the fiber group.
+ Requires a dt structure.
+ adc = fefgGet(fg,'adc',dt)
+ adc = fefgGet(fg,'adc',eigenvals)
+ adc = fefgGet(fg,'adc',dtFileName)
+-------------
+ Compute the FA for all the fibers in the fiber group.
+ Requires a dt structure.
+ fa = fefgGet(fg,'fa',dt)
+ fa = fefgGet(fg,'fa',eigenvals)
+ fa = fefgGet(fg,'fa',dtFileName)
+-------------
+ Compute the Mean Diffusivity for all the fibers in the fiber group.
+ Requires a dt structure.
+ md = fefgGet(fg,'md',dt)
+ md = fefgGet(fg,'md',eigenvals)
+ md = fefgGet(fg,'md',dtFileName)
+-------------
+ Compute the Radial Diffusivity for all the fibers in the fiber group.
+ Requires a dt structure.
+ rd = fefgGet(fg,'rd',dt)
+ rd = fefgGet(fg,'rd',eigenvals)
+ rd = fefgGet(fg,'rd',dtFileName)
+-------------
+ Compute the Axial Diffusivity for all the fibers in the fiber group.
+ Requires a dt structure.
+ ad = fefgGet(fg,'ad',dt)
+ ad = fefgGet(fg,'ad',eigenvals)
+ ad = fefgGet(fg,'ad',dtFileName)
+-------------
+ Compute the radial and axial ADC for all the fibers in the fiber group.
+ Requires a dt structure.
+ adc = fefgGet(fg,'adc',dt)
+ adc = fefgGet(fg,'adc',eigenvals)
+ adc = fefgGet(fg,'adc',dtFileName)
+-------------
+
+ Parameters
+ General
+    'name'
+    'type'
+    'colorrgb'
+    'thickness'
+    'visible'
+
+ Fiber related
+    'nfibers'- Number of fibers in this group
+    'nodes per fiber'  - Number of nodes per fiber.
+    'fibers' - Fiber coordinates
+    'fibernames'
+    'fiberindex'
+ Compute the Mean Diffusivity for all the fibers in the fiber group.
+ Requires a dt structure.
+ fa = fefgGet(fg,'fa',dt)
+ fa = fefgGet(fg,'fa',eigenvals)
+
+ ROI and image coord related
+    'unique image coords'
+    'nodes to imagecoords' -
+    'voxel2fiber node pairs' - For each roi coord, an Nx2 matrix of
+        (fiber number,node number)
+    'nodes in voxels' - Nodes inside the voxels of roi coords
+    'voxels in fg'  - Cell array of the roiCoords touched by each fiber
+    'voxels2fibermatrix' - Binary matrix (voxels by fibers).  1s when a
+        fiber is in a voxel of the roiCoords (which are, sadly, implicit).
+
+ Tensor and tractography related
+      'tensors'     - Tensors for each node
+
+
+ See also: fgCreate; fgSet
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>	Initializes a local matlab cluster if the parallel matlab toolbox is</li><li><a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>	Get values from a fiber group structure</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>	Get values from a fiber group structure</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function val = fefgGet(fg,param,varargin)</a>
+0002 <span class="comment">% Get values from a fiber group structure</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  val = fefgGet(fg,param,varargin)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%------------</span>
+0009 <span class="comment">% Returns the length of each fiber in the fiber group</span>
+0010 <span class="comment">% flen = fefgGet(fg,'length')</span>
+0011 <span class="comment">%------------</span>
+0012 <span class="comment">% Compute the Westin shape parameters (linearity and planarity)</span>
+0013 <span class="comment">% for all the fibers in the fiber group.</span>
+0014 <span class="comment">% Requires a dt structure.</span>
+0015 <span class="comment">% westin = fefgGet(fg,'westinshape',dt)</span>
+0016 <span class="comment">% westin = fefgGet(fg,'westinshape',eigenvals)</span>
+0017 <span class="comment">% westin = fefgGet(fg,'westinshape',dtFileName)</span>
+0018 <span class="comment">%-------------</span>
+0019 <span class="comment">% Compute eigenvalues for the fibers in a fiber group.</span>
+0020 <span class="comment">% It requires a dt structure.</span>
+0021 <span class="comment">% eigenvals = fefgGet(fg,'eigenvals',dt)</span>
+0022 <span class="comment">% eigenvals = fefgGet(fg,'eigenvals',dtFileName)</span>
+0023 <span class="comment">%-------------</span>
+0024 <span class="comment">% Compute the 6 parameters for the tensors at each node in each fiber.</span>
+0025 <span class="comment">% It requires a dt structure.</span>
+0026 <span class="comment">% dt6 = fefgGet(fg,'eigenvals',dt)</span>
+0027 <span class="comment">% dt6 = fefgGet(fg,'eigenvals',dtFileName)</span>
+0028 <span class="comment">%-------------</span>
+0029 <span class="comment">% Compute the radial and axial ADC for all the fibers in the fiber group.</span>
+0030 <span class="comment">% Requires a dt structure.</span>
+0031 <span class="comment">% adc = fefgGet(fg,'adc',dt)</span>
+0032 <span class="comment">% adc = fefgGet(fg,'adc',eigenvals)</span>
+0033 <span class="comment">% adc = fefgGet(fg,'adc',dtFileName)</span>
+0034 <span class="comment">%-------------</span>
+0035 <span class="comment">% Compute the FA for all the fibers in the fiber group.</span>
+0036 <span class="comment">% Requires a dt structure.</span>
+0037 <span class="comment">% fa = fefgGet(fg,'fa',dt)</span>
+0038 <span class="comment">% fa = fefgGet(fg,'fa',eigenvals)</span>
+0039 <span class="comment">% fa = fefgGet(fg,'fa',dtFileName)</span>
+0040 <span class="comment">%-------------</span>
+0041 <span class="comment">% Compute the Mean Diffusivity for all the fibers in the fiber group.</span>
+0042 <span class="comment">% Requires a dt structure.</span>
+0043 <span class="comment">% md = fefgGet(fg,'md',dt)</span>
+0044 <span class="comment">% md = fefgGet(fg,'md',eigenvals)</span>
+0045 <span class="comment">% md = fefgGet(fg,'md',dtFileName)</span>
+0046 <span class="comment">%-------------</span>
+0047 <span class="comment">% Compute the Radial Diffusivity for all the fibers in the fiber group.</span>
+0048 <span class="comment">% Requires a dt structure.</span>
+0049 <span class="comment">% rd = fefgGet(fg,'rd',dt)</span>
+0050 <span class="comment">% rd = fefgGet(fg,'rd',eigenvals)</span>
+0051 <span class="comment">% rd = fefgGet(fg,'rd',dtFileName)</span>
+0052 <span class="comment">%-------------</span>
+0053 <span class="comment">% Compute the Axial Diffusivity for all the fibers in the fiber group.</span>
+0054 <span class="comment">% Requires a dt structure.</span>
+0055 <span class="comment">% ad = fefgGet(fg,'ad',dt)</span>
+0056 <span class="comment">% ad = fefgGet(fg,'ad',eigenvals)</span>
+0057 <span class="comment">% ad = fefgGet(fg,'ad',dtFileName)</span>
+0058 <span class="comment">%-------------</span>
+0059 <span class="comment">% Compute the radial and axial ADC for all the fibers in the fiber group.</span>
+0060 <span class="comment">% Requires a dt structure.</span>
+0061 <span class="comment">% adc = fefgGet(fg,'adc',dt)</span>
+0062 <span class="comment">% adc = fefgGet(fg,'adc',eigenvals)</span>
+0063 <span class="comment">% adc = fefgGet(fg,'adc',dtFileName)</span>
+0064 <span class="comment">%-------------</span>
+0065 <span class="comment">%</span>
+0066 <span class="comment">% Parameters</span>
+0067 <span class="comment">% General</span>
+0068 <span class="comment">%    'name'</span>
+0069 <span class="comment">%    'type'</span>
+0070 <span class="comment">%    'colorrgb'</span>
+0071 <span class="comment">%    'thickness'</span>
+0072 <span class="comment">%    'visible'</span>
+0073 <span class="comment">%</span>
+0074 <span class="comment">% Fiber related</span>
+0075 <span class="comment">%    'nfibers'- Number of fibers in this group</span>
+0076 <span class="comment">%    'nodes per fiber'  - Number of nodes per fiber.</span>
+0077 <span class="comment">%    'fibers' - Fiber coordinates</span>
+0078 <span class="comment">%    'fibernames'</span>
+0079 <span class="comment">%    'fiberindex'</span>
+0080 <span class="comment">% Compute the Mean Diffusivity for all the fibers in the fiber group.</span>
+0081 <span class="comment">% Requires a dt structure.</span>
+0082 <span class="comment">% fa = fefgGet(fg,'fa',dt)</span>
+0083 <span class="comment">% fa = fefgGet(fg,'fa',eigenvals)</span>
+0084 <span class="comment">%</span>
+0085 <span class="comment">% ROI and image coord related</span>
+0086 <span class="comment">%    'unique image coords'</span>
+0087 <span class="comment">%    'nodes to imagecoords' -</span>
+0088 <span class="comment">%    'voxel2fiber node pairs' - For each roi coord, an Nx2 matrix of</span>
+0089 <span class="comment">%        (fiber number,node number)</span>
+0090 <span class="comment">%    'nodes in voxels' - Nodes inside the voxels of roi coords</span>
+0091 <span class="comment">%    'voxels in fg'  - Cell array of the roiCoords touched by each fiber</span>
+0092 <span class="comment">%    'voxels2fibermatrix' - Binary matrix (voxels by fibers).  1s when a</span>
+0093 <span class="comment">%        fiber is in a voxel of the roiCoords (which are, sadly, implicit).</span>
+0094 <span class="comment">%</span>
+0095 <span class="comment">% Tensor and tractography related</span>
+0096 <span class="comment">%      'tensors'     - Tensors for each node</span>
+0097 <span class="comment">%</span>
+0098 <span class="comment">%</span>
+0099 <span class="comment">% See also: fgCreate; fgSet</span>
+0100 <span class="comment">%</span>
+0101 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0102 val = [];
+0103 
+0104 <span class="keyword">switch</span> strrep(lower(param),<span class="string">' '</span>,<span class="string">''</span>)
+0105   
+0106   <span class="comment">% Basic fiber parameters</span>
+0107   <span class="keyword">case</span> <span class="string">'name'</span>
+0108     val = fg.name;
+0109   <span class="keyword">case</span> <span class="string">'type'</span>  <span class="comment">% Should always be fibergroup</span>
+0110     val = fg.type;
+0111     
+0112     <span class="comment">% Fiber visualization settings.</span>
+0113   <span class="keyword">case</span> <span class="string">'colorrgb'</span>
+0114     val = fg.colorRgb;
+0115   <span class="keyword">case</span> <span class="string">'thickness'</span>
+0116     val = fg.thickness;
+0117   <span class="keyword">case</span> <span class="string">'visible'</span>
+0118     val = fg.visible;
+0119     
+0120     <span class="comment">% Simple fiber properties --</span>
+0121   <span class="keyword">case</span> {<span class="string">'fibers'</span>}
+0122     <span class="comment">% val = fefgGet(fg,'fibers',fList);</span>
+0123     <span class="comment">%</span>
+0124     <span class="comment">% Returns a 3xN matrix of fiber coordinates corresponding to the</span>
+0125     <span class="comment">% fibers specified in the integer vector, fList.  This differs from</span>
+0126     <span class="comment">% the dtiH (mrDiffusion) representation, where fiber coordinates</span>
+0127     <span class="comment">% are stored as a set of cell arrays for each fiber.</span>
+0128     <span class="keyword">if</span> ~isempty(varargin)
+0129       list = varargin{1};
+0130       val = cell(length(list),1);
+0131       <span class="keyword">for</span> ii=1:length(list)
+0132         val{ii} = fg.fibers{ii};
+0133       <span class="keyword">end</span>
+0134     <span class="keyword">else</span>
+0135       val = fg.fibers;
+0136     <span class="keyword">end</span>
+0137   <span class="keyword">case</span> <span class="string">'fibernames'</span>
+0138     val = fg.fiberNames;
+0139   <span class="keyword">case</span> <span class="string">'fiberindex'</span>
+0140     val = fg.fiberIndex;
+0141   <span class="keyword">case</span> <span class="string">'nfibers'</span>
+0142     val = length(fg.fibers);
+0143   <span class="keyword">case</span> {<span class="string">'nodesperfiber'</span>,<span class="string">'nsamplesperfiber'</span>,<span class="string">'nfibersamples'</span>}
+0144     <span class="comment">% fefgGet(fg,'n samples per fiber ')</span>
+0145     <span class="comment">% How many samples per fiber.  This is about equal to</span>
+0146     <span class="comment">% their length in mm, though we need to write the fiber lengths</span>
+0147     <span class="comment">% routine to actually calculate this.</span>
+0148     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'n fibers'</span>);
+0149     val = zeros(1,nFibers);
+0150     <span class="keyword">for</span> ii=1:nFibers
+0151       val(ii) = length(fg.fibers{ii});
+0152     <span class="keyword">end</span>
+0153     
+0154     <span class="comment">% Fiber group (subgroup) properties.</span>
+0155     <span class="comment">% These are used when we classify fibers into subgroups.  We should</span>
+0156     <span class="comment">% probably clean up this organization which is currently</span>
+0157     <span class="comment">%</span>
+0158     <span class="comment">%   subgroup - length of fibers, an index of group identity</span>
+0159     <span class="comment">%   subgroupNames()</span>
+0160     <span class="comment">%    .subgroupIndex - Probably should go away and the index should</span>
+0161     <span class="comment">%          just be</span>
+0162     <span class="comment">%    .subgroupName  - Probably should be moved up.</span>
+0163     <span class="comment">%</span>
+0164   <span class="keyword">case</span> {<span class="string">'ngroups'</span>,<span class="string">'nsubgroups'</span>}
+0165     val = length(fg.subgroupNames);
+0166   <span class="keyword">case</span> {<span class="string">'groupnames'</span>}
+0167     val = cell(1,<a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'n groups'</span>));
+0168     <span class="keyword">for</span> ii=1:nGroups
+0169       val{ii} = fg.subgroupNames(ii).subgroupName;
+0170     <span class="keyword">end</span>
+0171     
+0172     <span class="comment">% DTI properties</span>
+0173   <span class="keyword">case</span> <span class="string">'tensors'</span>
+0174     val = fg.tensors;
+0175     
+0176     <span class="comment">% Fiber to coord calculations</span>
+0177   <span class="keyword">case</span> {<span class="string">'imagecoords'</span>}
+0178     <span class="comment">% c = fefgGet(fgAcpc,'image coords',fgList,xForm);</span>
+0179     <span class="comment">% c = fefgGet(fgAcpc,'image coords',fgList,xForm);</span>
+0180     <span class="comment">%</span>
+0181     <span class="comment">% Return the image coordinates of a specified list of fibers</span>
+0182     <span class="comment">% Returns a matrix that is fgList by 3 of the image coordinates for</span>
+0183     <span class="comment">% each node of each fiber.</span>
+0184     <span class="comment">%</span>
+0185     <span class="comment">% Fiber coords are represented at fine resolution in ACPC space.</span>
+0186     <span class="comment">% These coordinates are rounded and in image space</span>
+0187     <span class="keyword">if</span> ~isempty(varargin)
+0188       fList = varargin{1};
+0189       <span class="keyword">if</span> length(varargin) &gt; 1
+0190         xForm = varargin{2};
+0191         <span class="comment">% Put the fiber coordinates into image space</span>
+0192         fg = dtiXformFiberCoords(fg,xForm);
+0193       <span class="keyword">end</span>
+0194     <span class="keyword">else</span>
+0195       <span class="comment">% In this case, the fiber coords should already be in image</span>
+0196       <span class="comment">% space.</span>
+0197       nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'n fibers'</span>);
+0198       fList = 1:nFibers;
+0199     <span class="keyword">end</span>
+0200     
+0201     <span class="comment">% Pull out the coordinates and ceil them.  These are in image</span>
+0202     <span class="comment">% space.</span>
+0203     nFibers = length(fList);
+0204     val = cell(1,nFibers);
+0205     <span class="keyword">if</span> nFibers == 1
+0206       val = ceil(fg.fibers{fList(1)}')+1;
+0207 
+0208     <span class="keyword">else</span>
+0209      <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0210      parfor ii=1:nFibers
+0211          val{ii} = ceil(fg.fibers{fList(ii)}')+1;
+0212      <span class="keyword">end</span>
+0213     <span class="keyword">end</span>
+0214 
+0215   <span class="keyword">case</span> {<span class="string">'uniqueimagecoords'</span>}
+0216     <span class="comment">%   coords = fefgGet(fgIMG,'unique image coords');</span>
+0217     <span class="comment">%</span>
+0218     <span class="comment">% The fg input must be in IMG space.</span>
+0219     <span class="comment">%</span>
+0220     <span class="comment">% Returns the unique image coordinates of all the fibers as an Nx3</span>
+0221     <span class="comment">% matrix of integers.</span>
+0222     <span class="comment">% val = round(horzcat(fg.fibers{:})');</span>
+0223     val = ceil(horzcat(fg.fibers{:})')+1;
+0224     val = unique(val,<span class="string">'rows'</span>);
+0225   
+0226     <span class="keyword">case</span> {<span class="string">'allimagecoords'</span>}
+0227     <span class="comment">%   coords = fefgGet(fgIMG,'all image coords');</span>
+0228     <span class="comment">%</span>
+0229     <span class="comment">% The fg input must be in IMG space.</span>
+0230     <span class="comment">%</span>
+0231     <span class="comment">% Returns all image coordinates of all the fibers as an Nx3</span>
+0232     <span class="comment">% matrix of integers.</span>
+0233     <span class="comment">% val = round(horzcat(fg.fibers{:})');</span>
+0234     val = ceil(horzcat(fg.fibers{:})')+1;
+0235     
+0236   <span class="keyword">case</span> {<span class="string">'uniqueacpccoords'</span>}
+0237     <span class="comment">%   coords = fefgGet(fg,'unique acpc coords');</span>
+0238     <span class="comment">%</span>
+0239     <span class="comment">% The fg input must be in ACPC space.</span>
+0240     <span class="comment">%</span>
+0241     <span class="comment">% Returns the unique ACPC coordinates of all the fibers as an Nx3</span>
+0242     <span class="comment">% matrix of integers.</span>
+0243     val = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg, <span class="string">'uniqueimagecoords'</span>) ;
+0244 
+0245   <span class="keyword">case</span> {<span class="string">'nodes2voxels'</span>}
+0246     <span class="comment">%   nodes2voxels = fefgGet(fgImg,'nodes2voxels',roiCoords)</span>
+0247     <span class="comment">%</span>
+0248     <span class="comment">% The roiCoords are a matrix of Nx3 coordinates.  They describe a</span>
+0249     <span class="comment">% region of interest, typically in image space or possibly in acpc</span>
+0250     <span class="comment">% space.</span>
+0251     <span class="comment">%</span>
+0252     <span class="comment">% We return a cell array that is a mapping of fiber nodes to voxels in</span>
+0253     <span class="comment">% the roi.  The roi is specified as an Nx3 matrix of coordinates.</span>
+0254     <span class="comment">% The returned cell array, nodes2voxels, has the same number of</span>
+0255     <span class="comment">% cells as there are fibers.</span>
+0256     <span class="comment">%</span>
+0257     <span class="comment">% Unlike the fiber group cells, which have a 3D coordinate of each</span>
+0258     <span class="comment">% node, this cell array has an integer that indexes the row of</span>
+0259     <span class="comment">% roiCoords that contains the node. If a node is not in any of the</span>
+0260     <span class="comment">% roiCoords, the entry in node2voxels{ii} for that node is zero.</span>
+0261     <span class="comment">% This means that node is outside the 'roiCoords'.</span>
+0262     <span class="comment">%</span>
+0263     <span class="comment">% Once again: The cell nodes2voxels{ii} specifies whether each</span>
+0264     <span class="comment">% node in the iith fiber is inside a voxel in the roiCoords.  The</span>
+0265     <span class="comment">% value specifies the row in roiCoords that contains the node.</span>
+0266     <span class="comment">%</span>
+0267     <span class="keyword">if</span> isempty(varargin), error(<span class="string">'roiCoords required'</span>);
+0268     <span class="keyword">else</span>
+0269       roiCoords = varargin{1};
+0270     <span class="keyword">end</span>
+0271     fprintf(<span class="string">'[%s] Computing nodes-to-voxels..'</span>,mfilename)
+0272 
+0273     <span class="comment">% Find the roiCoord for each node in each fiber.</span>
+0274     nFiber = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'n fibers'</span>);
+0275     val    = cell(nFiber,1);
+0276     
+0277    <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0278    parfor ii=1:nFiber
+0279      <span class="comment">% if ~mod(ii,200), fprintf('%d ',ii); end</span>
+0280      <span class="comment">% Node coordinates in image space</span>
+0281      nodeCoords = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'image coords'</span>,ii);
+0282      
+0283      <span class="comment">% The values in loc are the row of the coords matrix that contains</span>
+0284      <span class="comment">% that sample point in a fiber.  For example, if the number 100 is</span>
+0285      <span class="comment">% in the 10th position of loc, then the 10th sample point in the</span>
+0286      <span class="comment">% fiber passes through the voxel in row 100 of coords.</span>
+0287      <span class="comment">%keyboard</span>
+0288      [~, val{ii}] = ismember(nodeCoords, roiCoords, <span class="string">'rows'</span>);  <span class="comment">% This operation is slow.</span>
+0289     <span class="keyword">end</span>    
+0290     fprintf(<span class="string">' took: %2.3fminutes.\n'</span>,toc/60)
+0291 
+0292   <span class="keyword">case</span> {<span class="string">'voxel2fibernodepairs'</span>,<span class="string">'v2fn'</span>}
+0293     <span class="comment">% voxel2FNpairs = fefgGet(fgImg,'voxel 2 fibernode pairs',roiCoords);</span>
+0294     <span class="comment">% voxel2FNpairs = fefgGet(fgImg,'voxel 2 fibernode pairs',roiCoords,nodes2voxels);</span>
+0295     <span class="comment">%</span>
+0296     <span class="comment">% The return is a cell array whose size is the number of voxels.</span>
+0297     <span class="comment">% The cell is a Nx2 matrix of the (fiber, node) pairs that pass</span>
+0298     <span class="comment">% through it.</span>
+0299     <span class="comment">%</span>
+0300     <span class="comment">% The value N is the number of nodes in the voxel.  The first</span>
+0301     <span class="comment">% column is the fiber number.  The second column reports the indexes</span>
+0302     <span class="comment">% of the nodes for each fiber in each voxel.</span>
+0303     fprintf(<span class="string">'[%s] Computing fibers/nodes pairing in each voxel..\n'</span>,mfilename)
+0304    
+0305     <span class="keyword">if</span> (length(varargin) &lt; 1), error(<span class="string">'Requires the roiCoords.'</span>);
+0306     <span class="keyword">else</span>
+0307       roiCoords = varargin{1};
+0308       nCoords   = size(roiCoords,1);
+0309     <span class="keyword">end</span>
+0310     <span class="keyword">if</span> length(varargin) &lt; 2
+0311       <span class="comment">% We assume the fg and the ROI coordinates are in the same</span>
+0312       <span class="comment">% coordinate frame.</span>
+0313       tic,nodes2voxels    = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nodes 2 voxels'</span>,roiCoords);
+0314     <span class="keyword">else</span> nodes2voxels = varargin{2};
+0315     <span class="keyword">end</span>
+0316     
+0317     nFibers      = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0318     voxelsInFG   = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'voxels in fg'</span>,nodes2voxels);      
+0319 
+0320     tic,roiNodesInFG = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nodes in voxels'</span>,nodes2voxels);
+0321     tic, val = cell(1,nCoords);
+0322     <span class="keyword">for</span> thisFiber=1:nFibers
+0323       voxelsInFiber = voxelsInFG{thisFiber};   <span class="comment">% A few voxels, in a list</span>
+0324       nodesInFiber  = roiNodesInFG{thisFiber}; <span class="comment">% The corresponding nodes</span>
+0325       
+0326       <span class="comment">% Then add a row for each (fiber,node) pairs that pass through</span>
+0327       <span class="comment">% the voxels for this fiber.</span>
+0328       <span class="keyword">for</span> jj=1:length(voxelsInFiber)
+0329         thisVoxel = voxelsInFiber(jj);
+0330         <span class="comment">% Print out roi coord and fiber coord to verify match</span>
+0331         <span class="comment">% roiCoords(thisVoxel,:)</span>
+0332         <span class="comment">% fg.fibers{thisFiber}(:,nodesInFiber(jj))</span>
+0333         <span class="comment">% Would horzcat be faster?</span>
+0334         val{thisVoxel} = cat(1,val{thisVoxel},[thisFiber,nodesInFiber(jj)]);
+0335       <span class="keyword">end</span>
+0336     <span class="keyword">end</span>
+0337     fprintf(<span class="string">'[%s] fiber/node pairing completed in: %2.3fs.\n'</span>,mfilename, toc)
+0338   
+0339   <span class="keyword">case</span> {<span class="string">'voxel2fibers'</span>,<span class="string">'fiberdensity'</span>}
+0340     <span class="comment">% voxel2FNpairs = fefgGet(fgImg,'fiber density',roiCoords);</span>
+0341     <span class="comment">%</span>
+0342     <span class="comment">% The return is a cell array whose size is the number of voxels.</span>
+0343     <span class="comment">% The cell is a Nx1 matrix of fiber counts. How many fibers in each</span>
+0344     <span class="comment">% voxel.</span>
+0345     <span class="comment">%</span>
+0346     fprintf(<span class="string">'[%s] Computing fiber density in each voxel...\n'</span>,mfilename)
+0347    
+0348     <span class="keyword">if</span> (length(varargin) &lt; 1), 
+0349       roiCoords = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'uniqueimagecoords'</span>);
+0350       fprintf(<span class="string">'[%s] Computing white-matter volume ROI from fibers coordinates.\n'</span>,mfilename) 
+0351       fprintf(<span class="string">'          Assuming fiber coordinates in IMG space.\n'</span>)
+0352     <span class="keyword">else</span>
+0353       roiCoords = varargin{1};
+0354     <span class="keyword">end</span>
+0355     
+0356     <span class="keyword">if</span> length(varargin) &lt; 2
+0357       <span class="comment">% We assume the fg and the ROI coordinates are in the same</span>
+0358       <span class="comment">% coordinate frame.</span>
+0359       tic,nodes2voxels= <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nodes 2 voxels'</span>,roiCoords);
+0360     <span class="keyword">else</span> nodes2voxels = varargin{2};
+0361     <span class="keyword">end</span>
+0362     
+0363     nCoords      = size(roiCoords,1);
+0364     nFibers      = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0365     voxelsInFG   = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'voxels in fg'</span>,nodes2voxels);      
+0366 
+0367     tic, fibersInVox = cell(1,nCoords);
+0368     <span class="keyword">for</span> thisFiber=1:nFibers
+0369       voxelsInFiber = voxelsInFG{thisFiber};   <span class="comment">% A few voxels, in a list</span>
+0370       
+0371       <span class="comment">% Then add a row for each (fiber,node) pairs that pass through</span>
+0372       <span class="comment">% the voxels for this fiber.</span>
+0373       <span class="keyword">for</span> jj=1:length(voxelsInFiber)
+0374         thisVoxel = voxelsInFiber(jj);
+0375         <span class="comment">% Print out roi coord and fiber coord to verify match</span>
+0376         <span class="comment">% roiCoords(thisVoxel,:)</span>
+0377         <span class="comment">% fg.fibers{thisFiber}(:,nodesInFiber(jj))</span>
+0378         <span class="comment">% Would horzcat be faster?</span>
+0379         fibersInVox{thisVoxel} = cat(1,fibersInVox{thisVoxel},thisFiber);
+0380       <span class="keyword">end</span>
+0381     <span class="keyword">end</span>
+0382     
+0383     <span class="comment">% Now create the fiber density, the unique fibers in each voxel</span>
+0384     val = zeros(length(fibersInVox),1);
+0385     <span class="keyword">for</span> ivx = 1:length(fibersInVox)
+0386       val(ivx) = length(unique(fibersInVox{ivx}));
+0387     <span class="keyword">end</span>
+0388     
+0389     fprintf(<span class="string">'[%s] fiber density completed in: %2.3fs.\n'</span>,mfilename, toc)
+0390   
+0391   <span class="keyword">case</span> {<span class="string">'uniquefibersinvox'</span>}
+0392     <span class="comment">% uniquefvx = fefgGet(fgImg,'uniquefibrsinvox',roiCoords);</span>
+0393     <span class="comment">%</span>
+0394     <span class="comment">% The return is a vector whose size is the number of voxels containing</span>
+0395     <span class="comment">% the unique fibers in each voxel</span>
+0396     <span class="comment">%</span>
+0397     fprintf(<span class="string">'[%s] Computing the unique fibers in each voxel...\n'</span>,mfilename)
+0398     tic
+0399     <span class="keyword">if</span> (length(varargin) &lt; 1), error(<span class="string">'Requires the roiCoords.'</span>);
+0400     <span class="keyword">else</span>
+0401       roiCoords = varargin{1};
+0402       nCoords   = size(roiCoords,1);
+0403     <span class="keyword">end</span>
+0404     
+0405     <span class="comment">% We assume the fg and the ROI coordinates are in the same</span>
+0406     <span class="comment">% coordinate frame.</span>
+0407     nodes2voxels    = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nodes 2 voxels'</span>,roiCoords);
+0408     
+0409     nFibers      = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0410     voxelsInFG   = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'voxels in fg'</span>,nodes2voxels);      
+0411 
+0412     fibersInVox = cell(1,nCoords);
+0413     <span class="keyword">for</span> thisFiber=1:nFibers
+0414       voxelsInFiber = voxelsInFG{thisFiber};   <span class="comment">% A few voxels, in a list</span>
+0415       
+0416       <span class="comment">% Then add a row for each (fiber,node) pairs that pass through</span>
+0417       <span class="comment">% the voxels for this fiber.</span>
+0418       <span class="keyword">if</span> ~isempty(voxelsInFiber)
+0419           <span class="keyword">for</span> jj=1:length(voxelsInFiber)
+0420               thisVoxel = voxelsInFiber(jj);
+0421               fibersInVox{thisVoxel} = cat(1,fibersInVox{thisVoxel},thisFiber);
+0422           <span class="keyword">end</span>
+0423       <span class="keyword">end</span>
+0424     <span class="keyword">end</span>
+0425     
+0426     <span class="comment">% Now create find the unique fibers in each voxel</span>
+0427     val = cell(length(fibersInVox),1);
+0428     <span class="keyword">for</span> ivx = 1:length(fibersInVox)
+0429       val{ivx} = (unique(fibersInVox{ivx}));
+0430     <span class="keyword">end</span>
+0431     fprintf(<span class="string">'[%s] done computing unique fibers in each voxel: %2.3fs.\n'</span>,mfilename, toc)
+0432 
+0433   <span class="keyword">case</span> {<span class="string">'nodesinvoxels'</span>}
+0434     <span class="comment">% nodesInVoxels = fefgGet(fg,'nodes in voxels',nodes2voxels);</span>
+0435     <span class="comment">%</span>
+0436     <span class="comment">% This cell array is a modified form of nodes2voxels (see above).</span>
+0437     <span class="comment">% In that cell array every node in every fiber has a number</span>
+0438     <span class="comment">% referring to its row in roiCoords, or a 0 when the node is not in</span>
+0439     <span class="comment">% any roiCoord voxel.</span>
+0440     <span class="comment">%</span>
+0441     <span class="comment">% This cell array differs only in that the 0s removed.  This</span>
+0442     <span class="comment">% is used to simplify certain calculations.</span>
+0443     <span class="comment">%</span>
+0444     <span class="keyword">if</span> (length(varargin) &lt;1), error(<span class="string">'Requires nodes2voxels cell array.'</span>); <span class="keyword">end</span>
+0445     tic,fprintf(<span class="string">'[%s] Computing nodes-in-voxels..'</span>,mfilename)
+0446     nodes2voxels = varargin{1};
+0447     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0448     val     = cell(1,nFibers);
+0449  
+0450     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0451     <span class="comment">% For each fiber, this is a list of the nodes that pass through</span>
+0452     <span class="comment">% a voxel in the roiCoords</span>
+0453     parfor ii = 1:nFibers
+0454       <span class="comment">% For each fiber, this is a list of the nodes that pass through</span>
+0455       <span class="comment">% a voxel in the roiCoords</span>
+0456       lst = (nodes2voxels{ii} ~= 0);
+0457       val{ii} = find(lst);
+0458     <span class="keyword">end</span>
+0459     fprintf(<span class="string">' took: %2.3fs.\n'</span>,toc)
+0460 
+0461   <span class="keyword">case</span> <span class="string">'voxelsinfg'</span>
+0462     <span class="comment">% voxelsInFG = fefgGet(fgImg,'voxels in fg',nodes2voxels);</span>
+0463     <span class="comment">%</span>
+0464     <span class="comment">% A cell array length n-fibers. Each cell has a list of the voxels</span>
+0465     <span class="comment">% (rows of roiCoords) for a fiber.</span>
+0466     <span class="comment">%</span>
+0467     <span class="comment">% This routine eliminates the 0's in the nodes2voxels lists.</span>
+0468     <span class="comment">%</span>
+0469     <span class="keyword">if</span> length(varargin) &lt; 1, error(<span class="string">'Requires nodes2voxels cell array.'</span>); <span class="keyword">end</span>
+0470     tic,fprintf(<span class="string">'[%s] Computing voxels-in-fg..'</span>,mfilename)
+0471 
+0472     nodes2voxels = varargin{1};
+0473     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0474     val = cell(1,nFibers);
+0475  
+0476     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0477     parfor ii = 1:nFibers
+0478       <span class="comment">% These are the nodes that pass through a voxel in the</span>
+0479       <span class="comment">% roiCoords</span>
+0480       lst = (nodes2voxels{ii} ~= 0);
+0481       val{ii} = nodes2voxels{ii}(lst);
+0482     <span class="keyword">end</span>
+0483     fprintf(<span class="string">' took: %2.3fs.\n'</span>,toc)
+0484 
+0485   <span class="keyword">case</span> {<span class="string">'voxels2fibermatrix'</span>,<span class="string">'v2fm'</span>}
+0486     <span class="comment">%   v2fm = fefgGet(fgImg,'voxels 2 fiber matrix',roiCoords);</span>
+0487     <span class="comment">% Or,</span>
+0488     <span class="comment">%   v2fnPairs = fefgGet(fgImg,'v2fn',roiCoords);</span>
+0489     <span class="comment">%   v2fm = fefgGet(fgImg,'voxels 2 fiber matrix',roiCoords, v2fnPairs);</span>
+0490     <span class="comment">%</span>
+0491     <span class="comment">% mrvNewGraphWin; imagesc(v2fm)</span>
+0492     <span class="comment">%</span>
+0493     <span class="comment">% Returns a binary matrix of size Voxels by Fibers.</span>
+0494     <span class="comment">% When voxel ii has at least one node from fiber jj, there is a one</span>
+0495     <span class="comment">% in v2fm(ii,jj).  Otherwise, the entry is zero.</span>
+0496     <span class="comment">%</span>
+0497     
+0498     <span class="comment">% Check that the fg is in the image coordspace:</span>
+0499     <span class="keyword">if</span> isfield(fg, <span class="string">'coordspace'</span>) &amp;&amp; ~strcmp(fg.coordspace, <span class="string">'img'</span>)
+0500       error(<span class="string">'Fiber group is not in the image coordspace, please xform'</span>);
+0501     <span class="keyword">end</span>
+0502     
+0503     <span class="keyword">if</span> isempty(varargin), error(<span class="string">'roiCoords required'</span>);
+0504     <span class="keyword">else</span>
+0505       roiCoords = varargin{1};
+0506       nCoords   = size(roiCoords,1);
+0507       <span class="keyword">if</span> length(varargin) &lt; 2
+0508         v2fnPairs = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'v2fn'</span>,roiCoords);
+0509       <span class="keyword">else</span>
+0510         v2fnPairs = varargin{2};
+0511       <span class="keyword">end</span>
+0512     <span class="keyword">end</span>
+0513     
+0514     <span class="comment">% Allocate matrix of voxels by fibers</span>
+0515     val = zeros(nCoords,<a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'n fibers'</span>));
+0516     
+0517     <span class="comment">% For each coordinate, find the fibers.  Set those entries to 1.</span>
+0518     <span class="keyword">for</span> ii=1:nCoords
+0519       <span class="keyword">if</span> ~isempty(v2fnPairs{ii})
+0520         f = unique(v2fnPairs{ii}(:,1));
+0521       <span class="keyword">end</span>
+0522       val(ii,f) = 1;
+0523     <span class="keyword">end</span>
+0524     
+0525   <span class="keyword">case</span> {<span class="string">'fibersinroi'</span>,<span class="string">'fginvoxels'</span>,<span class="string">'fibersinvoxels'</span>}
+0526     <span class="comment">% fList = fefgGet(fgImg,'fibersinroi',roiCoords);</span>
+0527     <span class="comment">%</span>
+0528     <span class="comment">% v2fn = fefgGet(fgImg,'v2fn',roiCoords);</span>
+0529     <span class="comment">% fList = fefgGet(fgImg,'fibersinroi',roiCoords,v2fn);</span>
+0530     <span class="comment">%</span>
+0531     <span class="comment">% Returns an integer vector of the fibers with at least</span>
+0532     <span class="comment">% one node in a region of interest.</span>
+0533     <span class="comment">%</span>
+0534     <span class="comment">% The fg and roiCoords should be in the same coordinate frame.</span>
+0535     <span class="comment">%</span>
+0536     <span class="keyword">if</span> isempty(varargin), error(<span class="string">'roiCoords required'</span>);
+0537     <span class="keyword">elseif</span> length(varargin) == 1
+0538       roiCoords = varargin{1};
+0539       v2fnPairs = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'v2fn'</span>,roiCoords);
+0540     <span class="keyword">elseif</span> length(varargin) &gt; 1
+0541       roiCoords = varargin{1};
+0542       v2fnPairs = varargin{2};
+0543     <span class="keyword">end</span>
+0544     
+0545     val = []; nCoords = size(roiCoords,1);
+0546     <span class="keyword">for</span> ii=1:nCoords
+0547       <span class="keyword">if</span> ~isempty(v2fnPairs{ii})
+0548         val = cat(1,val,v2fnPairs{ii}(:,1));
+0549       <span class="keyword">end</span>
+0550     <span class="keyword">end</span>
+0551     val = sort(unique(val),<span class="string">'ascend'</span>);
+0552     
+0553   <span class="keyword">case</span> {<span class="string">'coordspace'</span>,<span class="string">'fibercoordinatespace'</span>,<span class="string">'fcspace'</span>}
+0554     <span class="comment">% In some cases, the fg might contain information telling us in which</span>
+0555     <span class="comment">% coordinate space its coordinates are set. This information is set</span>
+0556     <span class="comment">% as a struct. Each entry in the struct can be either a 4x4 xform</span>
+0557     <span class="comment">% matrix from the fiber coordinates to that space (with eye(4) for</span>
+0558     <span class="comment">% the space in which the coordinates are defined), or (if the xform</span>
+0559     <span class="comment">% is not know) an empty matrix.</span>
+0560     
+0561     cspace_fields = fields(fg.coordspace);
+0562     val = [];
+0563     <span class="keyword">for</span> f=1:length(cspace_fields)
+0564       this_field = cspace_fields{f};
+0565       <span class="keyword">if</span> isequal(getfield(fg.coordspace, this_field), eye(4))
+0566         val = this_field;
+0567       <span class="keyword">end</span>
+0568     <span class="keyword">end</span>
+0569   
+0570   <span class="keyword">case</span> {<span class="string">'length'</span>}
+0571     <span class="comment">% Returns the length of each fiber in the fiber group</span>
+0572     <span class="comment">% flen = fefgGet(fg,'length')</span>
+0573     
+0574     <span class="comment">% Measure the step size of the first fiber. They *should* all be the same!</span>
+0575     stepSize = mean(sqrt(sum(diff(fg.fibers{1},1,2).^2)));
+0576     
+0577     <span class="comment">% Check that they are</span>
+0578     <span class="comment">%stepSize2 = mean(sqrt(sum(diff(fg.fibers{2},1,2).^2)));</span>
+0579     <span class="comment">%assertElementsAlmostEqual(stepSize,stepSize2,'relative',.001,.001);</span>
+0580     
+0581     <span class="comment">% Estimate the length for the fibers, as well mean, min and max</span>
+0582     val  = cellfun(<span class="string">'length'</span>,fg.fibers)*stepSize;
+0583   
+0584   <span class="keyword">case</span> {<span class="string">'dt6'</span>}
+0585     <span class="comment">% Compute the 6 parameters for the tensors at each node in each fiber.</span>
+0586     <span class="comment">% It requires a dt structure.</span>
+0587     <span class="comment">% dt6 = fefgGet(fg,'dt6',dt)</span>
+0588     <span class="comment">% dt6 = fefgGet(fg,'dt6',dtFileName)</span>
+0589 
+0590     <span class="keyword">if</span> ~ischar(varargin{1})    
+0591       <span class="keyword">if</span> isstruct(varargin{1})
+0592         <span class="comment">% A dti structure was passed.</span>
+0593         dt = varargin{1};
+0594       <span class="keyword">else</span>
+0595         error(<span class="string">'[%s] A ''dt'' structure is necessary.'</span>, mfilename)
+0596       <span class="keyword">end</span>
+0597     <span class="keyword">else</span> <span class="comment">% The string should be a path to a dt.mat file.</span>
+0598       dt = dtiLoadDt6(varargin{1});
+0599     <span class="keyword">end</span>
+0600     
+0601     <span class="comment">% Get the dt6 tensors for each node in each fiber.</span>
+0602     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0603     val     = cell(1,nFibers);
+0604     xform   = inv(dt.xformToAcpc);
+0605     dt6     = dt.dt6; clear dt
+0606     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0607     parfor ii = 1:nFibers
+0608       <span class="comment">% Get the fiber coordinates.</span>
+0609       coords = fg.fibers{ii}'; <span class="comment">% Assumed in ACPC</span>
+0610       
+0611       [val1,val2,val3,val4,val5,val6] = <span class="keyword">...</span>
+0612         dtiGetValFromTensors(dt6, coords, xform,<span class="string">'dt6'</span>,<span class="string">'nearest'</span>);
+0613       
+0614       <span class="comment">% Build a vector of tesnsors' eigenvalues</span>
+0615       val{ii} = [val1,val2,val3,val4,val5,val6];
+0616     <span class="keyword">end</span>
+0617     
+0618     
+0619   <span class="keyword">case</span> {<span class="string">'eigenvals'</span>}
+0620     <span class="comment">% Compute eigenvalues for the fibers in a fiber group.</span>
+0621     <span class="comment">% It requires a dt structure.</span>
+0622     <span class="comment">% eigenvals = fefgGet(fg,'eigenvals',dt)</span>
+0623     <span class="comment">% eigenvals = fefgGet(fg,'eigenvals',dt6FileName)</span>
+0624     <span class="keyword">if</span> ~ischar(varargin{1})
+0625       <span class="keyword">if</span> ( ~isstruct(varargin{1}) )
+0626         dt6 = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'dt6'</span>,varargin{1});
+0627       <span class="keyword">elseif</span> ( size(varargin{1},1)==6 )
+0628         dt6 = varargin{1};
+0629       <span class="keyword">else</span>
+0630         error(<span class="string">'[%s] Either a ''dt'' structure or a ''dt6'' vector of tensor coefficients is necessary.\n'</span>,mfilename)
+0631       <span class="keyword">end</span>
+0632     <span class="keyword">else</span> <span class="comment">% The string should be a path to a dt6.mat file.</span>
+0633       dt6 = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'dt6'</span>,dtiLoadDt6(varargin{1}));
+0634     <span class="keyword">end</span>
+0635     
+0636     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0637     val     = cell(1,nFibers);
+0638  
+0639     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0640     parfor ii = 1:nFibers
+0641       
+0642       <span class="comment">% We now have the dt6 data from all of the fibers.  We extract the</span>
+0643       <span class="comment">% directions into vec and the eigenvalues into val.  The units of val are</span>
+0644       <span class="comment">% um^2/sec or um^2/msec .. somebody answer this here, please.</span>
+0645       [~,val{ii}] = dtiEig(dt6{ii});
+0646     <span class="keyword">end</span>
+0647     
+0648     <span class="keyword">for</span>  ii = 1:nFibers
+0649       <span class="comment">% Some of the ellipsoid fits are wrong and we get negative eigenvalues.</span>
+0650       <span class="comment">% These are annoying. If they are just a little less than 0, then clipping</span>
+0651       <span class="comment">% to 0 is not an entirely unreasonable thing. Maybe we should check for the</span>
+0652       <span class="comment">% magnitude of the error?</span>
+0653       nonPD = find(any(val{ii}&lt;0,2), 1);
+0654       <span class="keyword">if</span>(~isempty(nonPD))
+0655         <span class="comment">%fprintf('\n NOTE: %d fiber points had negative eigenvalues. These will be clipped to 0..\n',length(nonPD));</span>
+0656         val{ii}(val{ii}&lt;0) = 0;
+0657       <span class="keyword">end</span>
+0658       
+0659       threeZeroVals = (sum(val{ii}, 2) == 0);
+0660       <span class="comment">%if ~isempty (threeZeroVals)</span>
+0661       <span class="comment">%  fprintf('\n NOTE: %d of these fiber points had all three negative eigenvalues. These will be excluded from analyses\n', length(threeZeroVals));</span>
+0662       <span class="comment">%end</span>
+0663       val{ii}(threeZeroVals, :)=[];
+0664     <span class="keyword">end</span>
+0665     
+0666   <span class="keyword">case</span> {<span class="string">'fa'</span>}
+0667     <span class="comment">% Compute the FA for all the fibers in the fiber group.</span>
+0668     <span class="comment">% Requires a dt structure.</span>
+0669     <span class="comment">% fa = fefgGet(fg,'fa',dt)</span>
+0670     <span class="comment">% fa = fefgGet(fg,'fa',eigenvals)</span>
+0671     <span class="comment">% fa = fefgGet(fg,'fa',dtFileName)</span>
+0672     <span class="keyword">if</span> (~isstruct(varargin{1}) || ischar(varargin{1})) &amp;&amp; ~iscell(varargin{1})
+0673       <span class="comment">% A dti structue was passed.</span>
+0674       eigenvals = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'eigenvals'</span>,varargin{1});
+0675     <span class="keyword">else</span>
+0676       <span class="comment">% We assume that eigenvals were passed already</span>
+0677       eigenvals = varargin{1};
+0678     <span class="keyword">end</span>
+0679     
+0680     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0681     val     = cell(1,nFibers);
+0682     
+0683     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0684     parfor ii = 1:nFibers    
+0685       [val{ii},~,~,~] = dtiComputeFA(eigenvals{ii});
+0686     <span class="keyword">end</span>
+0687     
+0688   <span class="keyword">case</span> {<span class="string">'md'</span>}
+0689     <span class="comment">% Compute the Mean Diffusivity for all the fibers in the fiber group.</span>
+0690     <span class="comment">% Requires a dt structure.</span>
+0691     <span class="comment">% md = fefgGet(fg,'md',dt)</span>
+0692     <span class="comment">% md = fefgGet(fg,'md',eigenvals)</span>
+0693     <span class="comment">% md = fefgGet(fg,'md',dtFileName)</span>
+0694 
+0695     <span class="keyword">if</span> (~isstruct(varargin{1}) || ischar(varargin{1})) &amp;&amp; ~iscell(varargin{1})
+0696       <span class="comment">% A dti structue was passed.</span>
+0697       eigenvals = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'eigenvals'</span>,varargin{1});
+0698     <span class="keyword">else</span>
+0699       <span class="comment">% We assume that eigenvals were passed already</span>
+0700       eigenvals = varargin{1};
+0701     <span class="keyword">end</span>
+0702     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0703     val     = cell(1,nFibers);
+0704     
+0705     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0706     parfor ii = 1:nFibers    
+0707       [~,val{ii},~,~] = dtiComputeFA(eigenvals{ii});
+0708     <span class="keyword">end</span>
+0709        
+0710   <span class="keyword">case</span> {<span class="string">'ad'</span>}
+0711     <span class="comment">% Compute the Axial Diffusivity for all the fibers in the fiber group.</span>
+0712     <span class="comment">% Requires a dt structure.</span>
+0713     <span class="comment">% ad = fefgGet(fg,'ad',dt)</span>
+0714     <span class="comment">% ad = fefgGet(fg,'ad',eigenvals)</span>
+0715     <span class="comment">% ad = fefgGet(fg,'ad',dtFileName)</span>
+0716 
+0717     <span class="keyword">if</span> (~isstruct(varargin{1}) || ischar(varargin{1})) &amp;&amp; ~iscell(varargin{1}) 
+0718       <span class="comment">% A dti structue was passed.</span>
+0719       eigenvals = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'eigenvals'</span>,varargin{1});
+0720     <span class="keyword">else</span>
+0721       <span class="comment">% We assume that eigenvals were passed already</span>
+0722       eigenvals = varargin{1};
+0723     <span class="keyword">end</span>
+0724     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0725     val     = cell(1,nFibers);
+0726     
+0727     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0728     parfor ii = 1:nFibers    
+0729       [~,~,~,val{ii}] = dtiComputeFA(eigenvals{ii});
+0730     <span class="keyword">end</span>
+0731         
+0732   <span class="keyword">case</span> {<span class="string">'rd'</span>}
+0733     <span class="comment">% Compute the Radial Diffusivity for all the fibers in the fiber group.</span>
+0734     <span class="comment">% Requires a dt structure.</span>
+0735     <span class="comment">% rd = fefgGet(fg,'rd',dt)</span>
+0736     <span class="comment">% rd = fefgGet(fg,'rd',eigenvals)</span>
+0737     <span class="comment">% rd = fefgGet(fg,'rd',dtFileName)</span>
+0738 
+0739     <span class="keyword">if</span> (~isstruct(varargin{1}) || ischar(varargin{1})) &amp;&amp; ~iscell(varargin{1}) 
+0740       <span class="comment">% A dti structue was passed.</span>
+0741       eigenvals = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'eigenvals'</span>,varargin{1});
+0742     <span class="keyword">else</span>
+0743       <span class="comment">% We assume that eigenvals were passed already</span>
+0744       eigenvals = varargin{1};
+0745     <span class="keyword">end</span>
+0746     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0747     val     = cell(1,nFibers);
+0748     
+0749     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0750     parfor ii = 1:nFibers    
+0751       [~,~,val{ii},~] = dtiComputeFA(eigenvals{ii});
+0752     <span class="keyword">end</span>
+0753     
+0754   <span class="keyword">case</span> {<span class="string">'adc'</span>}
+0755     <span class="comment">% Compute the radial and axial ADC for all the fibers in the fiber group.</span>
+0756     <span class="comment">% Requires a dt structure.</span>
+0757     <span class="comment">% adc = fefgGet(fg,'adc',dt)</span>
+0758     <span class="comment">% adc = fefgGet(fg,'adc',eigenvals)</span>
+0759     <span class="comment">% adc = fefgGet(fg,'adc',dtFileName)</span>
+0760     
+0761     <span class="keyword">if</span> (~isstruct(varargin{1}) || ischar(varargin{1})) &amp;&amp; ~iscell(varargin{1}) 
+0762       <span class="comment">% A dti structue was passed.</span>
+0763       eigenvals = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'eigenvals'</span>,varargin{1});
+0764     <span class="keyword">else</span>
+0765       <span class="comment">% We assume that eigenvals were passed already</span>
+0766       eigenvals = varargin{1};
+0767     <span class="keyword">end</span>
+0768     
+0769     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0770     val     = cell(1,nFibers);
+0771     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0772     parfor ii = 1:nFibers
+0773       [~,~,val{ii}.radial, val{ii}.axial] = dtiComputeFA(eigenvals{ii});
+0774     <span class="keyword">end</span>
+0775     
+0776   <span class="keyword">case</span> {<span class="string">'westinshape'</span>}
+0777     <span class="comment">% Compute the Westin shape parameters (linearity and planarity)</span>
+0778     <span class="comment">% for all the fibers in the fiber group.</span>
+0779     <span class="comment">% Requires a dt structure.</span>
+0780     <span class="comment">% westin = fefgGet(fg,'westinshape',dt)</span>
+0781     <span class="comment">% westin = fefgGet(fg,'westinshape',eigenvals)</span>
+0782     <span class="comment">% westin = fefgGet(fg,'westinshape',dtFileName)</span>
+0783     
+0784     <span class="keyword">if</span> (~isstruct(varargin{1}) || ischar(varargin{1})) &amp;&amp; ~iscell(varargin{1}) 
+0785       <span class="comment">% A dt structue was passed.</span>
+0786       eigenvals = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'eigenvals'</span>,varargin{1});
+0787     <span class="keyword">else</span>
+0788       <span class="comment">% We assume that eigenvals were passed already</span>
+0789       eigenvals = varargin{1};
+0790     <span class="keyword">end</span>
+0791     
+0792     <span class="comment">% This was the originial formulation described in:</span>
+0793     <span class="comment">% C-F. Westin, S. Peled, H. Gubbjartsson, R. Kikinis, and F.A. Jolesz.</span>
+0794     <span class="comment">% Geometrical diffusion measures for MRI from tensor basis analysis.</span>
+0795     <span class="comment">% In Proceedings 5th Annual ISMRM, 1997.</span>
+0796     nFibers = <a href="fefgGet.html" class="code" title="function val = fefgGet(fg,param,varargin)">fefgGet</a>(fg,<span class="string">'nFibers'</span>);
+0797     val     = cell(1,nFibers);
+0798 
+0799     <a href="feOpenLocalCluster.html" class="code" title="function feOpenLocalCluster">feOpenLocalCluster</a>
+0800     parfor ii = 1:nFibers
+0801       [val{ii}.linearity, val{ii}.planarity] = dtiComputeWestinShapes(eigenvals{ii});
+0802     <span class="keyword">end</span>
+0803     
+0804   <span class="keyword">otherwise</span>
+0805     error(<span class="string">'Unknown fg parameter: &quot;%s&quot;\n'</span>,param);
+0806 <span class="keyword">end</span>
+0807 
+0808 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

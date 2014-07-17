@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feComputeCanonicalDiffusion</title>
+  <meta name="keywords" content="feComputeCanonicalDiffusion">
+  <meta name="description" content="Calculate a tensor for forward modeling at each point of each fiber.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">compute</a> &gt; feComputeCanonicalDiffusion.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for compute&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feComputeCanonicalDiffusion
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Calculate a tensor for forward modeling at each point of each fiber.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function Q = feComputeCanonicalDiffusion(fibers,dParms) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Calculate a tensor for forward modeling at each point of each fiber.
+
+  Q = feComputeCanonicalDiffusion(fibers,dParms)
+
+ INPUTS:
+   fibers  - is a cell array of x,y,z coordinates for each node in a fiber.
+   dParams - is a a vector of axial and radial diffusivity to use as
+              parameters of the canonical tensors used to compute the 
+              diffusion at the node.
+ OUTPUT:
+   Q       - is a cell array of the same length as the number of fibers.
+             Each Q{ii} contains a matrix of (numNodes x 9) tensors.
+
+ To put the tensor into the quadratic form, use T = reshape(T,3,3);
+ eigs(T) calculates the axial diffusivity (largest) and so forth.
+
+ EXAMPLE:
+  d_ad = 1.5; d_rd = 0.3;
+  dParms(1) = d_ad; dParms(2) = d_rd; dParms(3) = d_rd;
+  fgImg.Q = feComputeCanonicalDiffusion(fibers,dParms)
+
+ See also: feConnectomeInit.m v_lifeExample.m
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function Q = feComputeCanonicalDiffusion(fibers,dParms)</a>
+0002 <span class="comment">% Calculate a tensor for forward modeling at each point of each fiber.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  Q = feComputeCanonicalDiffusion(fibers,dParms)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% INPUTS:</span>
+0007 <span class="comment">%   fibers  - is a cell array of x,y,z coordinates for each node in a fiber.</span>
+0008 <span class="comment">%   dParams - is a a vector of axial and radial diffusivity to use as</span>
+0009 <span class="comment">%              parameters of the canonical tensors used to compute the</span>
+0010 <span class="comment">%              diffusion at the node.</span>
+0011 <span class="comment">% OUTPUT:</span>
+0012 <span class="comment">%   Q       - is a cell array of the same length as the number of fibers.</span>
+0013 <span class="comment">%             Each Q{ii} contains a matrix of (numNodes x 9) tensors.</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% To put the tensor into the quadratic form, use T = reshape(T,3,3);</span>
+0016 <span class="comment">% eigs(T) calculates the axial diffusivity (largest) and so forth.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% EXAMPLE:</span>
+0019 <span class="comment">%  d_ad = 1.5; d_rd = 0.3;</span>
+0020 <span class="comment">%  dParms(1) = d_ad; dParms(2) = d_rd; dParms(3) = d_rd;</span>
+0021 <span class="comment">%  fgImg.Q = feComputeCanonicalDiffusion(fibers,dParms)</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% See also: feConnectomeInit.m v_lifeExample.m</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0026 
+0027 <span class="comment">% Preallocate</span>
+0028 nFibers = length(fibers); <span class="comment">% The number of Fibers.</span>
+0029 Q       = cell(1,nFibers); <span class="comment">% Memory for the tensors of each fiber.</span>
+0030 D       = diag(dParms);    <span class="comment">% The diagonal form of the Tensors' model parameters.</span>
+0031 
+0032 feOpenLocalCluster
+0033 parfor ii = 1:nFibers
+0034  <span class="comment">% Compute the diffusion gradient at each node of the fiber.</span>
+0035  fiberGradient = gradient(fibers{ii});
+0036  
+0037  <span class="comment">% Number of nodes fro this fiber</span>
+0038  numNodes = size(fibers{ii},2);
+0039  
+0040  <span class="comment">% preallocated memory for the vector representation of tensors.</span>
+0041  T = zeros(numNodes,9);
+0042  
+0043  <span class="keyword">for</span> jj = 1:numNodes
+0044   <span class="comment">% Rotate the tensor toward the gradient of the fiber.</span>
+0045   <span class="comment">%</span>
+0046   <span class="comment">% Calculate a rotation matrix for the tensor so that points in the fiberGradient</span>
+0047   <span class="comment">% direction and has two perpendicular directions (U)</span>
+0048   <span class="comment">% Leaving the 3 outputs for this function is the fastest use of it.</span>
+0049   [Rot,~, ~] = svd(fiberGradient(:,jj)); <span class="comment">% Compute the eigen vectors of the gradient.</span>
+0050   
+0051   <span class="comment">% Create the quadratic form of the tensor.</span>
+0052   <span class="comment">%</span>
+0053   <span class="comment">% The principal eigenvector is in the same direction of the</span>
+0054   <span class="comment">% fiberGradient. The direction of the other two are scaled by dParms.</span>
+0055   <span class="comment">% Human friendly version fo the code:</span>
+0056   <span class="comment">% tensor = Rot*D*Rot'; % tensor for the current node, 3x3 matrix.</span>
+0057   <span class="comment">% T(jj,:) = reshape(tensor,1,9); % reshaped as a vector 1,9 vector</span>
+0058   T(jj,:) = reshape(Rot*D*Rot',1,9);
+0059  <span class="keyword">end</span>
+0060  <span class="comment">% T is a matrix; each row is a 1,9 version of the tensor.</span>
+0061  Q{ii} = T;
+0062 <span class="keyword">end</span>
+0063 
+0064 <span class="keyword">return</span>
+0065</pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

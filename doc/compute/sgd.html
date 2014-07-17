@@ -1,0 +1,290 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of sgd</title>
+  <meta name="keywords" content="sgd">
+  <meta name="description" content="Least-square stochastic gradient-descend fit.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">compute</a> &gt; sgd.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for compute&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>sgd
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Least-square stochastic gradient-descend fit.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [w, R2] = sgd(y,X,numtoselect,finalstepsize,convergencecriterion,checkerror,nonneg,alpha,lambda) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Least-square stochastic gradient-descend fit.
+ 
+ sgd(y,X,numtoselect,finalstepsize,convergencecriterion,checkerror,nonneg)
+ 
+ &lt;y&gt; is p x 1 with the data
+
+ &lt;X&gt; is p x q with the regressors
+
+ &lt;numtoselect&gt; is the number of data points to randomly select on each
+ iteration
+
+ &lt;finalstepsize&gt; is like 0.05
+
+ &lt;convergencecriterion&gt; is [A B C] where A is in (0,1), B is a positive
+ integer, and C is number of percentages.
+   
+   We stop if we see a series of max(B,round(A*[current total-error-check
+   number])) total-error-check iterations that do not improve performance
+   on the estimation set, where improvement must be better by at least 1%
+   of the previously marked R^2.
+ 
+ &lt;checkerror&gt; is the number of iterations between total-error-checks
+
+ &lt;nonneg&gt; if set to 1 costrains the solution to be positive
+ 
+ For reference see : Kay et al. 2008 (Supplemental material)
+ 
+ &lt;alpha, lambda&gt; ElasticNet parameters (optional, defaults to 1 and 0).
+ The ElasticNet is a reguarization and variable selection algorithm. 
+ The EN penalty is: 
+ 
+ (y - X*w).^2) + lambda * sum(alpha * w.^2 + (1-alpha) * abs(w)) 
+
+ Such that lambda sets the slope of the additional regularization error
+ surface and alpha balances between the L1 and L2 constraints. When alpha
+ is 1, the algorithm reduces to ridge regression. When alpha is 0, the
+ algorithm reduces to the Lasso.
+ 
+ Reference: Zou and Hastie (Zou &amp; Hastie, (2005) Journal of the Royal
+ Statistical Society B 67, Part 2, pp. 301-320)
+ See also: Friedman, Hastie and Tibshirani (2008). The elements of
+ statistical learning, chapter 3 (page 31, equation 3.54)
+
+
+ Copyright Franco Pestilli and Kendrick Kay (2013) Vistasoft Stanford University.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feFitModel.html" class="code" title="function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)">feFitModel</a>	Fit the LiFE model.</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [v,len] = unitlengthfast(v,dim)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [w, R2] = sgd(y,X,numtoselect,finalstepsize,convergencecriterion,checkerror,nonneg,alpha,lambda)</a>
+0002 <span class="comment">% Least-square stochastic gradient-descend fit.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% sgd(y,X,numtoselect,finalstepsize,convergencecriterion,checkerror,nonneg)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% &lt;y&gt; is p x 1 with the data</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">% &lt;X&gt; is p x q with the regressors</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% &lt;numtoselect&gt; is the number of data points to randomly select on each</span>
+0011 <span class="comment">% iteration</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% &lt;finalstepsize&gt; is like 0.05</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% &lt;convergencecriterion&gt; is [A B C] where A is in (0,1), B is a positive</span>
+0016 <span class="comment">% integer, and C is number of percentages.</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">%   We stop if we see a series of max(B,round(A*[current total-error-check</span>
+0019 <span class="comment">%   number])) total-error-check iterations that do not improve performance</span>
+0020 <span class="comment">%   on the estimation set, where improvement must be better by at least 1%</span>
+0021 <span class="comment">%   of the previously marked R^2.</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% &lt;checkerror&gt; is the number of iterations between total-error-checks</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% &lt;nonneg&gt; if set to 1 costrains the solution to be positive</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% For reference see : Kay et al. 2008 (Supplemental material)</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% &lt;alpha, lambda&gt; ElasticNet parameters (optional, defaults to 1 and 0).</span>
+0030 <span class="comment">% The ElasticNet is a reguarization and variable selection algorithm.</span>
+0031 <span class="comment">% The EN penalty is:</span>
+0032 <span class="comment">%</span>
+0033 <span class="comment">% (y - X*w).^2) + lambda * sum(alpha * w.^2 + (1-alpha) * abs(w))</span>
+0034 <span class="comment">%</span>
+0035 <span class="comment">% Such that lambda sets the slope of the additional regularization error</span>
+0036 <span class="comment">% surface and alpha balances between the L1 and L2 constraints. When alpha</span>
+0037 <span class="comment">% is 1, the algorithm reduces to ridge regression. When alpha is 0, the</span>
+0038 <span class="comment">% algorithm reduces to the Lasso.</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">% Reference: Zou and Hastie (Zou &amp; Hastie, (2005) Journal of the Royal</span>
+0041 <span class="comment">% Statistical Society B 67, Part 2, pp. 301-320)</span>
+0042 <span class="comment">% See also: Friedman, Hastie and Tibshirani (2008). The elements of</span>
+0043 <span class="comment">% statistical learning, chapter 3 (page 31, equation 3.54)</span>
+0044 <span class="comment">%</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% Copyright Franco Pestilli and Kendrick Kay (2013) Vistasoft Stanford University.</span>
+0047 
+0048 <span class="comment">% Set the default for input params:</span>
+0049 <span class="keyword">if</span> notDefined(<span class="string">'convergencecriterion'</span>), convergencecriterion = [.15 3 5]; <span class="keyword">end</span> 
+0050 <span class="keyword">if</span> notDefined(<span class="string">'numtoselect'</span>), numtoselect = 0.1 * size(y,1); <span class="keyword">end</span>
+0051 <span class="keyword">if</span> notDefined(<span class="string">'checkerror'</span>), checkerror=40; <span class="keyword">end</span>
+0052 <span class="keyword">if</span> notDefined(<span class="string">'finalstepsize'</span>), finalstepsize=0.05; <span class="keyword">end</span>
+0053 <span class="keyword">if</span> notDefined(<span class="string">'nonneg'</span>), nonneg = false; <span class="keyword">end</span>
+0054 <span class="keyword">if</span> notDefined(<span class="string">'coordDescent'</span>), coordDescent = false; <span class="keyword">end</span>
+0055 
+0056 <span class="comment">% Set default values for ElasticNet (defaults to regular OLS):</span>
+0057 <span class="keyword">if</span> notDefined(<span class="string">'alpha'</span>), alpha   = 0; <span class="keyword">end</span> 
+0058 <span class="keyword">if</span> notDefined(<span class="string">'lambda'</span>), lambda = 0; <span class="keyword">end</span>
+0059 
+0060 p = size(y,1);  <span class="comment">% number of data points</span>
+0061 q = size(X,2);  <span class="comment">% number of parameters</span>
+0062 orig_ssq = full(sum((y).^2)); <span class="comment">% Sum of Squres fo the data</span>
+0063 
+0064 <span class="comment">% initialize various variables used in the fitting:</span>
+0065 w          = 0 .* rand(q,1); <span class="comment">% the set of weights, between 0 and .1</span>
+0066 w_best     = w;          <span class="comment">% The best set of weights.</span>
+0067 est_ssq_best = inf;      <span class="comment">% minimum estimation error found so far</span>
+0068 estbadcnt  = 0;          <span class="comment">% number of times estimation error has gone up</span>
+0069 iter       = 1;          <span class="comment">% the iteration number</span>
+0070 cnt        = 1;          <span class="comment">% the total-error-check number</span>
+0071   
+0072 <span class="comment">% report</span>
+0073 fprintf(<span class="string">'[%s] Performing fit | %d measurements | %d parameters | '</span>,mfilename,p,q);
+0074 
+0075 <span class="comment">% Start computing the fit.</span>
+0076 <span class="keyword">while</span> 1
+0077   <span class="comment">% Indices to selected signal and model</span>
+0078   ix      = randi(p,1,numtoselect); <span class="comment">% Slower indexing method</span>
+0079   ix2     = false(p,1);
+0080   ix2(ix) = true;
+0081 
+0082   <span class="comment">% select the subset of signal and model to use for fitting</span>
+0083   y0 = y(ix2);
+0084   X0 = X(ix2,:);
+0085   
+0086   <span class="comment">% if not the first iteration, adjust parameters</span>
+0087   <span class="keyword">if</span> iter ~= 1
+0088     <span class="comment">% Calculate the gradient (change in error over change in parameter):</span>
+0089     grad = -((y0 - X0*w)' * X0)' + lambda * (alpha + 2*(1 - alpha)*w);
+0090     
+0091     <span class="comment">% This computes the coordinate descent instead of the gradient descent.</span>
+0092     <span class="keyword">if</span> coordDescent
+0093         <span class="comment">% Coordinate descent</span>
+0094         m    = min(grad);
+0095         grad = (grad==m)*m;
+0096     <span class="keyword">end</span>
+0097     
+0098     <span class="comment">% Unit-length normalize the gradient</span>
+0099     grad = <a href="#_sub1" class="code" title="subfunction [v,len] = unitlengthfast(v,dim)">unitlengthfast</a>(grad);
+0100     
+0101     <span class="comment">% Perform gradient descent</span>
+0102     w = w - finalstepsize*grad;
+0103         
+0104     <span class="comment">% Non-negative constrain, we set negative weights to zero</span>
+0105     <span class="keyword">if</span> ( nonneg ), w(w&lt;0) = 0;<span class="keyword">end</span>
+0106   <span class="keyword">end</span>
+0107   
+0108   <span class="comment">% check the total error every so often</span>
+0109   <span class="keyword">if</span> mod(iter,checkerror) == 1
+0110     <span class="comment">% Curent estimated sum of the squares of the residuals (SSQ)</span>
+0111     est_ssq = sum((y - X*w).^2) + lambda*(alpha*sum(w) + (1-alpha)*sum(w.^2));
+0112      
+0113     <span class="comment">% Check if the SSQ improved</span>
+0114     isimprove = est_ssq &lt; est_ssq_best; 
+0115             
+0116     <span class="comment">% We keep fitting if the SSQ is not Inf OR some percent smaller than</span>
+0117     <span class="comment">% the best SSQ obtained so far</span>
+0118     <span class="comment">%keepfitting = isinf(est_ssq_best) | (est_ssq &lt; ((est_ssq_best - min_ssq)));</span>
+0119     keepfitting = isinf(est_ssq_best) | (est_ssq &lt; ((est_ssq_best * (1-convergencecriterion(3)/100))));
+0120 
+0121     <span class="comment">% do we consider this iteration to be the best yet?</span>
+0122     <span class="keyword">if</span> isimprove
+0123       <span class="comment">% The SSQ was smaller, the fit improved.</span>
+0124       w_best       = w;       <span class="comment">% Set the current to be the best so far</span>
+0125       est_ssq_best = est_ssq; <span class="comment">% The min error</span>
+0126       
+0127       <span class="comment">% OK we improved, but check whether improvement is too small to be</span>
+0128       <span class="comment">% considered useful.</span>
+0129       <span class="keyword">if</span> keepfitting
+0130         <span class="comment">% THe fit improved more than the minimum accptable improvement.</span>
+0131         <span class="comment">% Reset the counter fo rthe bad fits, so that we start over</span>
+0132         <span class="comment">% checking for stopping.</span>
+0133         estbadcnt  = 0;
+0134         <span class="comment">%est_ssq_best = est_ssq; %</span>
+0135       <span class="keyword">else</span>
+0136         estbadcnt = estbadcnt + 1;
+0137       <span class="keyword">end</span>
+0138     <span class="keyword">else</span>
+0139       <span class="comment">% The fit actually was bad, SSQ increases count how many bad fit we had. Stop after a centrain number.</span>
+0140       estbadcnt = estbadcnt + 1;
+0141     <span class="keyword">end</span>
+0142     
+0143     <span class="comment">% stop if we haven't improved in a while</span>
+0144     <span class="keyword">if</span> estbadcnt &gt;= max(convergencecriterion(2),round(convergencecriterion(1)*cnt))
+0145       R2 = 100*(1-(est_ssq_best/orig_ssq));
+0146       fprintf(<span class="string">' DONE fitting | SSQ=%2.3f (Original SSQ=%2.3f) | Rzero-squared %2.3f%%.\n'</span>,<span class="keyword">...</span>
+0147               est_ssq_best,orig_ssq,R2);
+0148       <span class="keyword">break</span>;
+0149     <span class="keyword">end</span>
+0150     
+0151     <span class="comment">% Update the counter</span>
+0152     cnt = cnt + 1;
+0153   <span class="keyword">end</span>
+0154   iter = iter + 1;
+0155 <span class="keyword">end</span>
+0156 
+0157 <span class="comment">% prepare output</span>
+0158 w = w_best;
+0159 
+0160 <a name="_sub1" href="#_subfunctions" class="code">function [v,len] = unitlengthfast(v,dim)</a>
+0161 
+0162 <span class="comment">% function [v,len] = unitlengthfast(v,dim)</span>
+0163 <span class="comment">%</span>
+0164 <span class="comment">% &lt;v&gt; is a vector (row or column) or a 2D matrix</span>
+0165 <span class="comment">% &lt;dim&gt; (optional) is dimension along which vectors are oriented.</span>
+0166 <span class="comment">%   if not supplied, assume that &lt;v&gt; is a row or column vector.</span>
+0167 <span class="comment">%</span>
+0168 <span class="comment">% unit-length normalize &lt;v&gt;.  aside from input flexibility,</span>
+0169 <span class="comment">% the difference between this function and unitlength.m is that</span>
+0170 <span class="comment">% we do not deal with NaNs (i.e. we assume &lt;v&gt; does not have NaNs),</span>
+0171 <span class="comment">% and if a vector has 0 length, it becomes all NaNs.</span>
+0172 <span class="comment">%</span>
+0173 <span class="comment">% we also return &lt;len&gt; which is the original vector length of &lt;v&gt;.</span>
+0174 <span class="comment">% when &lt;dim&gt; is not supplied, &lt;len&gt; is a scalar.  when &lt;dim&gt; is</span>
+0175 <span class="comment">% supplied, &lt;len&gt; is the same dimensions as &lt;v&gt; except collapsed</span>
+0176 <span class="comment">% along &lt;dim&gt;.</span>
+0177 <span class="comment">%</span>
+0178 <span class="comment">% note some weird cases:</span>
+0179 <span class="comment">%   unitlengthfast([]) is [].</span>
+0180 <span class="comment">%   unitlengthfast([0 0]) is [NaN NaN].</span>
+0181 <span class="comment">%</span>
+0182 <span class="comment">% example:</span>
+0183 <span class="comment">% a = [3 0];</span>
+0184 <span class="comment">% isequalwithequalnans(unitlengthfast(a),[1 0])</span>
+0185 
+0186 <span class="keyword">if</span> nargin==1
+0187   len = sqrt(v(:).'*v(:));
+0188   v = v / len;
+0189 <span class="keyword">else</span>
+0190   <span class="keyword">if</span> dim==1
+0191     len = sqrt(sum(v.^2,1));
+0192     v = v ./ repmat(len,[size(v,1) 1]);  <span class="comment">% like this for speed.  maybe use the indexing trick to speed up even more??</span>
+0193   <span class="keyword">else</span>
+0194     len = sqrt(sum(v.^2,2));
+0195     v = v ./ repmat(len,[1 size(v,2)]);
+0196   <span class="keyword">end</span>
+0197 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

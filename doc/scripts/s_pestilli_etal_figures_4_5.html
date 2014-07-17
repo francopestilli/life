@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of s_pestilli_etal_figures_4_5</title>
+  <meta name="keywords" content="s_pestilli_etal_figures_4_5">
+  <meta name="description" content="% Example of initialization and fitting of the LiFE model">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">scripts</a> &gt; s_pestilli_etal_figures_4_5.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for scripts&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>s_pestilli_etal_figures_4_5
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>% Example of initialization and fitting of the LiFE model</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [fh, fe] = s_pestilli_etal_Figures_4_5() </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% Example of initialization and fitting of the LiFE model
+
+ This function illustrates how:
+  - Set up an fe (fascicle evaluation) structure.
+  - Combines them with fibers tracted between the two ROIs 
+  - Generates an optimized connectome from a candidate connectome using LIFE 
+  - Performs a virtual lesion
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function [fh, rmse, rmsexv] = plotHistRMSE(fe,tractograpy)</a></li><li><a href="#_sub2" class="code">function [fh, R] = plotHistRrmse(fe,tractograpy)</a></li><li><a href="#_sub3" class="code">function [fh, w] = plotHistWeigths(fe,tractograpy)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [fh, fe] = s_pestilli_etal_Figures_4_5()</a>
+0002 <span class="comment">%% Example of initialization and fitting of the LiFE model</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% This function illustrates how:</span>
+0005 <span class="comment">%  - Set up an fe (fascicle evaluation) structure.</span>
+0006 <span class="comment">%  - Combines them with fibers tracted between the two ROIs</span>
+0007 <span class="comment">%  - Generates an optimized connectome from a candidate connectome using LIFE</span>
+0008 <span class="comment">%  - Performs a virtual lesion</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0011 
+0012 <span class="comment">% Intialize a local matlab cluster if the parallel toolbox is available.</span>
+0013 feOpenLocalCluster;
+0014 
+0015 <span class="comment">%% Build the file names for the diffusion data, the anatomical MR.</span>
+0016 dwiFile       = fullfile(lifeDemoDataPath(<span class="string">'diffusion'</span>),<span class="string">'pestilli_etal_life_demo_scan1_subject1_b2000_150dirs_stanford.nii.gz'</span>);
+0017 dwiFileRepeat = fullfile(lifeDemoDataPath(<span class="string">'diffusion'</span>),<span class="string">'pestilli_etal_life_demo_scan2_subject1_b2000_150dirs_stanford.nii.gz'</span>);
+0018 t1File        = fullfile(lifeDemoDataPath(<span class="string">'anatomy'</span>),  <span class="string">'pestilli_etal_life_demo_anatomy_t1w_stanford.nii.gz'</span>);
+0019 
+0020 <span class="comment">%% (1) Probabilistic CSD-based connectome:</span>
+0021 <span class="comment">% We will analyze first the CSD-based probabilistic tractography</span>
+0022 <span class="comment">% connectome.</span>
+0023 fgFileName    = fullfile(lifeDemoDataPath(<span class="string">'tractography'</span>), <span class="keyword">...</span>
+0024                 <span class="string">'pestilli_et_al_life_demo_mrtrix_csd_lmax10_probabilistic.mat'</span>);
+0025 
+0026 <span class="comment">% The final connectome and data astructure will be saved with this name:</span>
+0027 feFileName    = <span class="string">'life_build_model_demo_CSD_PROB'</span>;
+0028 
+0029 
+0030 <span class="comment">% Initialize the Connectome.</span>
+0031 fe = feConnectomeInit(dwiFile,fgFileName,feFileName,[],dwiFileRepeat,t1File);
+0032 
+0033 <span class="comment">% Fit the model.</span>
+0034 fe = feSet(fe,<span class="string">'fit'</span>,feFitModel(feGet(fe,<span class="string">'mfiber'</span>),feGet(fe,<span class="string">'dsigdemeaned'</span>),<span class="string">'bbnnls'</span>));
+0035 
+0036 <span class="comment">% Plot a histogram of the RMSE.</span>
+0037 [fh(1), ~, ~] = <a href="#_sub1" class="code" title="subfunction [fh, rmse, rmsexv] = plotHistRMSE(fe,tractograpy)">plotHistRMSE</a>(fe,<span class="string">'Probabilistic'</span>);
+0038 
+0039 <span class="comment">% Plot a histogram of the RMSE ratio.</span>
+0040 <span class="comment">% The Rrmse is the ratio between data test-retest reliability and</span>
+0041 <span class="comment">% model error (the quality of the model fit).</span>
+0042 [fh(2), ~] = <a href="#_sub2" class="code" title="subfunction [fh, R] = plotHistRrmse(fe,tractograpy)">plotHistRrmse</a>(fe,<span class="string">'Probabilistic'</span>);
+0043 
+0044 <span class="comment">% Plot a histogram of the fitted fascicle weights.</span>
+0045 [fh(3), ~] = <a href="#_sub3" class="code" title="subfunction [fh, w] = plotHistWeigths(fe,tractograpy)">plotHistWeigths</a>(fe,<span class="string">'Probabilistic'</span>);
+0046 
+0047 <span class="comment">%% (2) Deterministic tensor-based connectome:</span>
+0048 <span class="comment">% We will analyze first the CSD-based probabilistic tractography</span>
+0049 <span class="comment">% connectome.</span>
+0050 fgFileName    = fullfile(lifeDemoDataPath(<span class="string">'tractography'</span>), <span class="keyword">...</span>
+0051                 <span class="string">'pestilli_et_al_life_demo_mrtrix_tensor_deterministic.mat'</span>);
+0052 
+0053 <span class="comment">% The final connectome and data astructure will be saved with this name:</span>
+0054 feFileName    = <span class="string">'life_build_model_demo_TENSOR_DET'</span>;
+0055 
+0056 <span class="comment">% Initialize the Connectome.</span>
+0057 fe = feConnectomeInit(dwiFile,fgFileName,feFileName,[],dwiFileRepeat,t1File);
+0058 
+0059 <span class="comment">% Fit the model.</span>
+0060 fe = feSet(fe,<span class="string">'fit'</span>,feFitModel(feGet(fe,<span class="string">'mfiber'</span>),feGet(fe,<span class="string">'dsigdemeaned'</span>),<span class="string">'bbnnls'</span>));
+0061 
+0062 <span class="comment">% Plot a histogram of the RMSE.</span>
+0063 [fh(1), ~, ~] = <a href="#_sub1" class="code" title="subfunction [fh, rmse, rmsexv] = plotHistRMSE(fe,tractograpy)">plotHistRMSE</a>(fe,<span class="string">'Deterministic'</span>);
+0064 
+0065 <span class="comment">% Plot a histogram of the RMSE ratio.</span>
+0066 <span class="comment">% The Rrmse is the ratio between data test-retest reliability and</span>
+0067 <span class="comment">% model error (the quality of the model fit).</span>
+0068 [fh(2), ~] = <a href="#_sub2" class="code" title="subfunction [fh, R] = plotHistRrmse(fe,tractograpy)">plotHistRrmse</a>(fe,<span class="string">'Deterministic'</span>);
+0069 
+0070 <span class="comment">% Plot a histogram of the fitted fascicle weights.</span>
+0071 [fh(3), ~] = <a href="#_sub3" class="code" title="subfunction [fh, w] = plotHistWeigths(fe,tractograpy)">plotHistWeigths</a>(fe,<span class="string">'Deterministic'</span>);
+0072 
+0073 keyboard
+0074 <span class="keyword">end</span>
+0075 
+0076 <span class="comment">% ---------- Local  Functions ----------- %</span>
+0077 <a name="_sub1" href="#_subfunctions" class="code">function [fh, rmse, rmsexv] = plotHistRMSE(fe,tractograpy)</a>
+0078 <span class="comment">% Make a plot of the RMSE:</span>
+0079 
+0080 <span class="comment">% Extract the RMSE of the model on the fitted data set</span>
+0081 rmse   = feGet(fe,<span class="string">'vox rmse'</span>);
+0082 
+0083 <span class="comment">% Extract the RMSE of the model on the second data set (cross-validated</span>
+0084 <span class="comment">% error)</span>
+0085 rmsexv = feGetRep(fe,<span class="string">'vox rmse'</span>);
+0086 
+0087 figName = sprintf(<span class="string">'%s - RMSE'</span>,tractograpy);
+0088 fh = mrvNewGraphWin(figName);
+0089 [y,x] = hist(rmse,50);
+0090 plot(x,y,<span class="string">'k-'</span>);
+0091 hold on
+0092 [y,x] = hist(rmsexv,50);
+0093 plot(x,y,<span class="string">'r-'</span>);
+0094 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'fontsize'</span>,16,<span class="string">'box'</span>,<span class="string">'off'</span>);
+0095 title(<span class="string">'Root-mean squared error distribution across voxels'</span>,<span class="string">'fontsize'</span>,16);
+0096 ylabel(<span class="string">'number of voxels'</span>,<span class="string">'fontsize'</span>,16);
+0097 xlabel(<span class="string">'rmse (scanner units)'</span>,<span class="string">'fontsize'</span>,16);
+0098 legend({<span class="string">'RMSE fitted data set'</span>,<span class="string">'RMSE cross-validated'</span>},<span class="string">'fontsize'</span>,16);
+0099 <span class="keyword">end</span>
+0100 
+0101 <a name="_sub2" href="#_subfunctions" class="code">function [fh, R] = plotHistRrmse(fe,tractograpy)</a>
+0102 <span class="comment">% Make a plot of the RMSE Ratio:</span>
+0103 R       = feGetRep(fe,<span class="string">'voxrmseratio'</span>);
+0104 figName = sprintf(<span class="string">'%s - RMSE RATIO'</span>,tractograpy);
+0105 fh      = mrvNewGraphWin(figName);
+0106 [y,x]   = hist(R,linspace(.5,4,50));
+0107 plot(x,y,<span class="string">'k-'</span>,<span class="string">'linewidth'</span>,2);
+0108 hold on
+0109 plot([median(R) median(R)],[0 1200],<span class="string">'r-'</span>,<span class="string">'linewidth'</span>,2);
+0110 plot([1 1],[0 1200],<span class="string">'k-'</span>);
+0111 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'fontsize'</span>,16,<span class="string">'box'</span>,<span class="string">'off'</span>);
+0112 title(<span class="string">'Root-mean squared error ratio'</span>,<span class="string">'fontsize'</span>,16);
+0113 ylabel(<span class="string">'number of voxels'</span>,<span class="string">'fontsize'</span>,16);
+0114 xlabel(<span class="string">'R_{rmse}'</span>,<span class="string">'fontsize'</span>,16);
+0115 legend({sprintf(<span class="string">'Distribution of R_{rmse}'</span>),sprintf(<span class="string">'Median R_{rmse}'</span>)});
+0116 <span class="keyword">end</span>
+0117 
+0118 <a name="_sub3" href="#_subfunctions" class="code">function [fh, w] = plotHistWeigths(fe,tractograpy)</a>
+0119 <span class="comment">% Make a plot of the weights:</span>
+0120 w       = feGet(fe,<span class="string">'fiber weights'</span>);
+0121 figName = sprintf(<span class="string">'%s - Distribution of fascicle weights'</span>,tractograpy);
+0122 fh      = mrvNewGraphWin(figName);
+0123 [y,x]   = hist(w( w &gt; 0 ),logspace(-5,-.3,40));
+0124 semilogx(x,y,<span class="string">'k-'</span>,<span class="string">'linewidth'</span>,2)
+0125 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'fontsize'</span>,16,<span class="string">'box'</span>,<span class="string">'off'</span>)
+0126 title( <span class="keyword">...</span>
+0127     sprintf(<span class="string">'Number of fascicles candidate connectome: %2.0f\nNumber of fascicles in optimized connetome: %2.0f'</span> <span class="keyword">...</span>
+0128     ,length(w),sum(w &gt; 0)),<span class="string">'fontsize'</span>,16)
+0129 ylabel(<span class="string">'Number of fascicles'</span>,<span class="string">'fontsize'</span>,16)
+0130 xlabel(<span class="string">'Fascicle weight'</span>,<span class="string">'fontsize'</span>,16)
+0131 <span class="keyword">end</span>
+0132</pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

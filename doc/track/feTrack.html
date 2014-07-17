@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feTrack</title>
+  <meta name="keywords" content="feTrack">
+  <meta name="description" content="This function creates whole-brain white-matter connectome.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">track</a> &gt; feTrack.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for track&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feTrack
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>This function creates whole-brain white-matter connectome.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibersFolder,lmax,nSeeds,wmMask) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> This function creates whole-brain white-matter connectome.
+
+ [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibersFolder,[lmax],[nSeeds],[wmMask])
+
+ Inputs:
+  - dt6Dir - directory containing the dt6.mt file.
+  - fibersFolder - folder to use to save all the fibers computed.
+  - lmax - Max harmonic order. Default = 10.
+  - nSeeds - number of seeds to use for mrtrix, this determines the final
+             number of fibers.
+
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function algo = switchAlgo(algo)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibersFolder,lmax,nSeeds,wmMask)</a>
+0002 <span class="comment">% This function creates whole-brain white-matter connectome.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibersFolder,[lmax],[nSeeds],[wmMask])</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Inputs:</span>
+0007 <span class="comment">%  - dt6Dir - directory containing the dt6.mt file.</span>
+0008 <span class="comment">%  - fibersFolder - folder to use to save all the fibers computed.</span>
+0009 <span class="comment">%  - lmax - Max harmonic order. Default = 10.</span>
+0010 <span class="comment">%  - nSeeds - number of seeds to use for mrtrix, this determines the final</span>
+0011 <span class="comment">%             number of fibers.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0015 <span class="keyword">if</span> notDefined(<span class="string">'trackingAlgorithm'</span>), trackingAlgorithm = {<span class="string">'tensor'</span>};<span class="keyword">end</span>
+0016 <span class="keyword">if</span> notDefined(<span class="string">'dtFile'</span>),            dtFile = <span class="keyword">...</span>
+0017     <span class="string">'/biac2/wandell6/data/frk/LiFE/data/fp20120420/150dirs_b1000_1/dt6.mat'</span>;<span class="keyword">end</span>
+0018 <span class="keyword">if</span> notDefined(<span class="string">'wmMask'</span>),            wmMask  = [];<span class="keyword">end</span>
+0019 <span class="keyword">if</span> notDefined(<span class="string">'fibersFolder'</span>),      fibersFolder = <span class="keyword">...</span>
+0020     <span class="string">'/azure/scr1/frk/150dirs_b1000_b2000_b4000/life_mrtrix_rep1'</span>;<span class="keyword">end</span>
+0021 <span class="keyword">if</span> notDefined(<span class="string">'lmax'</span>),              lmax    = [8];<span class="keyword">end</span>
+0022 <span class="keyword">if</span> notDefined(<span class="string">'nSeeds'</span>),            nSeeds  = 500000; <span class="keyword">end</span>
+0023   
+0024 runInBackground = 0;
+0025 verbose = 1;
+0026   
+0027 <span class="comment">% make the fibers' folder if it does not exist</span>
+0028 <span class="keyword">if</span> ~exist(fibersFolder,<span class="string">'dir'</span>), system(sprintf(<span class="string">'mkdir -v %s'</span>,fibersFolder)); <span class="keyword">end</span>
+0029 
+0030 fprintf(<span class="string">'\n\n[%s] Performing whole-brain tractograpy ...\n\n'</span>,mfilename);
+0031 
+0032 <span class="comment">% Track with MRTRIX</span>
+0033 <span class="keyword">for</span> il = 1:length(lmax)
+0034   <span class="comment">% This first step initializes all the files necessary for mrtrix.</span>
+0035   <span class="comment">% This can take a long time.</span>
+0036   files           = mrtrix_init(dtFile, lmax(il),fibersFolder,wmMask);
+0037   
+0038   <span class="comment">% MRTRIX - We run this first because it is fast.</span>
+0039   <span class="keyword">for</span> ii = 1:length(trackingAlgorithm)
+0040     <span class="comment">% Track and save fibers using mrtrix</span>
+0041     [status, results, fg, pathstr] = mrtrix_track(files, files.brainmask, files.wm, <a href="#_sub1" class="code" title="subfunction algo = switchAlgo(algo)">switchAlgo</a>(trackingAlgorithm{ii}), nSeeds, runInBackground, verbose);
+0042   <span class="keyword">end</span>
+0043 <span class="keyword">end</span>
+0044 
+0045 <span class="keyword">return</span>
+0046 
+0047 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0048 <span class="comment">% Choose algorithm. %</span>
+0049 <span class="comment">%%%%%%%%%%%%%%%%%%%%%</span>
+0050 <a name="_sub1" href="#_subfunctions" class="code">function algo = switchAlgo(algo)</a>
+0051 <span class="comment">% Gets the algorithm type for tracktography.</span>
+0052 <span class="comment">%</span>
+0053 <span class="comment">% Tracking algorithm:</span>
+0054 <span class="comment">%</span>
+0055 <span class="comment">% 1=prob, 2=stream, 3=tensor.</span>
+0056 <span class="comment">%</span>
+0057 <span class="comment">%</span>
+0058 <span class="comment">% Copyright Franco Pestilli (2013) Vistasoft Stanford University.</span>
+0059 <span class="keyword">if</span> isnumeric(algo) <span class="comment">% from index to string</span>
+0060   <span class="keyword">switch</span> algo
+0061     <span class="keyword">case</span> {1}
+0062       algo = <span class="string">'prob'</span>;
+0063     <span class="keyword">case</span> {2}
+0064       algo = <span class="string">'stream'</span>;
+0065     <span class="keyword">case</span> {3}
+0066       algo = <span class="string">'tensor'</span>;
+0067     <span class="keyword">otherwise</span>
+0068       keyboard
+0069   <span class="keyword">end</span>
+0070   
+0071 <span class="keyword">elseif</span> ischar(algo)
+0072   <span class="keyword">switch</span> algo
+0073      <span class="keyword">case</span> {<span class="string">'prob'</span>,<span class="string">'probabilistic'</span>,<span class="string">'mrtrix probabilistic'</span>}
+0074       algo = <span class="string">'prob'</span>;
+0075     <span class="keyword">case</span> {<span class="string">'stream'</span>,<span class="string">'streamline'</span>,<span class="string">'deterministic'</span>, <span class="string">'mrtrix deterministic'</span>}
+0076       algo = <span class="string">'stream'</span>;
+0077     <span class="keyword">case</span> {<span class="string">'tensor'</span>,<span class="string">'tensor based'</span>,<span class="string">'mrtrix tensor based tractography'</span>}
+0078       algo = <span class="string">'tensor'</span>;
+0079     <span class="keyword">otherwise</span>
+0080       keyboard
+0081   <span class="keyword">end</span>
+0082   
+0083 <span class="keyword">else</span>
+0084   keyboard
+0085 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

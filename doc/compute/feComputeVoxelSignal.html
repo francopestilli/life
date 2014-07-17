@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feComputeVoxelSignal</title>
+  <meta name="keywords" content="feComputeVoxelSignal">
+  <meta name="description" content="Predict the signal in a single voxel given the fiber going through the">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">compute</a> &gt; feComputeVoxelSignal.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for compute&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feComputeVoxelSignal
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Predict the signal in a single voxel given the fiber going through the</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function voxDSig = feComputeVoxelSignal(fe,voxIndex) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Predict the signal in a single voxel given the fiber going through the
+ voxel.
+
+   voxDSig = feComputeVoxelSignal(fe,voxelIndex)
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feComputeSignal.html" class="code" title="function S = feComputeSignal(S0, bvecs, bvals, Q)">feComputeSignal</a>	Compute expected diffusion signal from tensor</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function voxDSig = feComputeVoxelSignal(fe,voxIndex)</a>
+0002 <span class="comment">% Predict the signal in a single voxel given the fiber going through the</span>
+0003 <span class="comment">% voxel.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%   voxDSig = feComputeVoxelSignal(fe,voxelIndex)</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0008 
+0009 <span class="comment">% Extract information regarding, voxels, signal and fibers.</span>
+0010 S0                = feGet(fe,<span class="string">'b0signalimage'</span>,   voxIndex);  <span class="comment">% non diffusion-weighted signal</span>
+0011 bvecs             = feGet(fe,<span class="string">'bvecs'</span>);                      <span class="comment">% bvecs</span>
+0012 bvals             = feGet(fe,<span class="string">'bvals'</span>);                      <span class="comment">% bvals</span>
+0013 tot_fibers_num    = feGet(fe,<span class="string">'tot f num'</span>,       voxIndex);  <span class="comment">% number of total fibers in the voxel</span>
+0014 unique_fibers_num = feGet(fe,<span class="string">'unique f num'</span>,    voxIndex);  <span class="comment">% number of unique fibers in the voxel</span>
+0015 tot_fiber_index   = cell2mat(feGet(fe,<span class="string">'totf'</span>,   voxIndex)); <span class="comment">% indexes to the total fibers in the voxels</span>
+0016 unique_fiber_index= cell2mat(feGet(fe,<span class="string">'uniquef'</span>,voxIndex)); <span class="comment">% indexes to the unique fibers in the voxels</span>
+0017 voxTensors        = feGet(fe,<span class="string">'voxeltensors'</span>,    voxIndex);  <span class="comment">% Get the tensors for each node in each fiber</span>
+0018                                                             <span class="comment">% going through this voxel</span>
+0019 
+0020 <span class="comment">% Compute the predicted signal by each tensors of each node in this voxel.</span>
+0021 voxDSig = <a href="feComputeSignal.html" class="code" title="function S = feComputeSignal(S0, bvecs, bvals, Q)">feComputeSignal</a>(S0, bvecs, bvals, voxTensors);
+0022 
+0023 <span class="comment">% Combine the diffusion predictions across nodes of a single fiber.</span>
+0024 <span class="comment">% Use only the prediction from the unique fibers, not from all the fibers.</span>
+0025 <span class="keyword">if</span> tot_fibers_num ~= unique_fibers_num
+0026   combineM = zeros(tot_fibers_num, unique_fibers_num);
+0027   
+0028   <span class="comment">% The matrix combineM is a set of 0s and 1s that will sum together the</span>
+0029   <span class="comment">% nodes from a single fiber.</span>
+0030   <span class="keyword">for</span> ii=1:unique_fibers_num
+0031     combineM(:,ii) = ( tot_fiber_index == unique_fiber_index(ii) );
+0032   <span class="keyword">end</span>
+0033   
+0034   <span class="comment">% The matrix for this voxel starts with each node, and when we multiply</span>
+0035   <span class="comment">% by combineM. The resulting matrix represents each fiber</span>
+0036   <span class="comment">% (not each node) as a column</span>
+0037   voxDSig = voxDSig*combineM;
+0038 <span class="keyword">end</span>
+0039 
+0040 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

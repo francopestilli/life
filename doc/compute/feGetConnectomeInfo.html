@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feGetConnectomeInfo</title>
+  <meta name="keywords" content="feGetConnectomeInfo">
+  <meta name="description" content="Find the unique fibers in a connectome.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">compute</a> &gt; feGetConnectomeInfo.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for compute&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feGetConnectomeInfo
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Find the unique fibers in a connectome.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function fe = feGetConnectomeInfo(fe) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Find the unique fibers in a connectome.
+ 
+   unique_fibers_index = feGetConnectomeInfo(fe)
+
+ We identify the fibers that have identical trajectories (that pass
+ through exactly the same voxels) within the ROI. These are stored in the
+ fe slot 'unique index'.
+
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function fe = feGetConnectomeInfo(fe)</a>
+0002 <span class="comment">% Find the unique fibers in a connectome.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%   unique_fibers_index = feGetConnectomeInfo(fe)</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% We identify the fibers that have identical trajectories (that pass</span>
+0007 <span class="comment">% through exactly the same voxels) within the ROI. These are stored in the</span>
+0008 <span class="comment">% fe slot 'unique index'.</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0012 
+0013 <span class="comment">% Get the indexes to the voxels actually used to build LifE.</span>
+0014 <span class="comment">% Remember that voxels with no fibers are disregarded during the build.</span>
+0015 usedVoxels = feGet(fe,<span class="string">'usedVoxels'</span>);
+0016 nVoxels    = length(usedVoxels);
+0017 
+0018 <span class="comment">% preallocate memory for speed.</span>
+0019 f                  = cell( nVoxels,1); <span class="comment">% This will contain all the fibers in each voxel</span>
+0020 unique_fibers_index= cell( nVoxels,1); <span class="comment">% This will contain the *unique* fibers in each voxel</span>
+0021 unique_fibers_num  = zeros(nVoxels,1); <span class="comment">% This will contain the number of unique fibers in each voxel</span>
+0022 
+0023 <span class="comment">% Get the fibers and unique fibers from voxel2FNpairs, in each voxel:</span>
+0024 parfor vv = 1:nVoxels
+0025   <span class="comment">% This is the index of the voxel used, it is used to address voxel2FNpair</span>
+0026   voxIndex = usedVoxels(vv);
+0027   
+0028   <span class="comment">% Indexes to the fibers in the current voxel</span>
+0029   f{vv} = fe.life.voxel2FNpair{voxIndex}(:,1);
+0030   
+0031   <span class="comment">% Reduce to the unique fibers:</span>
+0032   unique_fibers_index{vv} = sort(unique(f{vv}));
+0033   unique_fibers_num(vv)   = length(unique_fibers_index{vv});
+0034 <span class="keyword">end</span>
+0035 
+0036 tot_fibers_num = cellfun(@length,f);
+0037 
+0038 <span class="comment">% Set them in the fe structure:</span>
+0039 <span class="comment">% Indexes to the unique fibers going through each voxel</span>
+0040 fe = feSet(fe,<span class="string">'index to unique fibers in each voxel'</span>,  unique_fibers_index);
+0041 <span class="comment">% Number of unique fibers going through each voxel</span>
+0042 fe = feSet(fe,<span class="string">'number of unique fibers in each voxel'</span>, unique_fibers_num);
+0043 
+0044 <span class="comment">% Number of total fibers going trhough each voxel</span>
+0045 fe = feSet(fe,<span class="string">'number of total fibers in each voxel'</span>,  tot_fibers_num);
+0046 <span class="comment">% Indexes to the total fibers going through each voxel</span>
+0047 fe = feSet(fe,<span class="string">'index of total fibers in each voxel'</span>,   f);
+0048 
+0049 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

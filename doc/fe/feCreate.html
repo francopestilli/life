@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feCreate</title>
+  <meta name="keywords" content="feCreate">
+  <meta name="description" content="Create a linear fascicle evaluation structure">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">fe</a> &gt; feCreate.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for fe&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feCreate
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Create a linear fascicle evaluation structure</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function fe = feCreate </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Create a linear fascicle evaluation structure
+
+  fe = feCreate
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feConnectomeInit.html" class="code" title="function fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepeated,anatomyFile,varargin)">feConnectomeInit</a>	Initialize a new connectome (fe) structure.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function fe = feCreate</a>
+0002 <span class="comment">% Create a linear fascicle evaluation structure</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  fe = feCreate</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0007 
+0008 <span class="comment">% Book-keeping</span>
+0009 fe.name  = <span class="string">'default'</span>; <span class="comment">% This one's name</span>
+0010 fe.type  = <span class="string">'faseval'</span>; <span class="comment">% Always fascicle evaluation</span>
+0011 
+0012 <span class="comment">% Overview</span>
+0013 fe.life    = [];  <span class="comment">% Structure of parameters and results from LIFE analysis</span>
+0014 fe.fg      = [];  <span class="comment">% Fiber group candidate fascicles, uses fgSet/Get</span>
+0015 fe.roi     = [];  <span class="comment">% Cell array of regions of interest where we evaluate</span>
+0016 
+0017 <span class="comment">% Path to files</span>
+0018 fe.path.dwifile = [];  <span class="comment">% Diffusion weighted file used for testing results</span>
+0019 fe.path.dtfile  = [];  <span class="comment">% Diffusion weighted file used for testing results</span>
+0020 fe.path.savedir = [];  <span class="comment">% Top directory under which all files will be saved</span>
+0021 fe.path.anatomy = [];  <span class="comment">% 3D high-resolution anatomical file</span>
+0022 fe.path.dwifilerep = [];  <span class="comment">% File used for cross-validating the results.</span>
+0023                           <span class="comment">% A secodn measuremnt ideally acquried in the</span>
+0024                           <span class="comment">% same session witht the same scanning</span>
+0025                           <span class="comment">% parameters.</span>
+0026 
+0027 <span class="comment">% Life Algorithm parameters</span>
+0028 fe.life.Mfiber       = []; <span class="comment">% Fiber portion of A matrix</span>
+0029 fe.life.voxel2FNpair = []; <span class="comment">% Voxels to fiber/node pair, fefgGet(fg,'voxel 2 fiber node pair')</span>
+0030 fe.life.dSig         = []; <span class="comment">% Signal of fibers alone (demeaned).</span>
+0031 fe.life.Mfiber       = [];
+0032 fe.life.voxel2FNpair = {};
+0033 fe.life.dSig         = [];
+0034 fe.life.xform        = [];
+0035 fe.life.fibers       = [];
+0036 fe.life.diffusion_signal_img = [];
+0037 fe.life.diffusion_S0_img     = [];
+0038 fe.life.bvecs                = [];
+0039 fe.life.bvals                = [];
+0040 fe.life.bvecsindices         = [];
+0041 fe.life.imagedim             = [];
+0042 fe.life.xform          = [];  <span class="comment">% Transforms between coords for fg, roi, and dwi data</span>
+0043 fe.life.xform.img2acpc = [];
+0044 fe.life.xform.acpc2img = [];
+0045 
+0046 <span class="comment">% Repetition file for cross-validation</span>
+0047 fe.rep = [];
+0048 
+0049 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

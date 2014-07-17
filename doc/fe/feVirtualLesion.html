@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feVirtualLesion</title>
+  <meta name="keywords" content="feVirtualLesion">
+  <meta name="description" content="Perform a virtual lesion.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">fe</a> &gt; feVirtualLesion.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for fe&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feVirtualLesion
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Perform a virtual lesion.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [se, fig,  feLesion,  feNoLesion, newFascicleIndices, indicesFibersKept, commonCoords] =feVirtualLesion(feNoLesion, fascicleIndices, display, refitConnectome) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Perform a virtual lesion.
+ - Remove a set of fascicles from a whole-brain connectome
+ - Find the fascicle's path-neighborhood (the set of fascicles that share the same voxels)
+ - Reduce the connectome to only the voxels of the set of fascicels that
+   we are lesioning. These are the voxels that contain the signal and the
+   error useful for the lesion test.
+ - Compute a series of statistics on the lesioned connectome.
+
+ 
+ [se, fh,  feLesion,  feNoLesion, newFascicleIndices, indicesFibersKept, commonCoords] = ...
+           feVirtualLesion(feNoLesion, fascicleIndices, refitConnectome, display)
+
+ 
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feConnectomeReduceFibers.html" class="code" title="function [fe, removedFibers] = feConnectomeReduceFibers(fe, fibersToKeep)">feConnectomeReduceFibers</a>	Deletes a set of fibers from the signal and the M matrix.</li><li><a href="feConnectomeReduceVoxels.html" class="code" title="function [fe, indicesFibersKept] = feConnectomeReduceVoxels(fe,voxelsToKeep)">feConnectomeReduceVoxels</a>	Select the voxels to keep (extract) in a connectome matrix</li><li><a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>	Get function for fascicle evaluation structure</li><li><a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>	Get function for fascicle evaluation structure, to use for a repeated</li><li><a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>	Set fascicle evaluation parameters.</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [se, fig,  feLesion,  feNoLesion, newFascicleIndices, indicesFibersKept, commonCoords] = </a><span class="keyword">...</span>
+0002           feVirtualLesion(feNoLesion, fascicleIndices, display, refitConnectome)
+0003 <span class="comment">% Perform a virtual lesion.</span>
+0004 <span class="comment">% - Remove a set of fascicles from a whole-brain connectome</span>
+0005 <span class="comment">% - Find the fascicle's path-neighborhood (the set of fascicles that share the same voxels)</span>
+0006 <span class="comment">% - Reduce the connectome to only the voxels of the set of fascicels that</span>
+0007 <span class="comment">%   we are lesioning. These are the voxels that contain the signal and the</span>
+0008 <span class="comment">%   error useful for the lesion test.</span>
+0009 <span class="comment">% - Compute a series of statistics on the lesioned connectome.</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% [se, fh,  feLesion,  feNoLesion, newFascicleIndices, indicesFibersKept, commonCoords] = ...</span>
+0013 <span class="comment">%           feVirtualLesion(feNoLesion, fascicleIndices, refitConnectome, display)</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0017 
+0018 <span class="keyword">if</span> notDefined(<span class="string">'display'</span>),   
+0019     display.tract = 0;
+0020     display.distributions = 0; 
+0021     display.evidence = 0; 
+0022     fig = []; 
+0023 <span class="keyword">end</span>
+0024 <span class="keyword">if</span> notDefined(<span class="string">'refitConnectome'</span>), refitConnectome = 0;<span class="keyword">end</span>
+0025 
+0026 feOpenLocalCluster
+0027 tic,fprintf(<span class="string">'\n[%s] Performing the lesion (removing fascicles from the connectome)... '</span>,mfilename)
+0028 <span class="keyword">if</span> ~islogical( fascicleIndices )
+0029     nfibers = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(feNoLesion,<span class="string">'nfibers'</span>);
+0030     fascicles2keep = false(nfibers,1);
+0031     fascicles2keep(fascicleIndices) = true;
+0032 <span class="keyword">else</span>
+0033     fascicles2keep = fascicleIndices;
+0034 <span class="keyword">end</span>
+0035 feLesion = <a href="feConnectomeReduceFibers.html" class="code" title="function [fe, removedFibers] = feConnectomeReduceFibers(fe, fibersToKeep)">feConnectomeReduceFibers</a>(feNoLesion, fascicles2keep );toc
+0036 
+0037 <span class="comment">% Extract the fascicle out of the fiber group.</span>
+0038 fas = fgExtract(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(feNoLesion,<span class="string">'fibers img'</span>), fascicleIndices, <span class="string">'keep'</span> );
+0039 fasAcpc = fgExtract(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(feNoLesion,<span class="string">'fibers acpc'</span>), fascicleIndices, <span class="string">'keep'</span> );
+0040 
+0041 <span class="comment">% Get the cordinates of the fascicle we just deleted. These coordinates are</span>
+0042 <span class="comment">% contained in the full connectome. We want to fin the indices in the M</span>
+0043 <span class="comment">% matrix to the the voxels of the fascicle and keep only those voxels.</span>
+0044 tic, fprintf(<span class="string">'\n[%s] Finding the voxels of fascicle... '</span>,mfilename)
+0045 fasCoords    = fefgGet(fas,<span class="string">'unique image coords'</span>);
+0046 allCoords    = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(feNoLesion,   <span class="string">'roi coords'</span>);
+0047 commonCoords = ismember(allCoords, fasCoords,  <span class="string">'rows'</span>); toc
+0048 
+0049 <span class="comment">% Now: commonCoords contains the indices of the voxels to keep from feLesion,</span>
+0050 <span class="comment">% these voxels are part of the connectome feNoLesion. So now we want to delete all</span>
+0051 <span class="comment">% the rest of the voxels from feLesion and keep only the voxels where</span>
+0052 <span class="comment">% the fascicle in feFP goes through.</span>
+0053 <span class="comment">%</span>
+0054 <span class="comment">% At the same time we keep all the fibers in the connectome that still pass</span>
+0055 <span class="comment">% throught the left voxels in the ROI. We will use this subset of voxels</span>
+0056 <span class="comment">% and fibers to test the quality of fit of the connectome at the location</span>
+0057 <span class="comment">% where the feFN fascicle went through.</span>
+0058 tic,fprintf(<span class="string">'\n[%s] Creating a lesioned connectome... '</span>,mfilename)
+0059 feLesion = <a href="feConnectomeReduceVoxels.html" class="code" title="function [fe, indicesFibersKept] = feConnectomeReduceVoxels(fe,voxelsToKeep)">feConnectomeReduceVoxels</a>(feLesion,find(commonCoords));
+0060 toc
+0061 
+0062 tic,fprintf(<span class="string">'\n[%s] Creating an unleasioned path-neighborhood connectome... '</span>,mfilename)
+0063 [feNoLesion, indicesFibersKept]    = <a href="feConnectomeReduceVoxels.html" class="code" title="function [fe, indicesFibersKept] = feConnectomeReduceVoxels(fe,voxelsToKeep)">feConnectomeReduceVoxels</a>(feNoLesion, find(commonCoords));
+0064 toc
+0065 
+0066 tic,fprintf(<span class="string">'\n[%s] Finding the pathneighborhood voxels... '</span>,mfilename)
+0067 <span class="comment">% Here we return the indices of the fascicle in the newly resized connectome.</span>
+0068 newFascicleIndices = ismember(find(indicesFibersKept),<span class="keyword">...</span>
+0069                               find(fascicleIndices),<span class="string">'rows'</span>);
+0070 toc
+0071 
+0072 <span class="comment">% Fit the connectomes unlesioned the leftover fibers.</span>
+0073 <span class="keyword">if</span> refitConnectome
+0074     <span class="comment">% Refit and install the fit.</span>
+0075     tic, fprintf(<span class="string">'\n[%s] Fitting connectome lesioned the fascicle... '</span>,mfilename)
+0076     feLesion = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(feLesion,<span class="string">'fit'</span>, <span class="keyword">...</span>
+0077         feFitModel(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(feLesion,<span class="string">'Mfiber'</span>),<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(feLesion,<span class="string">'dsigdemeaned'</span>), <span class="keyword">...</span>
+0078         <span class="string">'bbnnls'</span>));toc
+0079     
+0080     tic, fprintf(<span class="string">'\n[%s] Fitting connectome unlesioned the fascicle... '</span>,mfilename)
+0081     feNoLesion    = <a href="feSet.html" class="code" title="function fe = feSet(fe,param,val,varargin)">feSet</a>(feNoLesion,   <span class="string">'fit'</span>, <span class="keyword">...</span>
+0082         feFitModel(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(feNoLesion,<span class="string">'Mfiber'</span>),   <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(feNoLesion,<span class="string">'dsigdemeaned'</span>), <span class="keyword">...</span>
+0083         <span class="string">'bbnnls'</span>));toc
+0084 <span class="keyword">end</span>
+0085 se = feComputeEvidence((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(feNoLesion,<span class="string">'vox  rmse'</span>)),(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(feLesion, <span class="string">'vox  rmse'</span>)));
+0086    
+0087 fig(1).name = sprintf(<span class="string">'rmse_distributions_%s'</span>,mfilename);
+0088 fig(1).h   = nan;
+0089 fig(1).type = <span class="string">'eps'</span>;
+0090 <span class="keyword">if</span> display.distributions
+0091     <span class="comment">% Raw RMSE distirbutions</span>
+0092     fig(1).name = sprintf(<span class="string">'rmse_distributions_%s'</span>,mfilename);
+0093     fig(1).h   = figure(<span class="string">'name'</span>,fig(1).name,<span class="string">'color'</span>,<span class="string">'w'</span>);
+0094     fig(1).type = <span class="string">'eps'</span>;
+0095     set(fig(1).h,<span class="string">'Units'</span>,<span class="string">'normalized'</span>,<span class="string">'Position'</span>,[0.007 0.55  0.28 0.36]);
+0096     plot(se.lesion.xhist,se.lesion.hist,<span class="string">'-'</span>,<span class="string">'color'</span>, [.95 .45 .1],<span class="string">'linewidth'</span>,2); hold on
+0097     plot(se.nolesion.xhist,se.nolesion.hist,<span class="string">'-'</span>,<span class="string">'linewidth'</span>,2, <span class="string">'color'</span>, [.1 .45 .95])
+0098     plot([se.nolesion.rmse.mean,se.nolesion.rmse.mean], [0,0.12],<span class="string">'-'</span>,<span class="string">'color'</span>,[.1 .45 .95] ) 
+0099     plot([se.lesion.rmse.mean,se.lesion.rmse.mean], [0,0.12], <span class="string">'-'</span>, <span class="string">'color'</span>,[.95 .45 .1])
+0100     title(sprintf(<span class="string">'mean RMSE\nno-lesion %2.3f | lesion %2.2f'</span>,se.nolesion.rmse.mean,se.lesion.rmse.mean),<span class="string">'fontsize'</span>,16)
+0101     ylabel(<span class="string">'Probability'</span>, <span class="string">'fontsize'</span>,14);xlabel(<span class="string">'RMSE'</span>, <span class="string">'fontsize'</span>,14)
+0102     legend({<span class="string">'Lesion'</span>,<span class="string">'No lesion'</span>},<span class="string">'fontsize'</span>,14);
+0103     set(gca,<span class="string">'box'</span>,<span class="string">'off'</span>,<span class="string">'xtick'</span>,[0 round(se.xrange(2)/2) se.xrange(2)],<span class="string">'ytick'</span>,[0 .06 .12],<span class="string">'xlim'</span>,[0 se.xrange(2)],<span class="string">'ylim'</span>,[0 .125], <span class="keyword">...</span>
+0104         <span class="string">'tickdir'</span>, <span class="string">'out'</span>, <span class="string">'ticklength'</span>, [0.025 0])
+0105 
+0106     <span class="comment">% Plot the null distribution and the empirical difference</span>
+0107     <span class="comment">% We reorganize the variables names hee below just to keep the plotting</span>
+0108     <span class="comment">% code more compact.</span>
+0109     ywo_e = se.s.lesioned_e;
+0110     y_e   = se.s.unlesioned_e;
+0111     woxhis = se.s.lesioned.xbins;
+0112     xhis   = se.s.unlesioned.xbins;
+0113     min_x = se.s.min_x;
+0114     max_x = se.s.max_x; 
+0115     fig(2).name = sprintf(<span class="string">'virtual_lesion_test_mean_rmse_hist_%s_%s'</span>,mfilename,feLesion.name);
+0116     fig(2).h   = figure(<span class="string">'name'</span>,fig(2).name,<span class="string">'color'</span>,<span class="string">'w'</span>);  
+0117     fig(2).type = <span class="string">'eps'</span>;
+0118     set(fig(2).h,<span class="string">'Units'</span>,<span class="string">'normalized'</span>,<span class="string">'Position'</span>,[0.007 0.55  0.28 0.36]);
+0119     patch([xhis,xhis],y_e(:),[.1 .45 .95],<span class="string">'FaceColor'</span>,[.1 .45 .95],<span class="string">'EdgeColor'</span>,[.1 .45 .95]);
+0120     hold on
+0121     patch([woxhis,woxhis],ywo_e(:),[.95 .45 .1],<span class="string">'FaceColor'</span>,[.95 .45 .1],<span class="string">'EdgeColor'</span>,[.95 .45 .1]);
+0122     set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>, <span class="keyword">...</span>
+0123         <span class="string">'box'</span>,<span class="string">'off'</span>, <span class="keyword">...</span>
+0124         <span class="string">'ylim'</span>,[0 0.25], <span class="keyword">...</span>
+0125         <span class="string">'xlim'</span>,[min_x,max_x], <span class="keyword">...</span>
+0126         <span class="string">'ytick'</span>,[0 0.1 0.2], <span class="keyword">...</span>
+0127         <span class="string">'xtick'</span>,round(linspace(min_x,max_x,4)), <span class="keyword">...</span>
+0128         <span class="string">'fontsize'</span>,16)
+0129     ylabel(<span class="string">'Probability'</span>,<span class="string">'fontsize'</span>,16)
+0130     xlabel(<span class="string">'rmse'</span>,<span class="string">'fontsize'</span>,16')
+0131     title(sprintf(<span class="string">'Strength of connection evidence %2.3f'</span>,(se.s.mean)), <span class="string">'FontSize'</span>,16)
+0132 <span class="keyword">end</span>
+0133 
+0134 fig(3).name = sprintf(<span class="string">'tract_%s'</span>,mfilename);
+0135 fig(3).h   = nan;
+0136 fig(3).type = <span class="string">'jpg'</span>;
+0137 fig(4).name = sprintf(<span class="string">'pathneighborhood_%s'</span>,mfilename);
+0138 fig(4).h   = nan;
+0139 fig(4).type = <span class="string">'jpg'</span>;
+0140 fig(5).name = sprintf(<span class="string">'pathneighborhood_AND_tract_%s'</span>,mfilename);
+0141 fig(5).h   = nan;
+0142 fig(5).type = <span class="string">'jpg'</span>;
+0143 <span class="keyword">if</span> display.tract
+0144     <span class="comment">% Now display the lesion performed.</span>
+0145     <span class="comment">% (1) The fascicle to delete.</span>
+0146     fig(3).name = sprintf(<span class="string">'tract_%s'</span>,mfilename);
+0147     fig(3).h   = figure(<span class="string">'name'</span>,fig(3).name,<span class="string">'color'</span>,[.1 .45 .95]); 
+0148     fig(3).type = <span class="string">'jpg'</span>;
+0149     [fig(3).h, fig(3).light] =  mbaDisplayConnectome(mbaFiberSplitLoops(fasAcpc.fibers),fig(3).h, [.1 .45 .95],<span class="string">'single'</span>,[],[],.2);
+0150     view(-23,-23);delete(fig(3).light); fig(3).light = camlight(<span class="string">'right'</span>);
+0151         
+0152     tmp_fas = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(feNoLesion,<span class="string">'fibers acpc'</span>);
+0153     fibers2display = randsample(1:length(tmp_fas.fibers),ceil(0.01*length(tmp_fas.fibers)));
+0154     fig(4).name = sprintf(<span class="string">'pathneighborhood_%s'</span>,mfilename);
+0155     fig(4).h   = figure(<span class="string">'name'</span>,fig(4).name,<span class="string">'color'</span>,[.1 .45 .95]);     
+0156     fig(4).type = <span class="string">'jpg'</span>;
+0157     [fig(4).h, fig(4).light] =  mbaDisplayConnectome(mbaFiberSplitLoops(<span class="keyword">...</span>
+0158         tmp_fas.fibers(fibers2display)),fig(4).h, [.95 .45 .1],<span class="string">'single'</span>,[],.6,.2);
+0159     view(-23,-23);delete(fig(2).light); fig(4).light = camlight(<span class="string">'right'</span>);
+0160 
+0161     <span class="comment">% (2) The facicle with the pah neighborhood</span>
+0162     fig(5).name = sprintf(<span class="string">'pathneighborhood_AND_tract_%s'</span>,mfilename);
+0163     fig(5).h   = figure(<span class="string">'name'</span>,fig(5).name,<span class="string">'color'</span>,[.1 .45 .95]);
+0164     fig(5).type = <span class="string">'jpg'</span>;
+0165     [fig(5).h, fig(5).light] =  mbaDisplayConnectome(mbaFiberSplitLoops(fasAcpc.fibers),fig(5).h, [.1 .45 .95],<span class="string">'single'</span>,[],[],.2);
+0166     view(-23,-23);delete(fig(5).light);
+0167     hold on
+0168     [fig(5).h, fig(5).light] =  mbaDisplayConnectome(mbaFiberSplitLoops(<span class="keyword">...</span>
+0169         tmp_fas.fibers(fibers2display)),fig(5).h, [.95 .45 .1],<span class="string">'single'</span>,[],.6,.2);
+0170     view(-23,-23);delete(fig(5).light); fig(5).light = camlight(<span class="string">'right'</span>);
+0171  
+0172     <span class="comment">% Show the voxels coordinates to see if we are in the right spot</span>
+0173     plot_test_fiber_location_debug= false;
+0174     <span class="keyword">if</span> plot_test_fiber_location_debug
+0175         figure(<span class="string">'name'</span>,<span class="string">'Coordinate check'</span>);
+0176         plot3(allCoords(commonCoords,1),allCoords(commonCoords,2), <span class="keyword">...</span>
+0177             allCoords(commonCoords,3),<span class="string">'ko'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'k'</span>,<span class="string">'MarkerSize'</span>,8);
+0178         hold on;
+0179         plot3(fasCoords(:,1),fasCoords(:,2),fasCoords(:,3),<span class="string">'ro'</span>, <span class="keyword">...</span>
+0180             <span class="string">'MarkerFaceColor'</span>,[.95 .45 .1],<span class="string">'MarkerSize'</span>,3);
+0181         axis equal
+0182         view(-23,-23); hold on
+0183         plot3(allCoords(commonCoords,1),allCoords(commonCoords,2), <span class="keyword">...</span>
+0184             allCoords(commonCoords,3),<span class="string">'go'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'g'</span>,<span class="string">'MarkerSize'</span>,12);
+0185         view(-23,-23);
+0186     <span class="keyword">end</span>
+0187 <span class="keyword">end</span>
+0188 
+0189 <span class="comment">% RMSE distributions</span>
+0190 fig(6).name = sprintf(<span class="string">'Size_of_effect_of_the_lesion_%s'</span>,mfilename);
+0191 fig(6).type = <span class="string">'eps'</span>;   
+0192 fig(6).h   = nan;
+0193 <span class="keyword">if</span> display.evidence
+0194     fig(6).name = sprintf(<span class="string">'Size_of_effect_of_the_lesion_%s'</span>,mfilename);
+0195     fig(6).h   = figure(<span class="string">'name'</span>,fig(6).name,<span class="string">'color'</span>,<span class="string">'w'</span>);
+0196     set(fig(6).h,<span class="string">'Units'</span>,<span class="string">'normalized'</span>,<span class="string">'Position'</span>,[0.007 0.55  0.28 0.36]);
+0197     subplot(1,4,1)
+0198     plot(1,se.s.mean,<span class="string">'-o'</span>,<span class="string">'color'</span>, [.95 .45 .1],<span class="string">'linewidth'</span>,2); hold on
+0199     plot([1,1], [se.s.mean,se.s.mean] + [-se.s.std,se.s.std], <span class="string">'-'</span>,<span class="string">'color'</span>,[.95 .45 .1] )
+0200     ylabel(<span class="string">'S (s.d.)'</span>, <span class="string">'fontsize'</span>,14);
+0201     set(gca,<span class="string">'box'</span>,<span class="string">'off'</span>,<span class="string">'xlim'</span>,[0 2], <span class="string">'ylim'</span>,[0 ceil(se.s.mean + se.s.std)], <span class="keyword">...</span>
+0202         <span class="string">'tickdir'</span>, <span class="string">'out'</span>, <span class="string">'ticklength'</span>, [0.025 0])
+0203     subplot(1,4,2)
+0204     plot(1,se.em.mean,<span class="string">'-o'</span>,<span class="string">'color'</span>, [.95 .45 .1],<span class="string">'linewidth'</span>,2); hold on
+0205     ylabel(<span class="string">'Earth mover''s distance (raw scanner units)'</span>, <span class="string">'fontsize'</span>,14);
+0206     set(gca,<span class="string">'box'</span>,<span class="string">'off'</span>,<span class="string">'xlim'</span>,[0 2], <span class="string">'ylim'</span>,[0 ceil(se.em.mean)], <span class="keyword">...</span>
+0207         <span class="string">'tickdir'</span>, <span class="string">'out'</span>, <span class="string">'ticklength'</span>, [0.025 0])
+0208     subplot(1,4,3)
+0209     plot(1,se.kl.mean,<span class="string">'-o'</span>,<span class="string">'color'</span>, [.95 .45 .1],<span class="string">'linewidth'</span>,2); hold on
+0210     ylabel(<span class="string">'K-L divergence (bits)'</span>, <span class="string">'fontsize'</span>,14);
+0211     set(gca,<span class="string">'box'</span>,<span class="string">'off'</span>,<span class="string">'xlim'</span>,[0 2], <span class="string">'ylim'</span>,[0 ceil(se.kl.mean)], <span class="keyword">...</span>
+0212         <span class="string">'tickdir'</span>, <span class="string">'out'</span>, <span class="string">'ticklength'</span>, [0.025 0])
+0213     subplot(1,4,4)
+0214     plot(1,se.j.mean,<span class="string">'-o'</span>,<span class="string">'color'</span>, [.95 .45 .1],<span class="string">'linewidth'</span>,2); hold on
+0215     ylabel(<span class="string">'Jeffrey''s divergence (bits)'</span>, <span class="string">'fontsize'</span>,14);
+0216     set(gca,<span class="string">'box'</span>,<span class="string">'off'</span>,<span class="string">'xlim'</span>,[0 2], <span class="string">'ylim'</span>,[0 ceil(se.j.mean)], <span class="keyword">...</span>
+0217         <span class="string">'tickdir'</span>, <span class="string">'out'</span>, <span class="string">'ticklength'</span>, [0.025 0])
+0218 <span class="keyword">end</span>
+0219 
+0220 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

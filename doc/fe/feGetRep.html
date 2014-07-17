@@ -1,0 +1,1111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of feGetRep</title>
+  <meta name="keywords" content="feGetRep">
+  <meta name="description" content="Get function for fascicle evaluation structure, to use for a repeated">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">fe</a> &gt; feGetRep.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for fe&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>feGetRep
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>Get function for fascicle evaluation structure, to use for a repeated</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function val = feGetRep(fe,param,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> Get function for fascicle evaluation structure, to use for a repeated
+ measure calculation. 
+
+ This function is similar to feGet but uses the repeted dataset to compute
+ the DWI signal and all the calculations that depend on the DWI signal
+ will be different.
+
+ Importantly, this function will use calls to feGet every time we compute
+ values that depend on the LiFE model or fit.
+
+ This function allows for computing measures of:
+ (1) data reliability and 
+ (2) model versus data reliability
+
+   val = feGetRep(fe,param,varargin)
+
+ INPUTS: 
+  Coords    - Nx3 set of coordinates in image space
+  voxelIndices - Vector of 1's and 0's, there is a one for each
+              location the the connectome coordinates for which there is
+              a match in the coords
+
+
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
+
+---------- List of arguments ----
+ Name of the current fe structure.
+ name = feGetRep(fe,'name')
+----------
+ The type of objes (always, fascicle evaluation)
+ type = feGetRep(fe,'type')
+----------
+ Load the repeated-measure diffusion weighted data.
+ dwi = feGetRep(fe,'dwirepeat') 
+----------
+ Load the repeated measure of the diffusion weighted data.
+ dwiFile = feGetRep(fe,'dwirepeatfile')
+----------
+ Directory where the LiFe structes are saved by defualt.
+ sdir = feGetRep(fe,'savedir');
+----------
+ Diffusion directions.
+ val = feGetRep(fe,'bvecs');
+----------
+ Indices to the diffusion directions in the DWi 4th Dimension.
+ val = feGetRep(fe,'bvecs indices');
+----------
+ Number of B0's
+ val = feGetRep(fe,'n bvals');
+----------
+ B0 Values.
+ bval = feGetRep(fe,'bvals')
+----------
+ Returns a nVoxels X nBvecs array of measured diffusion signal
+ val = feGetRep(fe,'dsiinvox');
+ val = feGetRep(fe,'dsiinvox',voxelsIndices);
+ val = feGetRep(fe,'dsiinvox',coords);
+----------
+ Returns a nVoxels X nBvecs array of demeaned diffusion signal
+ val =feGetRep(fe,'dsiinvoxdemeaned');
+ val =feGetRep(fe,'dsiinvoxdemeaned',voxelsIndices);
+ val =feGetRep(fe,'dsiinvoxdemeaned',coords);
+----------
+ Get the diffusion signal at 0 diffusion weighting (B0) for this voxel
+ val = feGetRep(fe,'b0signalimage');
+ val = feGetRep(fe,'b0signalimage',voxelIndex);
+ val = feGetRep(fe,'b0signalimage',coords);
+----------
+ Weights of the isotropic voxel signals, this is the mean signal in
+ each voxel.
+ val = feGetRep(fe,'iso weights');
+ val = feGetRep(fe,'iso weights'coords)
+ val = feGetRep(fe,'iso weights',voxelIndices)
+----------
+ Measured signal in VOI, this is the raw signal. not demeaned
+
+ dSig = feGetRep(fe,'dSig full')
+---------
+ Measured signal in VOI, demeaned, this is the signal used for the
+ fiber-portion of the M model.
+
+ dSig = feGetRep(fe,'dsigdemeaned');
+ dSig = feGetRep(fe,'dsigdemeaned',[1 10 100]);
+ dSig = feGetRep(fe,'dsigdemeaned',coords);
+---------
+ Get the demeaned signal for a subset of rows.
+ Useful for cross-validation.
+ dSig = feGetRep(fe,'dsigrowssubset',voxelsList);
+---------
+ Return the global R2 (fraction of variance explained) of the full life
+ model.
+ R2 = feGetRep(fe,'total r2');
+---------
+ Percent variance explained
+ R2 = feGetRep(fe,'explained variance')
+---------
+ Root mean squared error of the LiFE fit to the whole data
+ rmse = feGetRep(fe,'rmse')
+---------
+ Residual signal: (fiber prediction - measured_demeaned).
+ res = feGetRep(fe,'res sig fiber')
+---------
+ Residual signal: (full model prediction - measured signal).
+ res = feGetRep(fe,'res sig full');
+---------
+ Residual signal: (fiber model prediction - demeaned measured signal)
+ with added mean signal. Res is returned as a vector.
+ This is used to reconstruct an image (volume) to be used for the
+ refinement process.
+ res = feGetRep(fe,'fiber res sig with mean');
+ res = feGetRep(fe,'fiber res sig with mean',coords);
+ res = feGetRep(fe,'fiber res sig with mean',voxelIndices);
+---------
+ Residual signal fiber model prediction - demeaned measured signal
+ with added mean signal. Res is returned as an array (nBvecs x nVoxel).
+ This is used to reconstruct an image (volume) to be used for the
+ refinement process.
+ res = feGetRep(fe,'fiber res sig with mean voxel');
+ res = feGetRep(fe,'fiber res sig with mean voxel',coords);
+ res = feGetRep(fe,'fiber res sig with mean voxel',voxelIndices);
+---------
+ Return a column vector of the proportion of variance explained in
+ each voxel.
+ R2byVox = feGetRep(fe,'voxr2');
+ R2byVox = feGetRep(fe,'voxr2',coords);
+---------
+ Return a column vector of the proportion of variance explained in
+ each voxel. (Normalized to the squared mean diffusion signal in each voxel)
+ R2byVox = feGetRep(fe,'voxr2zero');
+ R2byVox = feGetRep(fe,'voxr2zero',coords);
+---------
+ Return the percent of varince explained in each voxel.
+ R2byVox = feGetRep(fe,'var exp by voxel');
+ R2byVox = feGetRep(fe,'var exp by voxel',coords);
+---------
+ Demeaned diffusion signal in each voxel.
+ dSigByVoxel = feGetRep(fe,'dsigdemeaned by Voxel');
+ dSigByVoxel = feGetRep(fe,'dsigdemeaned by Voxel',coords);
+ dSigByVoxel = feGetRep(fe,'dsigdemeaned by Voxel',vxIndex);
+---------
+ Full (measured) signal in each voxel.
+ dSigByVoxel = feGetRep(fe,'dSig full by Voxel');
+ dSigByVoxel = feGetRep(fe,'dSig full by Voxel',coords);
+ dSigByVoxel = feGetRep(fe,'dSig full by Voxel',vxIndex);
+---------
+ Predicted signal by the full model in a set of voxeles.
+ pSigByVoxel = feGetRep(fe, 'pSig full by voxel');
+ pSigByVoxel = feGetRep(fe, 'pSig full by voxel',coords);
+ pSigByVoxel = feGetRep(fe, 'pSig full by voxel',voxelIndex);
+---------
+ A volume of RMSE values.
+ RMSE = feGetRep(fe,'vox rmse')
+ RMSE = feGetRep(fe,'vox rmse',coords)
+ RMSE = feGetRep(fe,'vox rmse',vxIndex)
+---------
+ A volume of RMSE values with a subset of fibers' weights set to 0.
+ RMSE = feGetRep(fe,'vox rmse',fiberIndices)
+ RMSE = feGetRep(fe,'vox rmse',fiberIndices,coords)
+ RMSE = feGetRep(fe,'vox rmse',fiberIndices,voxelIndex)
+---------
+ Fibers' residual signal by voxel.
+ res = feGetRep(fe,'res sig fiber vox')
+ res = feGetRep(fe,'res sig fiber vox',coords)
+ res = feGetRep(fe,'res sig fiber vox',vxIndex)
+---------
+ Full (measured) residual signal by voxel.
+ res = feGetRep(fe,'res sig full vox')
+ res = feGetRep(fe,'res sig full vox',coords)
+ res = feGetRep(fe,'res sig full vox',vxIndex)
+---------
+ Fibers' residual signal by voxel with mean signal added (with added
+ isotropic component).
+ This is used to compute the residual signal for the refinement.
+ res = feGetRep(fe,'fiber res sig with mean vox')
+ res = feGetRep(fe,'fiber res sig with mean vox',coords)
+ res = feGetRep(fe,'fiber res sig with mean vox',vxIndex)
+---------
+ Residual signal full model prediction from a multi-voxel fit.
+ res = feGetRep(fe,'res sig full voxfit');
+ res = feGetRep(fe, 'res sig full voxfit',coords);
+ res = feGetRep(fe, 'res sig full voxfit',voxelIndex);
+---------
+ Dimensions of the DW volume.
+ dim = feGetRep(fe,'dims')
+---------
+ Dimensions of the maps of parameters and results.
+ dims = feGetRep(fe, 'mapsize')
+
+ End of feGetRep.m parameters, 
+ 
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>	Get function for fascicle evaluation structure</li><li><a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>	Get function for fascicle evaluation structure, to use for a repeated</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>	Get function for fascicle evaluation structure</li><li><a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>	Get function for fascicle evaluation structure, to use for a repeated</li><li><a href="feVirtualLesion.html" class="code" title="function [se, fig,  feLesion,  feNoLesion, newFascicleIndices, indicesFibersKept, commonCoords] =feVirtualLesion(feNoLesion, fascicleIndices, display, refitConnectome)">feVirtualLesion</a>	Perform a virtual lesion.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function val = feGetRep(fe,param,varargin)</a>
+0002 <span class="comment">% Get function for fascicle evaluation structure, to use for a repeated</span>
+0003 <span class="comment">% measure calculation.</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% This function is similar to feGet but uses the repeted dataset to compute</span>
+0006 <span class="comment">% the DWI signal and all the calculations that depend on the DWI signal</span>
+0007 <span class="comment">% will be different.</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% Importantly, this function will use calls to feGet every time we compute</span>
+0010 <span class="comment">% values that depend on the LiFE model or fit.</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% This function allows for computing measures of:</span>
+0013 <span class="comment">% (1) data reliability and</span>
+0014 <span class="comment">% (2) model versus data reliability</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%   val = feGetRep(fe,param,varargin)</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% INPUTS:</span>
+0019 <span class="comment">%  Coords    - Nx3 set of coordinates in image space</span>
+0020 <span class="comment">%  voxelIndices - Vector of 1's and 0's, there is a one for each</span>
+0021 <span class="comment">%              location the the connectome coordinates for which there is</span>
+0022 <span class="comment">%              a match in the coords</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%---------- List of arguments ----</span>
+0029 <span class="comment">% Name of the current fe structure.</span>
+0030 <span class="comment">% name = feGetRep(fe,'name')</span>
+0031 <span class="comment">%----------</span>
+0032 <span class="comment">% The type of objes (always, fascicle evaluation)</span>
+0033 <span class="comment">% type = feGetRep(fe,'type')</span>
+0034 <span class="comment">%----------</span>
+0035 <span class="comment">% Load the repeated-measure diffusion weighted data.</span>
+0036 <span class="comment">% dwi = feGetRep(fe,'dwirepeat')</span>
+0037 <span class="comment">%----------</span>
+0038 <span class="comment">% Load the repeated measure of the diffusion weighted data.</span>
+0039 <span class="comment">% dwiFile = feGetRep(fe,'dwirepeatfile')</span>
+0040 <span class="comment">%----------</span>
+0041 <span class="comment">% Directory where the LiFe structes are saved by defualt.</span>
+0042 <span class="comment">% sdir = feGetRep(fe,'savedir');</span>
+0043 <span class="comment">%----------</span>
+0044 <span class="comment">% Diffusion directions.</span>
+0045 <span class="comment">% val = feGetRep(fe,'bvecs');</span>
+0046 <span class="comment">%----------</span>
+0047 <span class="comment">% Indices to the diffusion directions in the DWi 4th Dimension.</span>
+0048 <span class="comment">% val = feGetRep(fe,'bvecs indices');</span>
+0049 <span class="comment">%----------</span>
+0050 <span class="comment">% Number of B0's</span>
+0051 <span class="comment">% val = feGetRep(fe,'n bvals');</span>
+0052 <span class="comment">%----------</span>
+0053 <span class="comment">% B0 Values.</span>
+0054 <span class="comment">% bval = feGetRep(fe,'bvals')</span>
+0055 <span class="comment">%----------</span>
+0056 <span class="comment">% Returns a nVoxels X nBvecs array of measured diffusion signal</span>
+0057 <span class="comment">% val = feGetRep(fe,'dsiinvox');</span>
+0058 <span class="comment">% val = feGetRep(fe,'dsiinvox',voxelsIndices);</span>
+0059 <span class="comment">% val = feGetRep(fe,'dsiinvox',coords);</span>
+0060 <span class="comment">%----------</span>
+0061 <span class="comment">% Returns a nVoxels X nBvecs array of demeaned diffusion signal</span>
+0062 <span class="comment">% val =feGetRep(fe,'dsiinvoxdemeaned');</span>
+0063 <span class="comment">% val =feGetRep(fe,'dsiinvoxdemeaned',voxelsIndices);</span>
+0064 <span class="comment">% val =feGetRep(fe,'dsiinvoxdemeaned',coords);</span>
+0065 <span class="comment">%----------</span>
+0066 <span class="comment">% Get the diffusion signal at 0 diffusion weighting (B0) for this voxel</span>
+0067 <span class="comment">% val = feGetRep(fe,'b0signalimage');</span>
+0068 <span class="comment">% val = feGetRep(fe,'b0signalimage',voxelIndex);</span>
+0069 <span class="comment">% val = feGetRep(fe,'b0signalimage',coords);</span>
+0070 <span class="comment">%----------</span>
+0071 <span class="comment">% Weights of the isotropic voxel signals, this is the mean signal in</span>
+0072 <span class="comment">% each voxel.</span>
+0073 <span class="comment">% val = feGetRep(fe,'iso weights');</span>
+0074 <span class="comment">% val = feGetRep(fe,'iso weights'coords)</span>
+0075 <span class="comment">% val = feGetRep(fe,'iso weights',voxelIndices)</span>
+0076 <span class="comment">%----------</span>
+0077 <span class="comment">% Measured signal in VOI, this is the raw signal. not demeaned</span>
+0078 <span class="comment">%</span>
+0079 <span class="comment">% dSig = feGetRep(fe,'dSig full')</span>
+0080 <span class="comment">%---------</span>
+0081 <span class="comment">% Measured signal in VOI, demeaned, this is the signal used for the</span>
+0082 <span class="comment">% fiber-portion of the M model.</span>
+0083 <span class="comment">%</span>
+0084 <span class="comment">% dSig = feGetRep(fe,'dsigdemeaned');</span>
+0085 <span class="comment">% dSig = feGetRep(fe,'dsigdemeaned',[1 10 100]);</span>
+0086 <span class="comment">% dSig = feGetRep(fe,'dsigdemeaned',coords);</span>
+0087 <span class="comment">%---------</span>
+0088 <span class="comment">% Get the demeaned signal for a subset of rows.</span>
+0089 <span class="comment">% Useful for cross-validation.</span>
+0090 <span class="comment">% dSig = feGetRep(fe,'dsigrowssubset',voxelsList);</span>
+0091 <span class="comment">%---------</span>
+0092 <span class="comment">% Return the global R2 (fraction of variance explained) of the full life</span>
+0093 <span class="comment">% model.</span>
+0094 <span class="comment">% R2 = feGetRep(fe,'total r2');</span>
+0095 <span class="comment">%---------</span>
+0096 <span class="comment">% Percent variance explained</span>
+0097 <span class="comment">% R2 = feGetRep(fe,'explained variance')</span>
+0098 <span class="comment">%---------</span>
+0099 <span class="comment">% Root mean squared error of the LiFE fit to the whole data</span>
+0100 <span class="comment">% rmse = feGetRep(fe,'rmse')</span>
+0101 <span class="comment">%---------</span>
+0102 <span class="comment">% Residual signal: (fiber prediction - measured_demeaned).</span>
+0103 <span class="comment">% res = feGetRep(fe,'res sig fiber')</span>
+0104 <span class="comment">%---------</span>
+0105 <span class="comment">% Residual signal: (full model prediction - measured signal).</span>
+0106 <span class="comment">% res = feGetRep(fe,'res sig full');</span>
+0107 <span class="comment">%---------</span>
+0108 <span class="comment">% Residual signal: (fiber model prediction - demeaned measured signal)</span>
+0109 <span class="comment">% with added mean signal. Res is returned as a vector.</span>
+0110 <span class="comment">% This is used to reconstruct an image (volume) to be used for the</span>
+0111 <span class="comment">% refinement process.</span>
+0112 <span class="comment">% res = feGetRep(fe,'fiber res sig with mean');</span>
+0113 <span class="comment">% res = feGetRep(fe,'fiber res sig with mean',coords);</span>
+0114 <span class="comment">% res = feGetRep(fe,'fiber res sig with mean',voxelIndices);</span>
+0115 <span class="comment">%---------</span>
+0116 <span class="comment">% Residual signal fiber model prediction - demeaned measured signal</span>
+0117 <span class="comment">% with added mean signal. Res is returned as an array (nBvecs x nVoxel).</span>
+0118 <span class="comment">% This is used to reconstruct an image (volume) to be used for the</span>
+0119 <span class="comment">% refinement process.</span>
+0120 <span class="comment">% res = feGetRep(fe,'fiber res sig with mean voxel');</span>
+0121 <span class="comment">% res = feGetRep(fe,'fiber res sig with mean voxel',coords);</span>
+0122 <span class="comment">% res = feGetRep(fe,'fiber res sig with mean voxel',voxelIndices);</span>
+0123 <span class="comment">%---------</span>
+0124 <span class="comment">% Return a column vector of the proportion of variance explained in</span>
+0125 <span class="comment">% each voxel.</span>
+0126 <span class="comment">% R2byVox = feGetRep(fe,'voxr2');</span>
+0127 <span class="comment">% R2byVox = feGetRep(fe,'voxr2',coords);</span>
+0128 <span class="comment">%---------</span>
+0129 <span class="comment">% Return a column vector of the proportion of variance explained in</span>
+0130 <span class="comment">% each voxel. (Normalized to the squared mean diffusion signal in each voxel)</span>
+0131 <span class="comment">% R2byVox = feGetRep(fe,'voxr2zero');</span>
+0132 <span class="comment">% R2byVox = feGetRep(fe,'voxr2zero',coords);</span>
+0133 <span class="comment">%---------</span>
+0134 <span class="comment">% Return the percent of varince explained in each voxel.</span>
+0135 <span class="comment">% R2byVox = feGetRep(fe,'var exp by voxel');</span>
+0136 <span class="comment">% R2byVox = feGetRep(fe,'var exp by voxel',coords);</span>
+0137 <span class="comment">%---------</span>
+0138 <span class="comment">% Demeaned diffusion signal in each voxel.</span>
+0139 <span class="comment">% dSigByVoxel = feGetRep(fe,'dsigdemeaned by Voxel');</span>
+0140 <span class="comment">% dSigByVoxel = feGetRep(fe,'dsigdemeaned by Voxel',coords);</span>
+0141 <span class="comment">% dSigByVoxel = feGetRep(fe,'dsigdemeaned by Voxel',vxIndex);</span>
+0142 <span class="comment">%---------</span>
+0143 <span class="comment">% Full (measured) signal in each voxel.</span>
+0144 <span class="comment">% dSigByVoxel = feGetRep(fe,'dSig full by Voxel');</span>
+0145 <span class="comment">% dSigByVoxel = feGetRep(fe,'dSig full by Voxel',coords);</span>
+0146 <span class="comment">% dSigByVoxel = feGetRep(fe,'dSig full by Voxel',vxIndex);</span>
+0147 <span class="comment">%---------</span>
+0148 <span class="comment">% Predicted signal by the full model in a set of voxeles.</span>
+0149 <span class="comment">% pSigByVoxel = feGetRep(fe, 'pSig full by voxel');</span>
+0150 <span class="comment">% pSigByVoxel = feGetRep(fe, 'pSig full by voxel',coords);</span>
+0151 <span class="comment">% pSigByVoxel = feGetRep(fe, 'pSig full by voxel',voxelIndex);</span>
+0152 <span class="comment">%---------</span>
+0153 <span class="comment">% A volume of RMSE values.</span>
+0154 <span class="comment">% RMSE = feGetRep(fe,'vox rmse')</span>
+0155 <span class="comment">% RMSE = feGetRep(fe,'vox rmse',coords)</span>
+0156 <span class="comment">% RMSE = feGetRep(fe,'vox rmse',vxIndex)</span>
+0157 <span class="comment">%---------</span>
+0158 <span class="comment">% A volume of RMSE values with a subset of fibers' weights set to 0.</span>
+0159 <span class="comment">% RMSE = feGetRep(fe,'vox rmse',fiberIndices)</span>
+0160 <span class="comment">% RMSE = feGetRep(fe,'vox rmse',fiberIndices,coords)</span>
+0161 <span class="comment">% RMSE = feGetRep(fe,'vox rmse',fiberIndices,voxelIndex)</span>
+0162 <span class="comment">%---------</span>
+0163 <span class="comment">% Fibers' residual signal by voxel.</span>
+0164 <span class="comment">% res = feGetRep(fe,'res sig fiber vox')</span>
+0165 <span class="comment">% res = feGetRep(fe,'res sig fiber vox',coords)</span>
+0166 <span class="comment">% res = feGetRep(fe,'res sig fiber vox',vxIndex)</span>
+0167 <span class="comment">%---------</span>
+0168 <span class="comment">% Full (measured) residual signal by voxel.</span>
+0169 <span class="comment">% res = feGetRep(fe,'res sig full vox')</span>
+0170 <span class="comment">% res = feGetRep(fe,'res sig full vox',coords)</span>
+0171 <span class="comment">% res = feGetRep(fe,'res sig full vox',vxIndex)</span>
+0172 <span class="comment">%---------</span>
+0173 <span class="comment">% Fibers' residual signal by voxel with mean signal added (with added</span>
+0174 <span class="comment">% isotropic component).</span>
+0175 <span class="comment">% This is used to compute the residual signal for the refinement.</span>
+0176 <span class="comment">% res = feGetRep(fe,'fiber res sig with mean vox')</span>
+0177 <span class="comment">% res = feGetRep(fe,'fiber res sig with mean vox',coords)</span>
+0178 <span class="comment">% res = feGetRep(fe,'fiber res sig with mean vox',vxIndex)</span>
+0179 <span class="comment">%---------</span>
+0180 <span class="comment">% Residual signal full model prediction from a multi-voxel fit.</span>
+0181 <span class="comment">% res = feGetRep(fe,'res sig full voxfit');</span>
+0182 <span class="comment">% res = feGetRep(fe, 'res sig full voxfit',coords);</span>
+0183 <span class="comment">% res = feGetRep(fe, 'res sig full voxfit',voxelIndex);</span>
+0184 <span class="comment">%---------</span>
+0185 <span class="comment">% Dimensions of the DW volume.</span>
+0186 <span class="comment">% dim = feGetRep(fe,'dims')</span>
+0187 <span class="comment">%---------</span>
+0188 <span class="comment">% Dimensions of the maps of parameters and results.</span>
+0189 <span class="comment">% dims = feGetRep(fe, 'mapsize')</span>
+0190 <span class="comment">%</span>
+0191 <span class="comment">% End of feGetRep.m parameters,</span>
+0192 <span class="comment">%</span>
+0193 <span class="comment">%</span>
+0194 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.</span>
+0195 
+0196 val = [];
+0197 
+0198 <span class="comment">% Format the input parameters.</span>
+0199 param = lower(strrep(param,<span class="string">' '</span>,<span class="string">''</span>));
+0200 
+0201 <span class="comment">% Start sorting the input and computing the output.</span>
+0202 <span class="keyword">switch</span> param
+0203   <span class="keyword">case</span> <span class="string">'name'</span>
+0204     <span class="comment">% Name of the current fe structure.</span>
+0205     <span class="comment">%</span>
+0206     <span class="comment">% name = feGetRep(fe,'name')</span>
+0207     val = fe.rep.name;
+0208     
+0209   <span class="keyword">case</span> <span class="string">'type'</span>
+0210     <span class="comment">% The type of objes (always, fascicle evaluation)</span>
+0211     <span class="comment">%</span>
+0212     <span class="comment">% type = feGetRep(fe,'type')</span>
+0213     val = fe.rep.type; <span class="comment">% Always fascicle evaluation</span>
+0214       
+0215   <span class="keyword">case</span> <span class="string">'dwi'</span>
+0216     <span class="comment">%  Load the diffusion weighted data.</span>
+0217     <span class="comment">%</span>
+0218     <span class="comment">% dwi = feGetRep(fe,'dwirepeat')</span>
+0219     val = dwiLoad(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dwifile'</span>));
+0220         
+0221   <span class="keyword">case</span> <span class="string">'dwifile'</span>
+0222     <span class="comment">%  Load the repeated measure of the diffusion weighted data.</span>
+0223     <span class="comment">%</span>
+0224     <span class="comment">% dwiFile = feGetRep(fe,'dwirepeatfile')</span>
+0225     val = fe.path.dwifilerep;
+0226     
+0227   <span class="keyword">case</span> {<span class="string">'bvecs'</span>}
+0228     <span class="comment">% Diffusion directions.</span>
+0229     <span class="comment">%</span>
+0230     <span class="comment">% val = feGetRep(fe,'bvecs');</span>
+0231     val = fe.rep.bvecs;
+0232     
+0233   <span class="keyword">case</span> {<span class="string">'bvecsindices'</span>}
+0234     <span class="comment">% Indices to the diffusion directions in the DWi 4th Dimension.</span>
+0235     <span class="comment">%</span>
+0236     <span class="comment">% val = feGetRep(fe,'bvecs indices rep');</span>
+0237     val = fe.rep.bvecsindices;
+0238     
+0239   <span class="keyword">case</span> {<span class="string">'nbvecs'</span>,<span class="string">'nbvals'</span>}
+0240     <span class="comment">% Number of B0's</span>
+0241     <span class="comment">%</span>
+0242     <span class="comment">% val = feGetRep(fe,'n bvals');</span>
+0243     val = length(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'bvals'</span>));
+0244     
+0245   <span class="keyword">case</span> {<span class="string">'bvals'</span>}
+0246     <span class="comment">% B0 Values.</span>
+0247     <span class="comment">%</span>
+0248     <span class="comment">% bval = feGetRep(fe,'bvals')</span>
+0249     val = fe.rep.bvals;
+0250     
+0251   <span class="keyword">case</span> {<span class="string">'diffusionsignalinvoxel'</span>,<span class="string">'dsiinvox'</span>,<span class="string">'dsigvox'</span>,<span class="string">'dsigmeasuredvoxel'</span>}
+0252     <span class="comment">% Returns a nVoxels X nBvecs array of measured diffusion signal</span>
+0253     <span class="comment">%</span>
+0254     <span class="comment">% val = feGetRep(fe,'dsiinvox');</span>
+0255     <span class="comment">% val = feGetRep(fe,'dsiinvox',voxelsIndices);</span>
+0256     <span class="comment">% val = feGetRep(fe,'dsiinvox',coords);</span>
+0257     val = fe.rep.diffusion_signal_img(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin),:)';
+0258     
+0259   <span class="keyword">case</span> {<span class="string">'diffusionsignalinvoxeldemeaned'</span>,<span class="string">'dsiinvoxdemeaned'</span>}
+0260     <span class="comment">% Returns a nVoxels X nBvecs array of demeaned diffusion signal</span>
+0261     <span class="comment">%</span>
+0262     <span class="comment">% val =feGetRep(fe,'dsiinvoxdemeaned');</span>
+0263     <span class="comment">% val =feGetRep(fe,'dsiinvoxdemeaned',voxelsIndices);</span>
+0264     <span class="comment">% val =feGetRep(fe,'dsiinvoxdemeaned',coords);</span>
+0265     nBvecs       = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0266     voxelIndices = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin);
+0267     val = fe.rep.diffusion_signal_img(voxelIndices,:) - repmat(mean(fe.rep.diffusion_signal_img(voxelIndices,:), 2),1,nBvecs);
+0268     keyboard <span class="comment">% THis seems to be worng</span>
+0269     
+0270   <span class="keyword">case</span> {<span class="string">'b0signalimage'</span>,<span class="string">'b0vox'</span>}
+0271     <span class="comment">% Get the diffusion signal at 0 diffusion weighting (B0) for this voxel</span>
+0272     <span class="comment">%</span>
+0273     <span class="comment">% val = feGetRep(fe,'b0signalimage');</span>
+0274     <span class="comment">% val = feGetRep(fe,'b0signalimage',voxelIndex);</span>
+0275     <span class="comment">% val = feGetRep(fe,'b0signalimage',coords);</span>
+0276     val = fe.rep.diffusion_S0_img(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin), :);
+0277  
+0278   <span class="keyword">case</span> {<span class="string">'isoweights'</span>,<span class="string">'weightsiso'</span>,<span class="string">'meanvoxelsignal'</span>}
+0279     <span class="comment">% Weights of the isotropic voxel signals, this is the mean signal in</span>
+0280     <span class="comment">% each voxel.</span>
+0281     <span class="comment">%</span>
+0282     <span class="comment">% val = feGetRep(fe,'iso weights');</span>
+0283     <span class="comment">% val = feGetRep(fe,'iso weights'coords)</span>
+0284     <span class="comment">% val = feGetRep(fe,'iso weights',voxelIndices)</span>
+0285     val = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'Miso'</span>) \ <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsig full'</span>)';
+0286     val = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin));
+0287      
+0288   <span class="keyword">case</span> {<span class="string">'dsigiso'</span>,<span class="string">'isodsig'</span>}
+0289     <span class="comment">% mean signalin each voxel, returned for each diffusion direction:</span>
+0290     <span class="comment">% size(nBvecsxnVoxels, 1).</span>
+0291     <span class="comment">%</span>
+0292     <span class="comment">% val = feGetRep(fe,'iso disg');</span>
+0293     <span class="comment">% val = feGetRep(fe,'iso disg',coords)</span>
+0294     <span class="comment">% val = feGetRep(fe,'iso dsig',voxelIndices)</span>
+0295     val = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'iso weights'</span>);
+0296     val = repmat(val,1,<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nbvecs'</span>))';
+0297     val = val(:);
+0298     
+0299   <span class="keyword">case</span> {<span class="string">'dsigmeasured'</span>,<span class="string">'dsigfull'</span>}
+0300     <span class="comment">% Measured signal in VOI, this is the raw signal. not demeaned</span>
+0301     <span class="comment">%</span>
+0302     <span class="comment">% dSig = feGetRep(fe,'dSig full')</span>
+0303     val = fe.rep.diffusion_signal_img';
+0304     val = val(:)';
+0305 
+0306     <span class="comment">% Return a subset of voxels</span>
+0307     <span class="keyword">if</span> ~isempty(varargin)
+0308       <span class="comment">% voxelIndices     = feGet(fe,'voxelsindices',varargin);</span>
+0309       <span class="comment">% voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);</span>
+0310       <span class="comment">% val              = val(voxelRowsToKeep,:);</span>
+0311       val = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxel rows'</span>,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin)));
+0312     <span class="keyword">end</span>
+0313     
+0314   <span class="keyword">case</span> {<span class="string">'diffusionsignaldemeaned'</span>,<span class="string">'dsigdemeaned'</span>}
+0315     <span class="comment">% Measured signal in VOI, demeaned, this is the signal used for the</span>
+0316     <span class="comment">% fiber-portion of the M model.</span>
+0317     <span class="comment">%</span>
+0318     <span class="comment">% dSig = feGetRep(fe,'dsigdemeaned');</span>
+0319     <span class="comment">% dSig = feGetRep(fe,'dsigdemeaned',[1 10 100]);</span>
+0320     <span class="comment">% dSig = feGetRep(fe,'dsigdemeaned',coords);</span>
+0321     nVoxels = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'nVoxels'</span>);
+0322     nBvecs  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0323     val     = (<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsig measured'</span>) - reshape(repmat( <span class="keyword">...</span>
+0324       mean(reshape(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsig measured'</span>), nBvecs, nVoxels),1),<span class="keyword">...</span>
+0325       nBvecs,1), size(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsig measured'</span>))))';
+0326     <span class="comment">% Return a subset of voxels</span>
+0327     <span class="keyword">if</span> ~isempty(varargin)
+0328       <span class="comment">% voxelIndices     = feGet(fe,'voxelsindices',varargin);</span>
+0329       <span class="comment">% voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);</span>
+0330       <span class="comment">% val           = val(voxelRowsToKeep,:);</span>
+0331       val = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxel rows'</span>,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin)));
+0332     <span class="keyword">end</span>
+0333     
+0334   <span class="keyword">case</span> {<span class="string">'dsigrowssubset'</span>,<span class="string">'diffusionsignaldemeanedinsubsetofrows'</span>}
+0335     <span class="comment">% Get the demeaned signal for a subset of rows.</span>
+0336     <span class="comment">% Useful for cross-validation.</span>
+0337     <span class="comment">%</span>
+0338     <span class="comment">% dSig = feGetRep(fe,'dsigrowssubset',voxelsList);</span>
+0339     dSig = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsigdemeaned'</span>);
+0340     <span class="keyword">for</span> vv = 1:length(voxelsList)
+0341       val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxel rows'</span>,vv)) = dSig(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxel rows'</span>,voxelList(vv)));
+0342     <span class="keyword">end</span>
+0343     
+0344   <span class="keyword">case</span> {<span class="string">'totalr2'</span>}
+0345     <span class="comment">% Return the global R2 (fraction of variance explained) of the full life</span>
+0346     <span class="comment">% model.</span>
+0347     <span class="comment">%</span>
+0348     <span class="comment">% R2 = feGetRep(fe,'total r2');</span>
+0349 
+0350     <span class="comment">%     measured  = feGetRep(fe,'dsigdemeaned');</span>
+0351     <span class="comment">%     predicted = feGetRep(fe,'fiber p sig');</span>
+0352     <span class="comment">%     val = (1 - (sum((measured - predicted).^2 ) ./ ...</span>
+0353     <span class="comment">%                 sum((measured - mean(measured)).^2) ));</span>
+0354     val = (1 - (sum((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>) - <span class="keyword">...</span>
+0355       <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig fiber'</span>)).^2 ) ./ <span class="keyword">...</span>
+0356       sum((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>) - <span class="keyword">...</span>
+0357       mean(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>))).^2) ));
+0358   
+0359   <span class="keyword">case</span> {<span class="string">'totalr2voxelwise'</span>}
+0360     <span class="comment">% Return the global R2 (fraction of variance explained) of the full life</span>
+0361     <span class="comment">% model from a voxel-wise fit</span>
+0362     <span class="comment">%</span>
+0363     <span class="comment">% R2 = feGetRep(fe,'total r2');</span>
+0364 
+0365     <span class="comment">%     measured  = feGetRep(fe,'dsigdemeaned');</span>
+0366     <span class="comment">%     predicted = feGetRep(fe,'p sig f voxel wise');</span>
+0367     <span class="comment">%     val = (1 - (sum((measured - predicted).^2 ) ./ ...</span>
+0368     <span class="comment">%                 sum((measured - mean(measured)).^2) ));</span>
+0369     val = (1 - (sum((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>)' - <span class="keyword">...</span>
+0370       <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig f voxel wise'</span>)).^2 ) ./ <span class="keyword">...</span>
+0371       sum((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>) - <span class="keyword">...</span>
+0372       mean(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>))).^2) ));
+0373   
+0374   <span class="keyword">case</span> {<span class="string">'totpve'</span>}
+0375     <span class="comment">% Total percent variance explained by data1 on data2</span>
+0376     <span class="comment">%</span>
+0377     <span class="comment">% R2 = feGetRep(fe,'tot pve data')</span>
+0378     val = 100 * <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'total r2'</span>);
+0379 
+0380   <span class="keyword">case</span> {<span class="string">'totalr2data'</span>}
+0381     <span class="comment">% Return the global R2 (fraction of variance explained) of the full life</span>
+0382     <span class="comment">% model in data set 2 by data set 1.</span>
+0383     <span class="comment">%</span>
+0384     <span class="comment">% R2 = feGetRep(fe,'total r2 data');</span>
+0385 
+0386     <span class="comment">%     measured  = feGetRep(fe,'dsigdemeaned');</span>
+0387     <span class="comment">%     predicted = feGetRep(fe,'fiber p sig');</span>
+0388     <span class="comment">%     val = (1 - (sum((measured - predicted).^2 ) ./ ...</span>
+0389     <span class="comment">%                 sum((measured - mean(measured)).^2) ));</span>
+0390     val = (1 - (sum((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>) - <span class="keyword">...</span>
+0391       <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'diffusion signal demeaned'</span>)).^2 ) ./ <span class="keyword">...</span>
+0392       sum((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>) - <span class="keyword">...</span>
+0393       mean(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>))).^2) ));
+0394  
+0395   <span class="keyword">case</span> {<span class="string">'totpvedata'</span>}
+0396     <span class="comment">% Total percent variance explained by data1 on data2</span>
+0397     <span class="comment">%</span>
+0398     <span class="comment">% R2 = feGetRep(fe,'tot pve data')</span>
+0399     val = 100 * <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'total r2 data'</span>);
+0400     
+0401   <span class="keyword">case</span> {<span class="string">'totalrmsedata'</span>}
+0402     <span class="comment">% Global root mean squared error of data1 on data 2</span>
+0403     <span class="comment">%</span>
+0404     <span class="comment">% rmse = feGetRep(fe,'rmse data')</span>
+0405     val = sqrt(mean((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>) - <span class="keyword">...</span>
+0406       <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'diffusion signal demeaned'</span>)).^2));
+0407       
+0408   <span class="keyword">case</span> {<span class="string">'totalrmseratio'</span>}
+0409     <span class="comment">% Global ratio of root mean squared error of Model/Data</span>
+0410     <span class="comment">%</span>
+0411     <span class="comment">% rmse = feGetRep(fe,'rmse data ratio')</span>
+0412     val = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'total rmse'</span>) ./ <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'total rmse data'</span>);
+0413      
+0414   <span class="keyword">case</span> {<span class="string">'totalrmseratiovoxelwise'</span>}
+0415     <span class="comment">% Global ratio of root mean squared error of Model/Data from a</span>
+0416     <span class="comment">% voxel-wise fit</span>
+0417     <span class="comment">%</span>
+0418     <span class="comment">% rmse = feGetRep(fe,'totalrmseratiovoxelwise')</span>
+0419     val = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'total rmse voxelwise'</span>) ./ <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'total rmse data'</span>);
+0420 
+0421   <span class="keyword">case</span> {<span class="string">'totalrmse'</span>,<span class="string">'rmsetotal'</span>}
+0422     <span class="comment">% Root mean squared error of the LiFE fit to the whole data</span>
+0423     <span class="comment">%</span>
+0424     <span class="comment">% rmse = feGetRep(fe,'rmsetotal')</span>
+0425     val = sqrt(mean((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>) - <span class="keyword">...</span>
+0426                      <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'psigfiber'</span>)).^2));
+0427   
+0428   <span class="keyword">case</span> {<span class="string">'totalrmsevoxelwise'</span>}
+0429     <span class="comment">% Root mean squared error of the LiFE fit to the whole data from a</span>
+0430     <span class="comment">% voxel-wise fit</span>
+0431     <span class="comment">%</span>
+0432     <span class="comment">% rmse = feGetRep(fe,'totalrmsevoxelwise')</span>
+0433     val = sqrt(mean((<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'diffusion signal demeaned'</span>)' - <span class="keyword">...</span>
+0434       <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'psigfvoxelwise'</span>)).^2));
+0435 
+0436   <span class="keyword">case</span> {<span class="string">'ressigfiber'</span>}
+0437     <span class="comment">% Residual signal fiber prediction - measured_demeaned.</span>
+0438     <span class="comment">%</span>
+0439     <span class="comment">% res = feGetRep(fe,'res sig fiber')</span>
+0440     val = (<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsigdemeaned'</span>)    - <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'psig fiber'</span>));
+0441     <span class="keyword">if</span> ~isempty(varargin)
+0442       <span class="comment">% voxelIndices     = feGet(fe,'voxelsindices',varargin);</span>
+0443       <span class="comment">% voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);</span>
+0444       <span class="comment">% val              = val(voxelRowsToKeep,:);</span>
+0445       val = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxel rows'</span>,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin)));
+0446     <span class="keyword">end</span>
+0447     
+0448   <span class="keyword">case</span> {<span class="string">'ressigfull'</span>}
+0449     <span class="comment">% Residual signal full model prediction - measured signal.</span>
+0450     <span class="comment">%</span>
+0451     <span class="comment">% res = feGetRep(fe,'res sig full');</span>
+0452     <span class="comment">% res = feGetRep(fe, 'res sig full',coords);</span>
+0453     <span class="comment">% res = feGetRep(fe, 'res sig full',voxelIndex);</span>
+0454     val = (<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsig full'</span>)    - <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'psig full'</span>)');
+0455     <span class="keyword">if</span> ~isempty(varargin)
+0456       <span class="comment">% voxelIndices     = feGet(fe,'voxelsindices',varargin);</span>
+0457       <span class="comment">% voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);</span>
+0458       <span class="comment">% val           = val(voxelRowsToKeep,:);</span>
+0459       val = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxel rows'</span>,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin)));
+0460     <span class="keyword">end</span>
+0461     
+0462   <span class="keyword">case</span> {<span class="string">'ressigfullvoxelwise'</span>}
+0463     <span class="comment">% Residual signal full model prediction from a multi-voxel fit.</span>
+0464     <span class="comment">%</span>
+0465     <span class="comment">% res = feGetRep(fe,'res sig full voxfit');</span>
+0466     <span class="comment">% res = feGetRep(fe, 'res sig full voxfit',coords);</span>
+0467     <span class="comment">% res = feGetRep(fe, 'res sig full voxfit',voxelIndex);</span>
+0468     <span class="comment">%tic,val      = feGetRep(fe,'dsig demeaned') - feGet(fe,'psigfvoxelwise') + feGetRep(fe,'dsigiso');toc</span>
+0469     val      = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsig full'</span>) - <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'psigfvoxelwise'</span>);
+0470     <span class="keyword">if</span> ~isempty(varargin)
+0471       <span class="comment">% voxelIndices     = feGet(fe,'voxelsindices',varargin);</span>
+0472       <span class="comment">% voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);</span>
+0473       <span class="comment">% val           = val(voxelRowsToKeep,:);</span>
+0474       val = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxel rows'</span>,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin)));
+0475     <span class="keyword">end</span>
+0476     
+0477    <span class="keyword">case</span> {<span class="string">'voxressigfullvoxelwise'</span>}
+0478     <span class="comment">% Residual signal full model prediction from a multi-voxel fit.</span>
+0479     <span class="comment">% ORganized in nvecsxn</span>
+0480     <span class="comment">%</span>
+0481     <span class="comment">% res = feGetRep(fe,'voxressigfullvoxelwise');</span>
+0482     <span class="comment">% res = feGetRep(fe, 'voxressigfullvoxelwise',coords);</span>
+0483     <span class="comment">% res = feGetRep(fe, 'voxressigfullvoxelwise',voxelIndex);</span>
+0484     <span class="comment">%tic,val      = feGetRep(fe,'dsig demeaned') - feGet(fe,'psigfvoxelwise') + feGetRep(fe,'dsigiso');toc</span>
+0485     val = reshape(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'ressigfullvoxelwise'</span>),<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nbvecs'</span>),<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'nvoxels'</span>));
+0486 
+0487     <span class="keyword">if</span> ~isempty(varargin)
+0488       <span class="comment">% voxelIndices     = feGet(fe,'voxelsindices',varargin);</span>
+0489       <span class="comment">% voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);</span>
+0490       <span class="comment">% val           = val(voxelRowsToKeep,:);</span>
+0491       val = val(:,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin));
+0492     <span class="keyword">end</span>
+0493     
+0494   <span class="keyword">case</span> {<span class="string">'voxisoweights'</span>,<span class="string">'voxweightsiso'</span>,<span class="string">'voxmeanvoxelsignal'</span>}
+0495     <span class="comment">% Weights of the isotropic voxel signals, this is the mean signal in</span>
+0496     <span class="comment">% each voxel.</span>
+0497     <span class="comment">% Organized nBvecs x nVoxels</span>
+0498     <span class="comment">%</span>
+0499     <span class="comment">% val = feGet(fe,'voxiso weights');</span>
+0500     <span class="comment">% val = feGet(fe,'voxiso weights'coords)</span>
+0501     <span class="comment">% val = feGet(fe,'voxiso weights',voxelIndices)</span>
+0502     val = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'Miso'</span>) \ <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsig full'</span>)';
+0503     val = repmat(val,1,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'nbvecs'</span>))';
+0504 
+0505     <span class="keyword">if</span> ~isempty(varargin)
+0506       <span class="comment">% voxelIndices     = feGet(fe,'voxelsindices',varargin);</span>
+0507       <span class="comment">% voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);</span>
+0508       <span class="comment">% val           = val(voxelRowsToKeep,:);</span>
+0509       val = val(:,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin));
+0510     <span class="keyword">end</span>
+0511     
+0512   <span class="keyword">case</span> {<span class="string">'fiberressigwithmean'</span>}
+0513     <span class="comment">% Residual signal fiber model prediction - demeaned measured signal</span>
+0514     <span class="comment">% with added mean signal. VECTOR FORM.</span>
+0515     <span class="comment">%</span>
+0516     <span class="comment">% This is used to reconstruct an image (volume) to be used for the</span>
+0517     <span class="comment">% refinement process.</span>
+0518     <span class="comment">%</span>
+0519     <span class="comment">% res = feGetRep(fe,'fiber res sig with mean');</span>
+0520     
+0521     <span class="comment">% predicted = feGet(fe,'psig fiber');</span>
+0522     <span class="comment">% measured  = feGetRep(fe,'dsigdemeaned');</span>
+0523     <span class="comment">% val = (measured_full - predicted demeaned);</span>
+0524     val = (<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsig full'</span>)' - <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'psig fiber'</span>)); 
+0525     
+0526     <span class="keyword">if</span> ~isempty(varargin)
+0527       <span class="comment">% voxelIndices     = feGet(fe,'voxelsindices',varargin);</span>
+0528       <span class="comment">% voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);</span>
+0529       <span class="comment">% val           = val(voxelRowsToKeep,:);</span>
+0530       val = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxel rows'</span>,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'voxelsindices'</span>,varargin)));
+0531     <span class="keyword">end</span>
+0532     
+0533   <span class="keyword">case</span> {<span class="string">'predictedfullsignalvoxel'</span>,<span class="string">'psigfullvox'</span>}
+0534     <span class="comment">% Predicted signal by the full model in a set of voxeles.</span>
+0535     <span class="comment">%</span>
+0536     <span class="comment">% Vox subfield stores per voxel within the VOI</span>
+0537     <span class="comment">% The pSig has size of the dwi.</span>
+0538     <span class="comment">% It is stored as val = pSig(X,Y,Z,Theta)</span>
+0539     <span class="comment">%</span>
+0540     <span class="comment">% pSig = feGetRep(fe, 'pSig full by voxel');</span>
+0541     <span class="comment">% pSig = feGetRep(fe, 'pSig full by voxel',coords);</span>
+0542     <span class="comment">% pSig = feGetRep(fe, 'pSig full by voxel',voxelIndex);</span>
+0543     nBvecs  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0544     nVoxels = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'n voxels'</span>);
+0545     val     = reshape(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'pSig full'</span>), nBvecs, nVoxels);
+0546       
+0547   <span class="keyword">case</span> {<span class="string">'voxelr2'</span>,<span class="string">'r2vox'</span>,<span class="string">'voxr2'</span>,<span class="string">'r2byvoxel'</span>}
+0548     <span class="comment">% Return a column vector of the proportion of variance explained in</span>
+0549     <span class="comment">% each voxel.</span>
+0550     <span class="comment">%</span>
+0551     <span class="comment">% R2byVox = feGetRep(fe,'voxr2');</span>
+0552     <span class="comment">% R2byVox = feGetRep(fe,'voxr2',coords);</span>
+0553     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0554     predicted = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig f vox'</span>);
+0555     nBvecs    = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0556     val       = (1 - (sum((measured - predicted).^2 ) ./ <span class="keyword">...</span>
+0557       sum((measured - repmat(mean(measured), nBvecs,1)).^2 ) ));
+0558     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0559  
+0560   <span class="keyword">case</span> {<span class="string">'voxelss'</span>,<span class="string">'ssvox'</span>,<span class="string">'voxss'</span>,<span class="string">'sumofsquaresbyvoxel'</span>}
+0561     <span class="comment">% Return a column vector of sum of squares error of the model</span>
+0562     <span class="comment">% prediction in each voxel</span>
+0563     <span class="comment">%</span>
+0564     <span class="comment">% ssem = feGetRep(fe,'voxss');</span>
+0565     <span class="comment">% ssem = feGetRep(fe,'voxss',coords);</span>
+0566     predicted = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig f vox'</span>);    
+0567     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0568     val       = sum((measured - predicted).^2 );
+0569     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0570  
+0571   <span class="keyword">case</span> {<span class="string">'voxelssdata'</span>,<span class="string">'ssvoxdata'</span>,<span class="string">'voxssdata'</span>,<span class="string">'sumofsquaresbyvoxeldata'</span>}
+0572     <span class="comment">% Return a column vector of sum of squares error of the data in</span>
+0573     <span class="comment">% each voxel</span>
+0574     <span class="comment">%</span>
+0575     <span class="comment">% ssed = feGetRep(fe,'voxssedata');</span>
+0576     <span class="comment">% ssed = feGetRep(fe,'voxssdata',coords);</span>
+0577     measured1 = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0578     measured2  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0579     val       = sum((measured2 - measured1).^2 );
+0580     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0581 
+0582   <span class="keyword">case</span> {<span class="string">'voxelr2data'</span>,<span class="string">'r2voxdata'</span>,<span class="string">'voxr2data'</span>,<span class="string">'r2byvoxeldata'</span>}
+0583     <span class="comment">% Return a column vector of the proportion of variance explained in</span>
+0584     <span class="comment">% each voxel in data set 2 given the data in dataset 1.</span>
+0585     <span class="comment">%</span>
+0586     <span class="comment">% R2byVox = feGetRep(fe,'voxr2data');</span>
+0587     <span class="comment">% R2byVox = feGetRep(fe,'voxr2data',coords);</span>
+0588     measured1  = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0589     measured2 = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0590     nBvecs    = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0591     val       = (1 - (sum((measured2 - measured1).^2 ) ./ <span class="keyword">...</span>
+0592       sum((measured2 - repmat(mean(measured2), nBvecs,1)).^2 ) ));
+0593     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0594 
+0595   <span class="keyword">case</span> {<span class="string">'voxelr2zero'</span>,<span class="string">'r2voxzero'</span>,<span class="string">'voxr2zero'</span>,<span class="string">'r2byvoxelzero'</span>}
+0596     <span class="comment">% Return a column vector of the proportion of variance explained in</span>
+0597     <span class="comment">% each voxel. (Normalized to the squared diffusion signal in each voxel)</span>
+0598     <span class="comment">%</span>
+0599     <span class="comment">% R2byVox = feGetRep(fe,'voxr2zero');</span>
+0600     <span class="comment">% R2byVox = feGetRep(fe,'voxr2zero',coords);</span>
+0601     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0602     predicted = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig f vox'</span>);
+0603     val       = (1 - (sum((measured - predicted).^2 ) ./ sum(measured.^2)));
+0604     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0605      
+0606   <span class="keyword">case</span> {<span class="string">'voxelr2pearson'</span>,<span class="string">'r2voxpearson'</span>,<span class="string">'voxr2corr'</span>,<span class="string">'r2byvoxelpearson'</span>}
+0607     <span class="comment">% Return a column vector of the squre of the pearson correlation coefficient</span>
+0608     <span class="comment">%</span>
+0609     <span class="comment">% R2byVox = feGetRep(fe,'voxr2corr');</span>
+0610     <span class="comment">% R2byVox = feGetRep(fe,'voxr2corr',coords);</span>
+0611     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0612     predicted = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig f vox'</span>);
+0613     val       = corrcoef(measured - predicted).^2;
+0614     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0615 
+0616   <span class="keyword">case</span> {<span class="string">'voxelr2zerodata'</span>,<span class="string">'r2voxzerodata'</span>,<span class="string">'voxr2zerodata'</span>,<span class="string">'r2byvoxelzerodata'</span>}
+0617     <span class="comment">% Return a column vector of the proportion of variance explained in</span>
+0618     <span class="comment">% each voxel in dataset 1 given the data in data set 2.</span>
+0619     <span class="comment">% (Normalized to the squared diffusion signal in each voxel)</span>
+0620     <span class="comment">%</span>
+0621     <span class="comment">% R2byVox = feGetRep(fe,'voxr2zerodata');</span>
+0622     <span class="comment">% R2byVox = feGetRep(fe,'voxr2zerodata',coords);</span>
+0623     measured  = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0624     measured2 = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0625     val       = (1 - (sum((measured - measured2).^2 ) ./ sum(measured.^2)));
+0626     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0627 
+0628   
+0629   <span class="keyword">case</span> {<span class="string">'voxelr2voxelwise'</span>,<span class="string">'r2voxvoxelwise'</span>,<span class="string">'voxr2voxelwise'</span>,<span class="string">'r2voxelwisebyvoxel'</span>}
+0630     <span class="comment">% Return a column vector of the proportion of variance explained in</span>
+0631     <span class="comment">% each voxel.</span>
+0632     <span class="comment">%</span>
+0633     <span class="comment">% R2byVox = feGetRep(fe,'voxr2voxelwise');</span>
+0634     <span class="comment">% R2byVox = feGetRep(fe,'voxr2voxelwise',coords);</span>
+0635     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0636     predicted = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig f voxel wise by voxel'</span>);
+0637     nBvecs    = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0638     val       = (1 - (sum((measured - predicted).^2 ) ./ <span class="keyword">...</span>
+0639       sum((measured - repmat(mean(measured), nBvecs,1)).^2 ) ));
+0640     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0641 
+0642   <span class="keyword">case</span> {<span class="string">'voxelr2zerovoxelwise'</span>,<span class="string">'r2zerovoxelwisebyvoxel'</span>,<span class="string">'voxr2zerovoxelwise'</span>}
+0643     <span class="comment">% Return a column vector of the proportion of variance explained in</span>
+0644     <span class="comment">% each voxel. (Normalized to the squared diffusion signal in each voxel)</span>
+0645     <span class="comment">%</span>
+0646     <span class="comment">% R2byVox = feGetRep(fe,'voxr2zerovoxelwise');</span>
+0647     <span class="comment">% R2byVox = feGetRep(fe,'voxr2zerovoxelwise',coords);</span>
+0648     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig demeaned by voxel'</span>);
+0649     predicted = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig f voxel wise by voxel'</span>);
+0650     val       = (1 - (sum((measured - predicted).^2 ) ./ sum(measured.^2)));
+0651     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));    
+0652     
+0653   <span class="keyword">case</span> {<span class="string">'voxelvarianceexplained'</span>,<span class="string">'varexpvox'</span>,<span class="string">'voxvarexp'</span>,<span class="string">'varexpbyvoxel'</span>}
+0654     <span class="comment">% Return the percent of varince explained in each voxel.</span>
+0655     <span class="comment">%</span>
+0656     <span class="comment">% R2byVox = feGetRep(fe,'var exp by voxel');</span>
+0657     <span class="comment">% R2byVox = feGetRep(fe,'var exp by voxel',coords);</span>
+0658     val = 100.*<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'voxr2'</span>);
+0659     val = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0660    
+0661   <span class="keyword">case</span> {<span class="string">'voxelvarianceexplaineddata'</span>,<span class="string">'varexpvoxdata'</span>,<span class="string">'voxvarexpdata'</span>,<span class="string">'varexpbyvoxeldata'</span>}
+0662     <span class="comment">% Return the percent of variance explained in each voxel in data set 1</span>
+0663     <span class="comment">% given the data in data set 2.</span>
+0664     <span class="comment">%</span>
+0665     <span class="comment">% R2byVox = feGetRep(fe,'var exp by voxel data');</span>
+0666     <span class="comment">% R2byVox = feGetRep(fe,'var exp by voxel data',coords);</span>
+0667     val = 100.*<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'voxr2 data'</span>);
+0668     val = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0669  
+0670   <span class="keyword">case</span> {<span class="string">'dsigdemeanedbyvoxel'</span>,<span class="string">'dsigdemeanedvox'</span>}
+0671     <span class="comment">% Demeaned diffusion signal in each voxel</span>
+0672     <span class="comment">%</span>
+0673     <span class="comment">% dSigByVoxel = feGetRep(fe,'dsigdemeaned by Voxel');</span>
+0674     <span class="comment">% dSigByVoxel = feGetRep(fe,'dsigdemeaned by Voxel',coords);</span>
+0675     <span class="comment">% dSigByVoxel = feGetRep(fe,'dsigdemeaned by Voxel',vxIndex);</span>
+0676     nBvecs  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0677     nVoxels = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'n voxels'</span>);
+0678     val     = reshape(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsigdemeaned'</span>), nBvecs, nVoxels);
+0679     val     = val(:,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0680     
+0681   <span class="keyword">case</span> {<span class="string">'dsigfullbyvoxel'</span>,<span class="string">'dsigfullvox'</span>}
+0682     <span class="comment">% Full (measured) signal in each voxel</span>
+0683     <span class="comment">%</span>
+0684     <span class="comment">% dSigByVoxel = feGetRep(fe,'dSig full by Voxel');</span>
+0685     <span class="comment">% dSigByVoxel = feGetRep(fe,'dSig full by Voxel',coords);</span>
+0686     <span class="comment">% dSigByVoxel = feGetRep(fe,'dSig full by Voxel',vxIndex);</span>
+0687     nBvecs  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0688     nVoxels = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'n voxels'</span>);
+0689     val     = reshape(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dSig full'</span>), nBvecs, nVoxels);
+0690     val     = val(:,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin))';
+0691     
+0692   <span class="keyword">case</span> {<span class="string">'voxelrmse'</span>,<span class="string">'voxrmse'</span>}
+0693     <span class="comment">% A volume of RMSE values</span>
+0694     <span class="comment">%</span>
+0695     <span class="comment">% RMSE = feGetRep(fe,'vox rmse')</span>
+0696     <span class="comment">% RMSE = feGetRep(fe,'vox rmse',coords)</span>
+0697     <span class="comment">% RMSE = feGetRep(fe,'vox rmse',vxIndex)</span>
+0698     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsigdemeaned by voxel'</span>);
+0699     predicted = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig f vox'</span>);
+0700     val       = sqrt(mean((measured - predicted).^2,1));
+0701     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0702     
+0703   <span class="keyword">case</span> {<span class="string">'voxelrmsevoxelwise'</span>,<span class="string">'voxrmsevoxelwise'</span>}
+0704     <span class="comment">% A volume of RMSE values optained with the voxel-wise (vw) fit.</span>
+0705     <span class="comment">%</span>
+0706     <span class="comment">% RMSE = feGetRep(fe,'vox rmse vw')</span>
+0707     <span class="comment">% RMSE = feGetRep(fe,'vox rmse vw',coords)</span>
+0708     <span class="comment">% RMSE = feGetRep(fe,'vox rmse vw',vxIndex)</span>
+0709     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsigdemeaned by voxel'</span>);
+0710     predicted = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig f voxel wise by voxel'</span>);
+0711     val       = sqrt(mean((measured - predicted).^2,1));
+0712     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0713 
+0714   <span class="keyword">case</span> {<span class="string">'voxelrmseratio'</span>,<span class="string">'voxrmseratio'</span>}
+0715     <span class="comment">% A volume with the ratio of the RMSE of model/data</span>
+0716     <span class="comment">%</span>
+0717     <span class="comment">% rmseRatio = feGetRep(fe,'vox rmse ratio')</span>
+0718     <span class="comment">% rmseRatio = feGetRep(fe,'vox rmse ratio',coords)</span>
+0719     <span class="comment">% rmseRatio  = feGetRep(fe,'vox rmse ratio',vxIndex)</span>
+0720     rmseData  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'vox rmse data'</span>);
+0721     rmseModel = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'vox rmse'</span>);
+0722     val       = rmseModel ./ rmseData;
+0723     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0724   
+0725   <span class="keyword">case</span> {<span class="string">'prmseratio'</span>,<span class="string">'proportionrmseratio'</span>}      
+0726     <span class="comment">% The probability of a ratio-value in the volume.</span>
+0727     <span class="comment">% Default across 25 log-distributed bins between [.5,2]</span>
+0728     <span class="comment">%</span>
+0729     <span class="comment">% rmseRatio = feGetRep(fe,'p rmse ratio')</span>
+0730     <span class="comment">%</span>
+0731     <span class="comment">% % Change the bins over whih the proportions are computed:</span>
+0732     <span class="comment">% bins      = logspace(log10(.25),log10(4),50)</span>
+0733     <span class="comment">% rmseRatio = feGetRep(fe,'p rmse ratio',bins)</span>
+0734     <span class="keyword">if</span> isempty(varargin)
+0735         bins = logspace(log10(.5),log10(2),25);
+0736     <span class="keyword">end</span>
+0737     <span class="comment">% Extract the rmse ratio in each voxel</span>
+0738     Rrmse  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'vox rmse ratio'</span>);
+0739     <span class="comment">% Compute the number of occurrences for a range of values.</span>
+0740     [val(1,:),val(2,:)]  = hist(Rrmse,bins);
+0741     val(1,:)             = val(1,:)./sum(val(1,:));
+0742     
+0743   <span class="keyword">case</span> {<span class="string">'voxelrmseratiovoxelwise'</span>,<span class="string">'voxrmseratiovoxelwise'</span>}
+0744     <span class="comment">% A volume with the ratio of the RMSE of model/data</span>
+0745     <span class="comment">%</span>
+0746     <span class="comment">% rmseRatio = feGetRep(fe,'vox rmse ratio voxel wise')</span>
+0747     <span class="comment">% rmseRatio = feGetRep(fe,'vox rmse ratio voxel wise',coords)</span>
+0748     <span class="comment">% rmseRatio  = feGetRep(fe,'vox rmse ratio voxel wise',vxIndex)</span>
+0749     rmseData  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'vox rmse data'</span>);
+0750     rmseModel = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'vox rmse voxel wise'</span>);
+0751     val       = rmseModel ./ rmseData;
+0752     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0753 
+0754   <span class="keyword">case</span> {<span class="string">'voxelrmsedata'</span>,<span class="string">'voxrmsedata'</span>}
+0755     <span class="comment">% A volume of RMSE values from data set 1 to data set 2</span>
+0756     <span class="comment">%</span>
+0757     <span class="comment">% RMSE = feGetRep(fe,'vox rmse data')</span>
+0758     <span class="comment">% RMSE = feGetRep(fe,'vox rmse data',coords)</span>
+0759     <span class="comment">% RMSE = feGetRep(fe,'vox rmse data',vxIndex)</span>
+0760     measured  =    <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'dsigdemeaned by voxel'</span>);
+0761     measured2 = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsigdemeaned by voxel'</span>);
+0762     val       = sqrt(mean((measured - measured2).^2,1));
+0763     val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0764 
+0765   <span class="keyword">case</span> {<span class="string">'voxelrmsetest'</span>,<span class="string">'voxrmsetest'</span>}
+0766     <span class="comment">% A volume of RMSE values with a subset of fibers' weights set to 0.</span>
+0767     <span class="comment">%</span>
+0768     <span class="comment">% RMSE = feGetRep(fe,'vox rmse',fiberIndices)</span>
+0769     <span class="comment">% RMSE = feGetRep(fe,'vox rmse',fiberIndices,coords)</span>
+0770     <span class="comment">% RMSE = feGetRep(fe,'vox rmse',fiberIndices,voxelIndex)</span>
+0771     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsigdemeaned by voxel'</span>);
+0772     <span class="comment">% Reshape the predicted signal by voxles</span>
+0773     predicted = reshape(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig fiber test voxel wise'</span>,varargin{1}), <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>), <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'nVoxels'</span>));   
+0774     val       = sqrt(mean((measured - predicted).^2,1));
+0775     
+0776     <span class="keyword">if</span> length(varargin) == 2
+0777       val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0778     <span class="keyword">end</span>
+0779     
+0780   <span class="keyword">case</span> {<span class="string">'voxelrmsetestvoxelwise'</span>,<span class="string">'voxrmsetestvoxelwise'</span>}
+0781     <span class="comment">% A volume of RMSE values with a subset of fibers' weights set to 0.</span>
+0782     <span class="comment">%</span>
+0783     <span class="comment">% RMSE = feGetRep(fe,'voxel rmse test voxel wise',fiberIndices)</span>
+0784     <span class="comment">% RMSE = feGetRep(fe,'voxel rmse test voxel wise',fiberIndices,coords)</span>
+0785     <span class="comment">% RMSE = feGetRep(fe,'voxel rmse test voxel wise',fiberIndices,voxelIndex)</span>
+0786     measured  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'dsigdemeaned by voxel'</span>);
+0787     <span class="comment">% Reshape the predicted signal by voxles</span>
+0788     predicted = reshape(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'pSig fiber test voxel wise'</span>,varargin{1}), <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>), <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'nVoxels'</span>));   
+0789     val       = sqrt(mean((measured - predicted).^2,1));
+0790     
+0791     <span class="keyword">if</span> length(varargin) == 2
+0792       val       = val(<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0793     <span class="keyword">end</span>
+0794     
+0795   <span class="keyword">case</span> {<span class="string">'residualsignalfibervoxel'</span>,<span class="string">'resfibervox'</span>}
+0796     <span class="comment">% Fibers' residual signal by voxel</span>
+0797     <span class="comment">%</span>
+0798     <span class="comment">% res = feGetRep(fe,'res sig fiber vox')</span>
+0799     <span class="comment">% res = feGetRep(fe,'res sig fiber vox',coords)</span>
+0800     <span class="comment">% res = feGetRep(fe,'res sig fiber vox',vxIndex)</span>
+0801     nBvecs  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0802     nVoxels = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'n voxels'</span>);
+0803     val     = reshape(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'res sig fiber'</span>), nBvecs, nVoxels);
+0804     val     = val(:,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin))';
+0805     
+0806   <span class="keyword">case</span> {<span class="string">'residualsignalfullvoxel'</span>,<span class="string">'resfullvox'</span>}
+0807     <span class="comment">% Full (measured) residual signal by voxel</span>
+0808     <span class="comment">%</span>
+0809     <span class="comment">% res = feGetRep(fe,'res sig full vox')</span>
+0810     <span class="comment">% res = feGetRep(fe,'res sig full vox',coords)</span>
+0811     <span class="comment">% res = feGetRep(fe,'res sig full vox',vxIndex)</span>
+0812     nBvecs  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0813     nVoxels = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'n voxels'</span>);
+0814     val     = reshape(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'res sig full'</span>), nBvecs, nVoxels);
+0815     val     = val(:,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin))';
+0816       
+0817   <span class="keyword">case</span> {<span class="string">'fiberressigwithmeanvoxel'</span>}
+0818     <span class="comment">% Residual signal fiber model prediction - demeaned measured signal</span>
+0819     <span class="comment">% with added mean signal. VOXEL FORM (nBvecs x nVoxel).</span>
+0820     <span class="comment">%</span>
+0821     <span class="comment">% This is used to reconstruct an image (volume) to be used for the</span>
+0822     <span class="comment">% refinement process.</span>
+0823     <span class="comment">%</span>
+0824     <span class="comment">% res = feGetRep(fe,'fiber res sig with mean');</span>
+0825     
+0826     <span class="comment">% predicted = feGet(fe,'psig fiber');</span>
+0827     <span class="comment">% measured  = feGetRep(fe,'dsigdemeaned');</span>
+0828     <span class="comment">% val = (measured     - predicted) + (measured_full - measured);</span>
+0829     val     = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'fiberressigwithmean'</span>);
+0830     nBvecs  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0831     nVoxels = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'n voxels'</span>);
+0832     val     = reshape(val, nBvecs, nVoxels);
+0833     
+0834     <span class="keyword">if</span> ~isempty(varargin)
+0835       <span class="comment">% voxelIndices     = feGet(fe,'voxelsindices',varargin);</span>
+0836       <span class="comment">% voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);</span>
+0837       <span class="comment">% val              = val(voxelRowsToKeep,:);</span>
+0838       val = val(:, <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin));
+0839     <span class="keyword">end</span>
+0840     
+0841   <span class="keyword">case</span> {<span class="string">'fiberressigwithmeanvox'</span>,<span class="string">'resfibermeanvox'</span>}
+0842     <span class="comment">% Fibers' residual signal by voxel with mean signal added (with added</span>
+0843     <span class="comment">% isotropic component).</span>
+0844     <span class="comment">%</span>
+0845     <span class="comment">% This is used to compute the residual signal for the refinement.</span>
+0846     <span class="comment">%</span>
+0847     <span class="comment">% res = feGetRep(fe,'fiber res sig with mean vox')</span>
+0848     <span class="comment">% res = feGetRep(fe,'fiber res sig with mean vox',coords)</span>
+0849     <span class="comment">% res = feGetRep(fe,'fiber res sig with mean vox',vxIndex)</span>
+0850     nBvecs  = <a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'nBvecs'</span>);
+0851     nVoxels = <a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'n voxels'</span>);
+0852     val     = reshape(<a href="feGetRep.html" class="code" title="function val = feGetRep(fe,param,varargin)">feGetRep</a>(fe,<span class="string">'fiber res sig with mean'</span>), nBvecs, nVoxels);
+0853     val     = val(:,<a href="feGet.html" class="code" title="function val = feGet(fe,param,varargin)">feGet</a>(fe,<span class="string">'return voxel indices'</span>,varargin))'; 
+0854 
+0855   <span class="keyword">case</span> {<span class="string">'volumesize'</span>,<span class="string">'dims'</span>,<span class="string">'dim'</span>,<span class="string">'imagedim'</span>}
+0856     <span class="comment">% Dimensions of the DW volume.</span>
+0857     <span class="comment">%</span>
+0858     <span class="comment">% dim = feGetRep(fe,'dims')</span>
+0859     val = fe.rep.imagedim;
+0860   <span class="keyword">case</span> {<span class="string">'mapsize'</span>}
+0861     <span class="comment">% Dimensions of the maps of parameters and results.</span>
+0862     <span class="comment">%</span>
+0863     <span class="comment">% dims = feGetRep(fe, 'mapsize')</span>
+0864     val = fe.rep.imagedim(1:3);
+0865     
+0866   <span class="keyword">otherwise</span>
+0867     help(<span class="string">'feGetRep'</span>)
+0868     fprintf(<span class="string">'[feGetRep] Unknown parameter &lt;&lt; %s &gt;&gt;...\n'</span>,param);
+0869     keyboard
+0870 <span class="keyword">end</span>
+0871 
+0872 <span class="keyword">end</span> <span class="comment">% END MAIN FUNCTION</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of s_pestilli_etal_figure_7</title>
+  <meta name="keywords" content="s_pestilli_etal_figure_7">
+  <meta name="description" content="% Comparison between two tractography model.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">scripts</a> &gt; s_pestilli_etal_figure_7.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for scripts&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>s_pestilli_etal_figure_7
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>% Comparison between two tractography model.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function s_pestilli_etal_figure_7() </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% Comparison between two tractography model.
+
+  This function illustrates how to:
+  - Compute the Room-Mean-Square-Error (RMSE) from precomputed LiFE structures.
+  - Compare the RMSE of two different tractography models. In this example
+    we show how to compare a Probabilistic and a Deterministic
+    tractogrpahy model.
+  - We show how to use the LiFE software to compute the &quot;Strength of evidence&quot; and
+    the &quot;Earth Movers Distance&quot; to assess the difference in RMSE between
+    two tractography models.
+
+ The example shows that for this brain and tractography model the
+ Probabilitic tractorgrpahy model generates smaller error; it predicts the
+ diffusion measuments better than the Deterministic.
+ 
+ Results similar to the ones in reproduced in this exmple are reported in
+ Fig. 7 of Pestilli et al. UNDER REVIEW.
+
+ Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function scatterPlotRMSE(det,prob)</a></li><li><a href="#_sub2" class="code">function distributionPlotStrengthOfEvidence(y_e,ywo_e,dprime,std_dprime,xhis,woxhis)</a></li><li><a href="#_sub3" class="code">function distributionPlotEarthMoversDistance(prob,det,em)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function s_pestilli_etal_figure_7()</a>
+0002 <span class="comment">%% Comparison between two tractography model.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  This function illustrates how to:</span>
+0005 <span class="comment">%  - Compute the Room-Mean-Square-Error (RMSE) from precomputed LiFE structures.</span>
+0006 <span class="comment">%  - Compare the RMSE of two different tractography models. In this example</span>
+0007 <span class="comment">%    we show how to compare a Probabilistic and a Deterministic</span>
+0008 <span class="comment">%    tractogrpahy model.</span>
+0009 <span class="comment">%  - We show how to use the LiFE software to compute the &quot;Strength of evidence&quot; and</span>
+0010 <span class="comment">%    the &quot;Earth Movers Distance&quot; to assess the difference in RMSE between</span>
+0011 <span class="comment">%    two tractography models.</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% The example shows that for this brain and tractography model the</span>
+0014 <span class="comment">% Probabilitic tractorgrpahy model generates smaller error; it predicts the</span>
+0015 <span class="comment">% diffusion measuments better than the Deterministic.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% Results similar to the ones in reproduced in this exmple are reported in</span>
+0018 <span class="comment">% Fig. 7 of Pestilli et al. UNDER REVIEW.</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com</span>
+0021 
+0022 <span class="comment">% Get the base directory for the data</span>
+0023 datapath = pestilliDataPath;
+0024 
+0025 <span class="comment">%% Load two pre-computed connectomes generated using Probabilistic and Deterministic tractography.</span>
+0026 <span class="comment">%</span>
+0027 feProbFileName = <span class="string">'subject1_life_culled_2mm_150dir_b2000_probabilistic_lmax8_diffModAx100Rd0.mat'</span>;
+0028 feDetFileName  = <span class="string">'subject1_life_culled_2mm_150dir_b2000_tensor_diffModAx100Rd0.mat'</span>;
+0029 
+0030 fprintf(<span class="string">'Loading precomputed LiFE models for probabilistic (P) and deterministic (D) connectomes...\n'</span>)
+0031 p = load(fullfile(datapath,<span class="string">'life_structures'</span>,feProbFileName));
+0032 d = load(fullfile(datapath,<span class="string">'life_structures'</span>,feDetFileName)); 
+0033 
+0034 <span class="comment">%% Extract the RMSE of the LiFE model for each connectome in each white-matter voxel.</span>
+0035 <span class="comment">% We compute the RMSE for each individual voxel within the White-matter.</span>
+0036 fprintf(<span class="string">'Computing Root-Mean-Square-Error (RMSE) for each brain voxel and tractography model..\n'</span>)
+0037 p.rmse   = feGetRep(p.fe,<span class="string">'vox rmse'</span>);
+0038 d.rmse   = feGetRep(d.fe, <span class="string">'vox rmse'</span>);
+0039 
+0040 <span class="comment">%% Find the common coordinates between the two connectomes.</span>
+0041 <span class="comment">% The two tractography method might have passed through slightly different</span>
+0042 <span class="comment">% voxels. Here we find the voxels where both models passed. We will compare</span>
+0043 <span class="comment">% the error only in these common voxels. There are more coordinates in the</span>
+0044 <span class="comment">% Prob connectome, because the tracking fills up more White-matter.</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% So, hereafter:</span>
+0047 <span class="comment">%</span>
+0048 <span class="comment">% - First we find the indices in the probabilistic connectome of the</span>
+0049 <span class="comment">% coordinate in the deterministic connectome. But there are some of the</span>
+0050 <span class="comment">% coordinates in the Deterministic conectome that are NOT in the</span>
+0051 <span class="comment">% Probabilistic connectome.</span>
+0052 <span class="comment">%</span>
+0053 <span class="comment">% - Second we find the indices in the Deterministic connectome of the</span>
+0054 <span class="comment">% subset of coordinates in the Probabilistic connectome found in the</span>
+0055 <span class="comment">% previous step.</span>
+0056 <span class="comment">%</span>
+0057 <span class="comment">% - Third we find the common voxels. These allow us to find the rmse for</span>
+0058 <span class="comment">% the same voxels.</span>
+0059 
+0060 fprintf(<span class="string">'Finding common brain coordinates between P and D connectomes...\n'</span>)
+0061 p.coords = feGet(   p.fe,<span class="string">'roi coords'</span>);
+0062 d.coords = feGet(   d.fe, <span class="string">'roi coords'</span>);
+0063 prob.coordsIdx = ismember(p.coords,d.coords,<span class="string">'rows'</span>);
+0064 prob.coords   = p.coords(prob.coordsIdx,:);
+0065 det.coordsIdx = ismember(d.coords,prob.coords,<span class="string">'rows'</span>);
+0066 det.coords    = d.coords(det.coordsIdx,:);
+0067 prob.rmse  = p.rmse( prob.coordsIdx);
+0068 det.rmse   = d.rmse( det.coordsIdx);
+0069 
+0070 
+0071 <span class="comment">%% Compare the RMSE of the Probabilistic and Deterministic models using a scatter-density plot.</span>
+0072 <a href="#_sub1" class="code" title="subfunction scatterPlotRMSE(det,prob)">scatterPlotRMSE</a>(det,prob)
+0073 
+0074 <span class="comment">%% Compare the RMSE of the two models using the Stregth-of-evidence and the Earth Movers Distance.</span>
+0075 se = feComputeEvidence(p.rmse,d.rmse);
+0076 
+0077 <span class="comment">%% Show the strength of evidence in favor of Probabilistic versus Deterministic tractography.</span>
+0078 <span class="comment">% Plot the distributions of resampled mean RMSE used to compute the strength of</span>
+0079 <span class="comment">% evidence (S).</span>
+0080 <a href="#_sub2" class="code" title="subfunction distributionPlotStrengthOfEvidence(y_e,ywo_e,dprime,std_dprime,xhis,woxhis)">distributionPlotStrengthOfEvidence</a>(se.s.unlesioned_e,se.s.lesioned_e,se.s.mean,se.s.std,se.s.unlesioned.xbins, se.s.lesioned.xbins)
+0081 
+0082 <span class="comment">%% Show the RMSE distributions for Probabilistic deterministic tractography.</span>
+0083 <span class="comment">%% Compare the distributions using the Earth Movers Distance.</span>
+0084 <span class="comment">% Plot the distributions of RMSE for the two models and report the Earth</span>
+0085 <span class="comment">% Movers Distance between the distributions</span>
+0086 
+0087 <a href="#_sub3" class="code" title="subfunction distributionPlotEarthMoversDistance(prob,det,em)">distributionPlotEarthMoversDistance</a>(se.nolesion,se.lesion,se.em)
+0088 
+0089 <span class="keyword">end</span> <span class="comment">% End main function</span>
+0090 
+0091 <span class="comment">%% Helper functions used for plotting</span>
+0092 <a name="_sub1" href="#_subfunctions" class="code">function scatterPlotRMSE(det,prob)</a>
+0093 figNameRmse = sprintf(<span class="string">'prob_vs_det_rmse_common_voxels_map'</span>);
+0094 mrvNewGraphWin(figNameRmse);
+0095 [ymap,x]  = hist3([det.rmse;prob.rmse]',{[10:1:70], [10:1:70]});
+0096 ymap = ymap./length(prob.rmse);
+0097 sh   = imagesc(flipud(log10(ymap)));
+0098 cm   = colormap(flipud(hot)); view(0,90);
+0099 axis(<span class="string">'square'</span>)      
+0100 set(gca, <span class="keyword">...</span>
+0101     <span class="string">'xlim'</span>,[1 length(x{1})],<span class="keyword">...</span>
+0102     <span class="string">'ylim'</span>,[1 length(x{1})], <span class="keyword">...</span>
+0103     <span class="string">'ytick'</span>,[1 (length(x{1})/2) length(x{1})], <span class="keyword">...</span>
+0104     <span class="string">'xtick'</span>,[1 (length(x{1})/2) length(x{1})], <span class="keyword">...</span>
+0105     <span class="string">'yticklabel'</span>,[x{1}(end) x{1}(round(end/2)) x{1}(1)], <span class="keyword">...</span>
+0106     <span class="string">'xticklabel'</span>,[x{1}(1)   x{1}(round(end/2)) x{1}(end)], <span class="keyword">...</span>
+0107     <span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'ticklen'</span>,[.025 .05],<span class="string">'box'</span>,<span class="string">'off'</span>, <span class="keyword">...</span>
+0108     <span class="string">'fontsize'</span>,16,<span class="string">'visible'</span>,<span class="string">'on'</span>)
+0109 hold on
+0110 plot3([1 length(x{1})],[length(x{1}) 1],[max(ymap(:)) max(ymap(:))],<span class="string">'k-'</span>,<span class="string">'linewidth'</span>,1)
+0111 ylabel(<span class="string">'Deterministic_{rmse}'</span>,<span class="string">'fontsize'</span>,16)
+0112 xlabel(<span class="string">'Probabilistic_{rmse}'</span>,<span class="string">'fontsize'</span>,16)
+0113 cb = colorbar;
+0114 tck = get(cb,<span class="string">'ytick'</span>);
+0115 set(cb,<span class="string">'yTick'</span>,[min(tck)  mean(tck) max(tck)], <span class="keyword">...</span>
+0116     <span class="string">'yTickLabel'</span>,round(1000*10.^[min(tck),<span class="keyword">...</span>
+0117     mean(tck), <span class="keyword">...</span>
+0118     max(tck)])/1000, <span class="keyword">...</span>
+0119     <span class="string">'tickdir'</span>,<span class="string">'out'</span>,<span class="string">'ticklen'</span>,[.025 .05],<span class="string">'box'</span>,<span class="string">'on'</span>, <span class="keyword">...</span>
+0120     <span class="string">'fontsize'</span>,16,<span class="string">'visible'</span>,<span class="string">'on'</span>)
+0121 <span class="keyword">end</span>
+0122 
+0123 <a name="_sub2" href="#_subfunctions" class="code">function distributionPlotStrengthOfEvidence(y_e,ywo_e,dprime,std_dprime,xhis,woxhis)</a>
+0124 histcolor{1} = [0 0 0];
+0125 histcolor{2} = [.95 .6 .5];
+0126 figName = sprintf(<span class="string">'Strength_of_Evidence_test_PROB_vs_DET_model_rmse_mean_HIST'</span>);
+0127 mrvNewGraphWin(figName);
+0128 patch([xhis,xhis],y_e(:),histcolor{1},<span class="string">'FaceColor'</span>,histcolor{1},<span class="string">'EdgeColor'</span>,histcolor{1});
+0129 hold on
+0130 patch([woxhis,woxhis],ywo_e(:),histcolor{2},<span class="string">'FaceColor'</span>,histcolor{2},<span class="string">'EdgeColor'</span>,histcolor{2}); 
+0131 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>, <span class="keyword">...</span>
+0132         <span class="string">'box'</span>,<span class="string">'off'</span>, <span class="keyword">...</span>
+0133         <span class="string">'ticklen'</span>,[.025 .05], <span class="keyword">...</span>
+0134         <span class="string">'ylim'</span>,[0 .2], <span class="keyword">...</span><span class="comment"> </span>
+0135         <span class="string">'xlim'</span>,[28 34], <span class="keyword">...</span>
+0136         <span class="string">'xtick'</span>,[28 30 32 34], <span class="keyword">...</span>
+0137         <span class="string">'ytick'</span>,[0 .1 .2], <span class="keyword">...</span>
+0138         <span class="string">'fontsize'</span>,16)
+0139 ylabel(<span class="string">'Probability'</span>,<span class="string">'fontsize'</span>,16)
+0140 xlabel(<span class="string">'rmse'</span>,<span class="string">'fontsize'</span>,16')
+0141 
+0142 title(sprintf(<span class="string">'Strength of evidence:\n mean %2.3f - std %2.3f'</span>,dprime,std_dprime), <span class="keyword">...</span>
+0143     <span class="string">'FontSize'</span>,16)
+0144 legend({<span class="string">'Probabilistic'</span>,<span class="string">'Deterministic'</span>})
+0145 <span class="keyword">end</span>
+0146 
+0147 
+0148 <a name="_sub3" href="#_subfunctions" class="code">function distributionPlotEarthMoversDistance(prob,det,em)</a>
+0149 histcolor{1} = [0 0 0];
+0150 histcolor{2} = [.95 .6 .5];
+0151 figName = sprintf(<span class="string">'EMD_PROB_DET_model_rmse_mean_HIST'</span>);
+0152 mrvNewGraphWin(figName);
+0153 plot(prob.xhist,prob.hist,<span class="string">'r-'</span>,<span class="string">'color'</span>,histcolor{1},<span class="string">'linewidth'</span>,4);
+0154 hold on
+0155 plot(det.xhist,det.hist,<span class="string">'r-'</span>,<span class="string">'color'</span>,histcolor{2},<span class="string">'linewidth'</span>,4); 
+0156 set(gca,<span class="string">'tickdir'</span>,<span class="string">'out'</span>, <span class="keyword">...</span>
+0157         <span class="string">'box'</span>,<span class="string">'off'</span>, <span class="keyword">...</span>
+0158         <span class="string">'ticklen'</span>,[.025 .05], <span class="keyword">...</span>
+0159         <span class="string">'ylim'</span>,[0 .12], <span class="keyword">...</span><span class="comment"> </span>
+0160         <span class="string">'xlim'</span>,[0 95], <span class="keyword">...</span>
+0161         <span class="string">'xtick'</span>,[0 45 90], <span class="keyword">...</span>
+0162         <span class="string">'ytick'</span>,[0 .06 .12], <span class="keyword">...</span>
+0163         <span class="string">'fontsize'</span>,16)
+0164 ylabel(<span class="string">'Proportion white-matter volume'</span>,<span class="string">'fontsize'</span>,16)
+0165 xlabel(<span class="string">'RMSE (raw MRI scanner units)'</span>,<span class="string">'fontsize'</span>,16')
+0166 title(sprintf(<span class="string">'Earth Movers Distance: %2.3f (raw scanner units)'</span>,em.mean),<span class="string">'FontSize'</span>,16)
+0167 legend({<span class="string">'Probabilistic'</span>,<span class="string">'Deterministic'</span>})
+0168 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 16-Jul-2014 19:56:13 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
