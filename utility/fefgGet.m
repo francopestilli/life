@@ -1,11 +1,9 @@
 function val = fefgGet(fg,param,varargin)
-%Get values from a fiber group structure
+% Get values from a fiber group structure
 %
 %  val = fefgGet(fg,param,varargin)
 %
-%
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 %
 %------------
 % Returns the length of each fiber in the fiber group
@@ -98,10 +96,9 @@ function val = fefgGet(fg,param,varargin)
 %      'tensors'     - Tensors for each node
 %
 %
-% See also: dwiGet/Set, fgCreate; fgSet
+% See also: fgCreate; fgSet
 %
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 val = [];
 
 switch strrep(lower(param),' ','')
@@ -201,21 +198,18 @@ switch strrep(lower(param),' ','')
       fList = 1:nFibers;
     end
     
-    % Pull out the coordinates and floor them.  These are in image
+    % Pull out the coordinates and ceil them.  These are in image
     % space.
     nFibers = length(fList);
     val = cell(1,nFibers);
     if nFibers == 1
-      val = floor(fg.fibers{fList(1)}');
+      val = ceil(fg.fibers{fList(1)}')+1;
 
     else
-      % Handling parallel processing
-      poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-      if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
-      parfor ii=1:nFibers
-        val{ii} = floor(fg.fibers{fList(ii)}');
-      end
-      if ~poolwasopen, matlabpool close; end
+     feOpenLocalCluster
+     parfor ii=1:nFibers
+         val{ii} = ceil(fg.fibers{fList(ii)}')+1;
+     end
     end
 
   case {'uniqueimagecoords'}
@@ -226,7 +220,7 @@ switch strrep(lower(param),' ','')
     % Returns the unique image coordinates of all the fibers as an Nx3
     % matrix of integers.
     % val = round(horzcat(fg.fibers{:})'); 
-    val = floor(horzcat(fg.fibers{:})');
+    val = ceil(horzcat(fg.fibers{:})')+1;
     val = unique(val,'rows');
   
     case {'allimagecoords'}
@@ -237,7 +231,7 @@ switch strrep(lower(param),' ','')
     % Returns all image coordinates of all the fibers as an Nx3
     % matrix of integers.
     % val = round(horzcat(fg.fibers{:})'); 
-    val = floor(horzcat(fg.fibers{:})');
+    val = ceil(horzcat(fg.fibers{:})')+1;
     
   case {'uniqueacpccoords'}
     %   coords = fefgGet(fg,'unique acpc coords');
@@ -280,10 +274,8 @@ switch strrep(lower(param),' ','')
     nFiber = fefgGet(fg,'n fibers');
     val    = cell(nFiber,1);
     
-    % Handling parallel processing
-    poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
-    parfor ii=1:nFiber
+   feOpenLocalCluster
+   parfor ii=1:nFiber
      % if ~mod(ii,200), fprintf('%d ',ii); end
      % Node coordinates in image space
      nodeCoords = fefgGet(fg,'image coords',ii);
@@ -295,7 +287,6 @@ switch strrep(lower(param),' ','')
      %keyboard
      [~, val{ii}] = ismember(nodeCoords, roiCoords, 'rows');  % This operation is slow.
     end    
-    if ~poolwasopen, matlabpool close; end
     fprintf(' took: %2.3fminutes.\n',toc/60)
 
   case {'voxel2fibernodepairs','v2fn'}
@@ -456,9 +447,7 @@ switch strrep(lower(param),' ','')
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
  
-    % Handling parallel processing
-    poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+    feOpenLocalCluster
     % For each fiber, this is a list of the nodes that pass through
     % a voxel in the roiCoords
     parfor ii = 1:nFibers
@@ -467,7 +456,6 @@ switch strrep(lower(param),' ','')
       lst = (nodes2voxels{ii} ~= 0);
       val{ii} = find(lst);
     end
-    if ~poolwasopen, matlabpool close; end
     fprintf(' took: %2.3fs.\n',toc)
 
   case 'voxelsinfg'
@@ -485,16 +473,13 @@ switch strrep(lower(param),' ','')
     nFibers = fefgGet(fg,'nFibers');
     val = cell(1,nFibers);
  
-    % Handling parallel processing
-    poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
-     parfor ii = 1:nFibers
+    feOpenLocalCluster
+    parfor ii = 1:nFibers
       % These are the nodes that pass through a voxel in the
       % roiCoords
       lst = (nodes2voxels{ii} ~= 0);
       val{ii} = nodes2voxels{ii}(lst);
     end
-    if ~poolwasopen, matlabpool close; end
     fprintf(' took: %2.3fs.\n',toc)
 
   case {'voxels2fibermatrix','v2fm'}
@@ -618,10 +603,7 @@ switch strrep(lower(param),' ','')
     val     = cell(1,nFibers);
     xform   = inv(dt.xformToAcpc);
     dt6     = dt.dt6; clear dt
-    
-    % Handling parallel processing
-    poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+    feOpenLocalCluster
     parfor ii = 1:nFibers
       % Get the fiber coordinates.
       coords = fg.fibers{ii}'; % Assumed in ACPC
@@ -654,9 +636,7 @@ switch strrep(lower(param),' ','')
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
  
-    % Handling parallel processing
-    poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+    feOpenLocalCluster
     parfor ii = 1:nFibers
       
       % We now have the dt6 data from all of the fibers.  We extract the
@@ -700,9 +680,7 @@ switch strrep(lower(param),' ','')
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
     
-    % Handling parallel processing
-    poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+    feOpenLocalCluster
     parfor ii = 1:nFibers    
       [val{ii},~,~,~] = dtiComputeFA(eigenvals{ii});
     end
@@ -724,9 +702,7 @@ switch strrep(lower(param),' ','')
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
     
-    % Handling parallel processing
-    poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+    feOpenLocalCluster
     parfor ii = 1:nFibers    
       [~,val{ii},~,~] = dtiComputeFA(eigenvals{ii});
     end
@@ -748,9 +724,7 @@ switch strrep(lower(param),' ','')
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
     
-    % Handling parallel processing
-    poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+    feOpenLocalCluster
     parfor ii = 1:nFibers    
       [~,~,~,val{ii}] = dtiComputeFA(eigenvals{ii});
     end
@@ -772,9 +746,7 @@ switch strrep(lower(param),' ','')
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
     
-    % Handling parallel processing
-    poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+    feOpenLocalCluster
     parfor ii = 1:nFibers    
       [~,~,val{ii},~] = dtiComputeFA(eigenvals{ii});
     end
@@ -796,9 +768,7 @@ switch strrep(lower(param),' ','')
     
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
-    % Handling parallel processing
-    poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+    feOpenLocalCluster
     parfor ii = 1:nFibers
       [~,~,val{ii}.radial, val{ii}.axial] = dtiComputeFA(eigenvals{ii});
     end
@@ -826,9 +796,7 @@ switch strrep(lower(param),' ','')
     nFibers = fefgGet(fg,'nFibers');
     val     = cell(1,nFibers);
 
-    % Handling parallel processing
-    poolwasopen = 1; % if a matlabpool was open already we do not open nor close one
-    if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+    feOpenLocalCluster
     parfor ii = 1:nFibers
       [val{ii}.linearity, val{ii}.planarity] = dtiComputeWestinShapes(eigenvals{ii});
     end

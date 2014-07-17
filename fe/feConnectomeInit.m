@@ -1,5 +1,4 @@
 function fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepeated,anatomyFile,varargin)
-%
 % Initialize a new connectome (fe) structure. 
 %
 %    fe = feConnectomeInit(dwiFile,dtFile,fgFileName,feFileName,savedir,dwiFileRepeated,anatomyFile,varargin);
@@ -9,17 +8,15 @@ function fe = feConnectomeInit(dwiFile,fgFileName,feFileName,savedir,dwiFileRepe
 %
 % Example: 
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
-% Handling parallel processing
-poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+feOpenLocalCluster
 
 % Intialize the fe structure.
 fe = feCreate;
 
 % Set the based dir for fe, this dire will be used 
-if notDefined('savedir'),  savedir = fullfile(fileparts(dtFile),'LiFE');
+if notDefined('savedir'),  savedir = fullfile(fileparts(fgFileName),'life');
 end
 fe = feSet(fe,'savedir',savedir);
 

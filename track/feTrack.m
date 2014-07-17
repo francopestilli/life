@@ -1,5 +1,4 @@
 function [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibersFolder,lmax,nSeeds,wmMask)
-%
 % This function creates whole-brain white-matter connectome.
 %
 % [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibersFolder,[lmax],[nSeeds],[wmMask])
@@ -12,7 +11,7 @@ function [status, results, fg, pathstr] = feTrack(trackingAlgorithm, dtFile,fibe
 %             number of fibers.
 %
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 if notDefined('trackingAlgorithm'), trackingAlgorithm = {'tensor'};end
 if notDefined('dtFile'),            dtFile = ...
     '/biac2/wandell6/data/frk/LiFE/data/fp20120420/150dirs_b1000_1/dt6.mat';end

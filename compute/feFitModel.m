@@ -6,23 +6,25 @@ function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)
 %
 %  fit = mctDiffusionModelFit(M,dSig,fitMethod)
 %
-% dSig:  The diffusion weighted signa measured at each
+% dSig:  The diffusion weighted signal measured at each
 %        voxel in each direction. These are extracted from 
-%        the dwi data at some roi coordinates.
-% M:     The microtrack difusion model matrix, constructed
+%        the dwi data at some white-matter coordinates.
+% M:     The LiFE difusion model matrix, constructed
 %        by feConnectomeBuildModel.m
 %
-% fitMethod: it can be set to 'lsqnonneg' or 'stochastic gradient descent',
-% 'sgd'
+% fitMethod: 
+%  - 'bbnnls' - DEFAULT and best, faster large-scale solver.
+%  - 'lsqnonneg' - MatLab defaoult non-negative least-square solver (SLOW)
+%  - 'sgd', 'sgdnn' - Stochastic gradient descent.
+%  - 'sgdl1','sgdl1nn' - Stochastic gradient descent with L1 constrain on weights.
 %
-% See also: feCreate.m, feConnectomeBuildModel.m, feGet.m, feGet.
+% See also: feCreate.m, feConnectomeBuildModel.m, feGet.m, feSet.m
 %
 % Example:
-%  See v_lifeExample.m
 %
-% Franco (c) 2012 Stanford VISTA Team
-
-% ** Notes **
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
+%
+% Notes about the LiFE model:
 %
 % The rows of the M matrix are nVoxels*nBvecs. We are going to predict the
 % diffusion signal in each voxel for each direction.
@@ -34,7 +36,6 @@ function [fit w R2] = feFitModel(M,dSig,fitMethod,lambda)
 % In addition to M, we typically return dSig, which is the signal measured
 % at each voxel in each direction.  These are extracted from the dwi data
 % and knowledge of the roiCoords.
-%
 
 % fit the model, by selecting the proper toolbox.
 switch fitMethod
@@ -48,7 +49,7 @@ switch fitMethod
     tic
     fprintf('\nLiFE: Computing least-square minimization with BBNNLS...\n')
     opt = solopt;
-    opt.maxit = 210;
+    opt.maxit = 500;
     opt.use_tolo = 1;
     out_data = bbnnls(M,dSig,zeros(size(M,2),1),opt);
     fprintf('BBNNLS status: %s\nReason: %s\n',out_data.status,out_data.termReason);

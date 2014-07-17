@@ -21,7 +21,7 @@ function figDir = feSavefig(h,varargin)
 %   feSavefig(figureHandle,'verbose','yes','figName','myfig','figDir','/path/to/fig/folder/');
 %
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % set up default variables:
 figName           = sprintf('feFig_%s',get(h,'Name')); % the name of the figure file

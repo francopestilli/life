@@ -1,5 +1,4 @@
 function [fg, keepFG] = feSegmentFascicleFromConnectome(fg, rois, operation, fascicleFileName)
-%
 % Segment a fascicle from a connectome by applying a series of 'AND' and
 % 'NOT' operations between the connectome and a set of ROIs.
 %
@@ -35,8 +34,7 @@ function [fg, keepFG] = feSegmentFascicleFromConnectome(fg, rois, operation, fas
 %                  not survive some of the logical operations and it was
 %                  deleted from the output fiber group.
 %
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Make sure that the inputs have one logical operation per ROI
 if ~(length(rois) == length(operation))
@@ -80,7 +78,7 @@ for ir = 1:length(rois)
   % counterintuitive: they mark fibers that DO intersect the ROI and that are
   % exluded from the output FG."
   switch operation{ir}
-    case {'and','AND','and both endpoints'}
+    case {'and','AND','and both endpoints','endpoints'}
       currentFibIndices{ir+1} = currentFibIndices{ir}(keep);
     case {'not','NOT'}
       currentFibIndices{ir+1} = currentFibIndices{ir}(~keep);

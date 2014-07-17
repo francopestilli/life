@@ -1,11 +1,7 @@
 function fe = feSet(fe,param,val,varargin)
-% Set fascicle evaluation parameters
+% Set fascicle evaluation parameters.
 %
 %   fe = feSet(fe,param,val,varargin)
-%
-%
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
 %
 %----------
 % feSet(fe,'bvecsindices');
@@ -23,7 +19,7 @@ function fe = feSet(fe,param,val,varargin)
 %----------
 %
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Check for input parameters
 if notDefined('fe'),    error('fe structure required'); end

@@ -9,16 +9,11 @@ function img = feReplaceImageValues(img,vals,coords,indexes)
 % vals:    A list of N values that will be placed into the img volume
 % coords:  Nx3 matrix of coordinates in the volume.
 %
-% TODO - let's discuss whether this should only work for a 3D planning that
-% we are using for ROIs and overlays, or we want really to do this special
-% treatment of the 4th dimension.
-%
 % indexes is a subset of the 4th dimension of img if img is a 4D file. For
 % example it helsp addressing the diffusion directions and not the b0
 % images in the data set. Default is 1:size(img,4).
 %
-%
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % If index is not passed, then copy the data into all of the slots in the
 % 4th dimension

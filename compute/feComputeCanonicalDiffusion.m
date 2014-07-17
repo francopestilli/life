@@ -1,5 +1,5 @@
 function Q = feComputeCanonicalDiffusion(fibers,dParms)
-% Calculate a tensor for forward modeling at each point of each fiber
+% Calculate a tensor for forward modeling at each point of each fiber.
 %
 %  Q = feComputeCanonicalDiffusion(fibers,dParms)
 %
@@ -22,16 +22,14 @@ function Q = feComputeCanonicalDiffusion(fibers,dParms)
 %
 % See also: feConnectomeInit.m v_lifeExample.m
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Preallocate
 nFibers = length(fibers); % The number of Fibers.
 Q       = cell(1,nFibers); % Memory for the tensors of each fiber.
 D       = diag(dParms);    % The diagonal form of the Tensors' model parameters.
 
-% Handling parallel processing
-poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
+feOpenLocalCluster
 parfor ii = 1:nFibers
  % Compute the diffusion gradient at each node of the fiber.
  fiberGradient = gradient(fibers{ii});
@@ -62,7 +60,6 @@ parfor ii = 1:nFibers
  % T is a matrix; each row is a 1,9 version of the tensor.
  Q{ii} = T;
 end
-if ~poolwasopen, matlabpool close; end
 
 return
 

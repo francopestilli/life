@@ -7,9 +7,9 @@ function fe = feConnectomeBuildModel(fe)
 %
 % See also: feFitModel.m, feComputePredictedSignal.m
 %
-% Example:  See v_lifeExample.m
+% Example:  
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 %
 % -- The LiFE Model --
 %
@@ -75,10 +75,7 @@ vox_sparse_pSig = cell(nVoxels,1);
 % will run it in parallel if parallel processing is allowed.
 fprintf('LiFE - Predicting diffusion signal in %i voxel...\n',nVoxels);
 
-% Handling parallel processing
-poolwasopen=1; % if a matlabpool was open already we do not open nor close one
-if (matlabpool('size') == 0), matlabpool open; poolwasopen=0; end
-
+feOpenLocalCluster
 parfor vv = 1:nVoxels
   num_unique_fibers = feGet(fe,'unique f num',usedVoxels(vv));
   
@@ -172,21 +169,7 @@ end
 % Install the matrix in the fe structure.
 fe = feSet(fe,'Mfiber',sparse(M_rows, M_cols, M_signal));
 
-% Let's visualize the Mfiber matrix to make sure it has the right general
-% structure of columns with nBvecs numbers, but sparse.  We can visualize for
-% smallish numbers of fibers and voxels.
-%
-% Here is a picture of the Mfiber matrix.
-%
-% The contrast of the graph tells us about how many nodes are in the fiber
-% (we think).  This would totally be true if all the nodes are pointing
-% basically the same way.
-%
-% NOTE TO SELF:  Let's make a nice way to plot the M fiber matrix with
-% lines demarking the voxels. 
-% mrvNewGraphWin;imagesc(feGet(fe,'M fiber'));
 fprintf('process completed in %2.3fs.\n',toc)
 disp('LiFE - DONE Building the connectome model.');
-if ~poolwasopen, matlabpool close; end
 
 return

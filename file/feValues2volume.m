@@ -10,7 +10,7 @@ function vol3d = feValues2volume(vals,coords,vSize)
 % vSize  -  The size of the image volume 
 % 
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Check that we have a value for each coordinate.
 if ~( length(vals) == size(coords,1) )

@@ -1,8 +1,4 @@
 function [w, R2] = sgd(y,X,numtoselect,finalstepsize,convergencecriterion,checkerror,nonneg,alpha,lambda)
-% 
-% This fucntion is working properly and can be used. But the HELP of this
-% function has not been updated yet. Blame Franco. F.P. 2012
-% 
 % Least-square stochastic gradient-descend fit.
 % 
 % sgd(y,X,numtoselect,finalstepsize,convergencecriterion,checkerror,nonneg)

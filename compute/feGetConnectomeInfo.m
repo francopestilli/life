@@ -8,14 +8,14 @@ function fe = feGetConnectomeInfo(fe)
 % fe slot 'unique index'.
 %
 %
-% Copyright Franco Pestilli (2013) Vistasoft Stanford University.
+% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Get the indexes to the voxels actually used to build LifE.
 % Remember that voxels with no fibers are disregarded during the build.
 usedVoxels = feGet(fe,'usedVoxels');
 nVoxels    = length(usedVoxels);
 
-% preallocate
+% preallocate memory for speed.
 f                  = cell( nVoxels,1); % This will contain all the fibers in each voxel
 unique_fibers_index= cell( nVoxels,1); % This will contain the *unique* fibers in each voxel
 unique_fibers_num  = zeros(nVoxels,1); % This will contain the number of unique fibers in each voxel
