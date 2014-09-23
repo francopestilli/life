@@ -20,21 +20,27 @@ voxTensors        = feGet(fe,'voxeltensors',    voxIndex);  % Get the tensors fo
 % Compute the predicted signal by each tensors of each node in this voxel.
 voxDSig = feComputeSignal(S0, bvecs, bvals, voxTensors);
 
-% Combine the diffusion predictions across nodes of a single fiber.
+% We (FRK/BW) now think we should never really enter this condition.
+% At some point there were redundant representations of the nodes, and they
+% could be eliminated here.  But we don't think this happens any more.
+%
+% The code here found the redundant nodes and removed them by 
+% multiplying with the combineM matrix.
 % Use only the prediction from the unique fibers, not from all the fibers.
 if tot_fibers_num ~= unique_fibers_num
-  combineM = zeros(tot_fibers_num, unique_fibers_num);
-  
-  % The matrix combineM is a set of 0s and 1s that will sum together the
-  % nodes from a single fiber.
-  for ii=1:unique_fibers_num
-    combineM(:,ii) = ( tot_fiber_index == unique_fiber_index(ii) );
-  end
-  
-  % The matrix for this voxel starts with each node, and when we multiply
-  % by combineM. The resulting matrix represents each fiber
-  % (not each node) as a column
-  voxDSig = voxDSig*combineM;
+    warning('redundant nodes')
+    combineM = zeros(tot_fibers_num, unique_fibers_num);
+    
+    % The matrix combineM is a set of 0s and 1s that will sum together the
+    % nodes from a single fiber.
+    for ii=1:unique_fibers_num
+        combineM(:,ii) = ( tot_fiber_index == unique_fiber_index(ii) );
+    end
+    
+    % The matrix for this voxel starts with each node, and when we multiply
+    % by combineM. The resulting matrix represents each fiber
+    % (not each node) as a column
+    voxDSig = voxDSig*combineM;
 end
 
 return

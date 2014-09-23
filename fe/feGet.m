@@ -523,12 +523,12 @@ switch param
     % bval = feGet(fe,'bvals')
     val = fe.life.bvals;
     
-  case {'diffusionsignalinvoxel','dsiinvox','dsigvox','dsigmeasuredvoxel'}
+  case {'diffusionsignalinvoxel','dsinvox','dsigvox','dsigmeasuredvoxel'}
     % Returns a nVoxels X nBvecs array of measured diffusion signal
     %
-    % val = feGet(fe,'dsiinvox');
-    % val = feGet(fe,'dsiinvox',voxelsIndices);
-    % val = feGet(fe,'dsiinvox',coords);
+    % val = feGet(fe,'dsinvox');
+    % val = feGet(fe,'dsinvox',voxelsIndices);
+    % val = feGet(fe,'dsinvox',coords);
     val = fe.life.diffusion_signal_img(feGet(fe,'voxelsindices',varargin),:)';
     
   case {'diffusionsignalinvoxeldemeaned','dsiinvoxdemeaned'}
@@ -1505,6 +1505,9 @@ switch param
     % location the the connectome coordinates for which there is a match in
     % the coords
     %
+    % FIX FIX FIX 
+    % Change name ofcall to add in the term 'logical' 
+    % this function returns a logical index 
     varargin = varargin{1};
     if ( ~isempty(varargin) )
       if ( size(varargin{1},2) == 3 )

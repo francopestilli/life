@@ -1,31 +1,27 @@
 function S = feComputeSignal(S0, bvecs, bvals, Q)
-% Compute expected diffusion signal from tensor
+% Compute expected diffusion signal from a collection of tensors
 %
 %  S = feComputeSignal(S0, bvals, bvecs, Q)
 %
 % This function implements the Stejskal Tanner equation prediction given a
-% quadratic form.  There should also be a form of this equation that takes
-% in the ADC values, rather than the quadratic form.
+% quadratic form.
 %
-% This is a version of the Stejskal/Tanner equation for signal attenuation
 % See: http://en.wikipedia.org/wiki/Diffusion_MRI#Diffusion_imaging
-%
-% We need a better description of the expected parameter format (BW).
 %
 % INPUTS
 %   S0    - The signal measured in the non-diffusion weighted scans (B0)  
 %   bvals - the b values
 %   bvecs - the b vectors
-%   Q     - The tensors (quadratic forms) (e.g. see fgTensors) corresponding
-%           to each node in a voxel. There are often several tensors.  
+%   Q     - The tensors (quadratic forms) corresponding to each node in a
+%           voxel. Each row is a tensor from some node. So if there are M
+%           nodes then Q is M x 9.
 %
 % OUTPUTS
 %   S     - The signal predicted according to this form of the Stejskal/Tanner eq: 
 % 
 %         S = S0 exp(-bval*(bvec*Q*bvec))
 %
-%    There is a column of signals for each of the tensors.  So if there are
-%    30 directions and 4 tensors, then the returned signals is 30 x 4.
+%   So if there are 30 directions and 4 tensors, the returned signals is 30 x 4.
 %
 % Example:
 %

@@ -1,9 +1,10 @@
-function fe = feConnectomeBuildModel(fe)
+function fe = feConnectomeBuildModel(fe,zeroMean)
 % Compute matrix to predict directional diffusion in each voxel from fibers
 %
-%   fe = feConnectomeBuildModel(fe)
+%   fe = feConnectomeBuildModel(fe,zeroMean)
 %
 % INPUTS: fe -  An fe structure, see feCreate.m
+%         zeroMean - Remote the mean of the prediction (default = true).
 %
 % See also: feFitModel.m, feComputePredictedSignal.m
 %
@@ -59,6 +60,7 @@ if notDefined('fe'),  error('LiFE (fe = feCreate) struct needed'); end
 if ~isfield(fe,'life')
   error('LiFE - the field ''life'' is necessary in the fe structure.')
 end
+if notDefined('zeroMean'), zeroMean = true; end
 
 disp('LiFE - Building the connectome model...');
 tic
@@ -83,12 +85,12 @@ parfor vv = 1:nVoxels
   voxelPSignal      = feComputeVoxelSignal(fe,usedVoxels(vv));
   
   % Fibers in the connectome determine the directional signal in the voxel
-  % signal, not the mean signal in the voxel. Here we first demean the
+  % signal, not the mean signal in the voxel. Typically, we demean the
   % voxel signal we will predict.
   %
-  %  demeaned_pSig       = voxelPSignal - repmat(mean(voxelPSignal, 1),nBvecs,1);
+  %  demeaned_pSig = voxelPSignal - repmat(mean(voxelPSignal, 1),nBvecs,1);
   %
-  % The mean will be predicted by the Miso part of the matrix, not the
+  % The mean is predicted by the Miso part of the matrix, not the
   % Mfiber part.
   %
   % Then we reorganize the demeaned signal into a column vector
@@ -97,8 +99,20 @@ parfor vv = 1:nVoxels
   %
   % Somehow this column vector ends up occupying the right parts of the
   % Mfiber matrix when we are done.  That miracle happens below.
-  vox_sparse_pSig{vv}   = reshape((voxelPSignal - repmat(mean(voxelPSignal, 1),nBvecs,1))', ...
-                          num_unique_fibers * nBvecs, 1) ;
+  if zeroMean
+      % In typical application, we remove the mean from the fiber
+      % predictions.  The returned prediction has zero mean.
+      vox_sparse_pSig{vv}   = reshape((voxelPSignal - repmat(mean(voxelPSignal, 1),nBvecs,1))', ...
+          num_unique_fibers * nBvecs, 1) ;
+  else
+      % Do not remove the mean
+
+      % For other purposes, we want to retain the fiber mean.
+      % These cases have to do with building simulated
+      % data set.
+      vox_sparse_pSig{vv}   = reshape((voxelPSignal)', num_unique_fibers * nBvecs, 1) ;
+  end
+  
 end
 fprintf('LiFE - Prediction computed in: %2.3fs.\n',toc);
 
@@ -132,6 +146,7 @@ M_cols   = zeros(M_siz, 1);
 % filled up in the following loop, too.
 fe       = feSet(fe,'dSig measured',zeros(1,nVoxels*nBvecs));
 
+% This is the slowest part of the computation.
 % The following lines create the *sparse-matrix* indexing into the M matrix.
 % Plus generate a vector of measured signal, full signal and demeaned.
 %
