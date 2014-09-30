@@ -41,12 +41,21 @@ switch param
   
     % Set top level structure, not just single slot
   case 'life'
-    fe.life  = val;  % Structure of parameters and results from LIFE analysis
+    fe  = val;  % Structure of parameters and results from LIFE analysis
     
   case 'fgfromacpc'
     % Fiber group candidate fascicles, Connectome.
     % Everything isin img coordinates in LiFE
-    fe.fg  = dtiXformFiberCoords(val, fe.life.xform.acpc2img,'img');
+    
+    % If it is a file name load.
+    if ischar(val) && exist(val,'file') 
+        [p,n] = fileparts(val);
+        val     = fgRead(val); 
+        fe.fg  = feSet(fe,'fg',fullfile(feGet(fe,'folder'),n,'_img.mat'));
+    end
+    
+    fgWrite(dtiXformFiberCoords(val, fe.xform.acpc2img,'img'));
+    
     % Must clear when we change the fg
     fe = feSet(fe,'voxel 2 fiber node pairs',[]);
     
@@ -60,7 +69,7 @@ switch param
 
   case {'fgtensors','tensors','fgq','q'}
     % fe = feSet(fe, 'tensors', tensors);    - set the passed tensors
-    fe.life.fibers.tensors = val;
+    fe.fibers.tensors = val;
 
   case 'roi'
     % Cell array of regions of interest where we evaluate
@@ -74,25 +83,25 @@ switch param
     fe.roi = dtiNewRoi(name,randColor,fefgGet(feGet(fe,'fg img'),'unique image coords'));
     
   case 'xform'
-    fe.life.xform = val;  % Transforms between coords for fg, roi, and dwi data
+    fe.xform = val;  % Transforms between coords for fg, roi, and dwi data
      
   %% Diffusion data related parameters
   case {'bvecs','diffusionbvecs'}
     % feSet(fe,'bvecs');
-    fe.life.bvecs = val;
+    fe.bvecs = val;
   case {'bvecsindices','diffusionimagesindicesindwivolume'}
     % feSet(fe,'bvecsindices');
-    fe.life.bvecsindices = val;
+    fe.bvecsindices = val;
   case {'bvals','diffusionbvals'}
-    fe.life.bvals = val;    
+    fe.bvals = val;    
   case {'diffusionsignalimage','dsi', 'diffusion_signal_img'}
-    fe.life.diffusion_signal_img = val;
+    fe.diffusion_signal_img = val;
   case {'b0signalimage','b0img', 'diffusion_s0_im','s0image'}
-    fe.life.diffusion_S0_img = val;
+    fe.diffusion_S0_img = val;
   case {'usedvoxels'}
-    fe.life.usedVoxels = val;
+    fe.usedVoxels = val;
   case {'modeltensor'}
-    fe.life.modelTensor = val;
+    fe.modelTensor = val;
   case {'roivoxels','roicoords'}
     % What space?  What form for the coords?
     % Always in IMG coords in LiFE.
@@ -101,35 +110,35 @@ switch param
     
     %% The LiFE model
   case 'mfiber'
-    fe.life.Mfiber = val;             % Fiber portion of M matrix
+    fe.Mfiber = val;             % Fiber portion of M matrix
   case {'measuredsignalfull', 'dsigmeasured'}      % Measured signal in ROI
-    fe.life.dSig  = val;
+    fe.dSig  = val;
   case 'fit'
-    fe.life.fit = val;
+    fe.fit = val;
   case 'voxfit'
-    fe.life.voxfit = val;
+    fe.voxfit = val;
   case 'xvalfit'
-    fe.life.xvalfit = val;
+    fe.xvalfit = val;
   
     %% Connectome fibers information.
   case {'numberofuniquefibersineachvoxel','uniquefibersnum','numberofuniquefibers','numuniquef'}
-    fe.life.fibers.unique.num = val;
+    fe.fibers.unique.num = val;
   case {'indextouniquefibersineachvoxel','uniquefibersindex','uniqueindex','indexesofuniquefibers','indexuniquef','uniquefibers'}
-    fe.life.fibers.unique.index = val;
+    fe.fibers.unique.index = val;
   case {'numberoftotalfibersineachvoxel','totalfibernmber','fibersnum','numberoffibers','numf','numfibers'}
-    fe.life.fibers.total.num = val;
+    fe.fibers.total.num = val;
   case {'indexoftotalfibersineachvoxel','totalfiberindex','fibersbyvox','fibersinvox'}
-    fe.life.fibers.total.index = val;
+    fe.fibers.total.index = val;
   case {'voxel2fibernodepairs','v2fnp'}
     % This has to be cleared whenever we change fg or roi
-    fe.life.voxel2FNpair = val;
+    fe.voxel2FNpair = val;
     % Spatial coordinate transforms for voxels and fg to coordinate frames
   case {'xformimg2acpc','img2acpc','img2acpcxform'}
-    fe.life.xform.img2acpc = val;
+    fe.xform.img2acpc = val;
   case {'xformacpc2img','acpc2img','acpc2imgxform'}
-    fe.life.xform.acpc2img = val;
+    fe.xform.acpc2img = val;
   case {'size','imgsize','volumesize','dims','dim'}
-    fe.life.imagedim = val;
+    fe.imagedim = val;
     
     %% Diffusion data reapeted measure parameters
   case 'dwirepeatfile'
