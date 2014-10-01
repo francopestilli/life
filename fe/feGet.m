@@ -1524,7 +1524,7 @@ switch param
     
   case {'findvoxels','findvoxelindexes','findvoxelsinconnectome','findvoxelsinconnectomeroi', ...
       'voxel2index','coords2index'}
-    % Given an VOI finds the indices of the matching voxels inside the big
+    % Given a VOI find the indices of the matching voxels inside the big
     % volume, which ordinarily represents the full connectome.
     %
     % foundVoxels = feGet(fe,'find voxels',coords)
@@ -1545,6 +1545,7 @@ switch param
       % This is how I had it. I think it is worng:
       % val = ismember(feGet(fe,'roi coords'), varargin{1}, 'rows'); % This is slow
       % This is hwo I think it should be:
+      if ~isinteger(varargin{1}), error('Coords should be integers'); end 
       [~,val] = ismember(varargin{1}, feGet(fe,'roi coords'),'rows'); % This is slow
     end
     
