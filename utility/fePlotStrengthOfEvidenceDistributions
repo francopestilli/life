@@ -1,0 +1,67 @@
+function fig = fePlotStrengthOfEvidenceDistributions(se)
+%
+% Plots the distribution of RMSE used to compute the strenght of evidence.
+% Makes two plots:
+% (1) The distributions of RMSE in the path-neighborhood, leasioned and unlesioned. 
+% (2) The distribution of resampled mean RMSE used to compute "S" 
+%
+% INPUTS:
+%    se - is a structure containing the results of a virtual lesion, see feVirtualLesion.m and feComputeEvidence.m
+%    
+% OUTPUTS:
+%    fig - a strucutre containing figure handle, name and print type for each of the two figures returned
+%          fig.name = 'figure name' % String
+%          fig.h    = figure handle % numeric 
+%          fig.type = printing type; % string ['eps' | 'jpg' | 'png']
+%
+% See also,  feVirtualLesion.m and feComputeEvidence.m, fePrintfigure.m
+%
+% Copyright 2014-2015 Franco Pestilli, PhD, Indiana University
+
+   
+% Raw RMSE distributions
+fig(1).name = sprintf('rmse_distributions_%s',mfilename);
+fig(1).h   = figure('name',fig(1).name,'color','w');
+fig(1).type = 'eps';
+set(fig(1).h,'Units','normalized','Position',[0.007 0.55  0.28 0.36]);
+
+plot(se.lesion.xhist,se.lesion.hist,'-','color', [.95 .45 .1],'linewidth',2); hold on
+plot(se.nolesion.xhist,se.nolesion.hist,'-','linewidth',2, 'color', [.1 .45 .95])
+plot([se.nolesion.rmse.mean,se.nolesion.rmse.mean], [0,0.12],'-','color',[.1 .45 .95] ) 
+plot([se.lesion.rmse.mean,se.lesion.rmse.mean], [0,0.12], '-', 'color',[.95 .45 .1])
+title(sprintf('mean RMSE\nno-lesion %2.3f | lesion %2.2f',se.nolesion.rmse.mean,se.lesion.rmse.mean),'fontsize',16)
+ylabel('Probability', 'fontsize',14);xlabel('RMSE', 'fontsize',14)
+legend({'Lesion','No lesion'},'fontsize',14);
+set(gca,'box','off','xtick',[0 round(se.xrange(2)/2) se.xrange(2)],'ytick',[0 .06 .12],'xlim',[0 se.xrange(2)],'ylim',[0 .125], ...
+    'tickdir', 'out', 'ticklength', [0.025 0])
+
+% Plot the resampled distribution of RMSE used to compute "S"
+fig(2).name = sprintf('virtual_lesion_test_mean_rmse_hist_%s',mfilename);
+fig(2).h   = figure('name',fig(2).name,'color','w');  
+fig(2).type = 'eps';
+set(fig(2).h,'Units','normalized','Position',[0.007 0.55  0.28 0.36]);
+
+% We reorganize the variables names hee below just to keep the plotting
+% code more compact.
+ywo_e = se.s.lesioned_e;
+y_e   = se.s.unlesioned_e;
+woxhis = se.s.lesioned.xbins;
+xhis   = se.s.unlesioned.xbins;
+min_x = se.s.min_x;
+max_x = se.s.max_x; 
+
+patch([xhis,xhis],y_e(:),[.1 .45 .95],'FaceColor',[.1 .45 .95],'EdgeColor',[.1 .45 .95]);
+hold on
+patch([woxhis,woxhis],ywo_e(:),[.95 .45 .1],'FaceColor',[.95 .45 .1],'EdgeColor',[.95 .45 .1]);
+set(gca,'tickdir','out', ...
+        'box','off', ...
+        'ylim',[0 0.25], ...
+        'xlim',[min_x,max_x], ...
+        'ytick',[0 0.1 0.2], ...
+        'xtick',round(linspace(min_x,max_x,4)), ...
+        'fontsize',16)
+ylabel('Probability','fontsize',16)
+xlabel('rmse','fontsize',16')
+title(sprintf('Strength of connection evidence %2.3f',(se.s.mean)), 'FontSize',16)
+
+end
