@@ -44,19 +44,32 @@ switch param
     fe  = val;  % Structure of parameters and results from LIFE analysis
     
   case 'fgfromacpc'
-    % Fiber group candidate fascicles, Connectome.
-    % Everything isin img coordinates in LiFE
-    
-    % If it is a file name load.
+    % Fiber group representing the candidate connectome.
+    % Everything is in IMAGE coordinates (not in ACPC) in the FE structure. 
+    % Here we make this assumption.
+
+    % If it is a string we assume thisis a file name for a fiber group.
+    % We load the fiber group from file.
     if ischar(val) && exist(val,'file') 
-        [p,n] = fileparts(val);
-        val     = fgRead(val); 
-        fe.fg  = feSet(fe,'fg',fullfile(feGet(fe,'folder'),n,'_img.mat'));
+       [p,n]  = fileparts(val);
+       val    = fgRead(val); 
+
+    elseif isstruct(val) && isfield(val,'fibers')
+    % We do nothing beside assuming that the fiber group 
+    % is passed in ACPC coordinates as default in mrDiffusion
+   
+    else error('[%s] incorrect val parameter %s.',mfilename, val);
     end
     
-    fgWrite(dtiXformFiberCoords(val, fe.xform.acpc2img,'img'));
+    % If a fiber group structure was passed in instead
+    % we assume that it was passed in in AC-PC coordinates 
+    % (the default in mrDiffusion) we trasform  in IMAGE coordinates
+    val = dtiXformFiberCoords(val, fe.xform.acpc2img,'img');
+      
+    % Finally we set the fiber group in the FE structure in IMAGE coordinates
+    fe  = feSet(fe,'fg',val);
     
-    % Must clear when we change the fg
+    % Must clear the fields associated with the fiber group every time a new FG is set.
     fe = feSet(fe,'voxel 2 fiber node pairs',[]);
     
   case {'fgimg', 'fg'}
