@@ -19,7 +19,7 @@ function fe = feSet(fe,param,val,varargin)
 %----------
 %
 %
-% Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
+% Copyright (2013-2015), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 
 % Check for input parameters
 if notDefined('fe'),    error('fe structure required'); end
@@ -120,7 +120,6 @@ switch param
     % Always in IMG coords in LiFE.
     fe.roi.coords = val;
   
-    
     %% The LiFE model
   case 'mfiber'
     fe.Mfiber = val;             % Fiber portion of M matrix
