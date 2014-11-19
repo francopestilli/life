@@ -91,7 +91,7 @@ switch param
     fe       = feSet(fe,'v2fnp',[]);
     
   case {'roifromfg','fgroi','roifg'}
-    name   = sprintf('roi_%s',fe.fg.name); 
+    name   = sprintf('roi_%s', fe.fg.name);
     randColor = rand(1,3);
     fe.roi = dtiNewRoi(name,randColor,fefgGet(feGet(fe,'fg img'),'unique image coords'));
     

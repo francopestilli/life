@@ -26,7 +26,7 @@ parfor vv = 1:nVoxels
   voxIndex = usedVoxels(vv);
   
   % Indexes to the fibers in the current voxel
-  f{vv} = fe.life.voxel2FNpair{voxIndex}(:,1);
+  f{vv} = fe.voxel2FNpair{voxIndex}(:,1);
   
   % Reduce to the unique fibers:
   unique_fibers_index{vv} = sort(unique(f{vv}));
