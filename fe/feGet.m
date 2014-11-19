@@ -503,7 +503,7 @@ switch param
     % Diffusion directions.
     %
     % val = feGet(fe,'bvecs');
-    val = fe.life.bvecs;
+    val = fe.bvecs;
     
   case {'bvecsindices'}
     % Indices to the diffusion directions in the DWi 4th Dimension.
@@ -521,7 +521,7 @@ switch param
     % B0 Values.
     %
     % bval = feGet(fe,'bvals')
-    val = fe.life.bvals;
+    val = fe.bvals;
     
   case {'diffusionsignalinvoxel','dsinvox','dsigvox','dsigmeasuredvoxel'}
     % Returns a nVoxels X nBvecs array of measured diffusion signal
@@ -529,7 +529,7 @@ switch param
     % val = feGet(fe,'dsinvox');
     % val = feGet(fe,'dsinvox',voxelsIndices);
     % val = feGet(fe,'dsinvox',coords);
-    val = fe.life.diffusion_signal_img(feGet(fe,'voxelsindices',varargin),:)';
+    val = fe.diffusion_signal_img(feGet(fe,'voxelsindices',varargin),:)';
     
   case {'diffusionsignalinvoxeldemeaned','dsiinvoxdemeaned'}
     % Returns a nVoxels X nBvecs array of demeaned diffusion signal
@@ -539,7 +539,7 @@ switch param
     % val =feGet(fe,'dsiinvoxdemeaned',coords);
     nBvecs     = feGet(fe,'nBvecs');
     voxelIndices = feGet(fe,'voxelsindices',varargin);
-    val = fe.life.diffusion_signal_img(voxelIndices,:) - repmat(mean(fe.life.diffusion_signal_img(voxelIndices,:), 2),1,nBvecs);
+    val = fe.diffusion_signal_img(voxelIndices,:) - repmat(mean(fe.life.diffusion_signal_img(voxelIndices,:), 2),1,nBvecs);
     keyboard
     % THis seems to be wrong
     
@@ -549,7 +549,7 @@ switch param
     % val = feGet(fe,'b0signalvoxel');
     % val = feGet(fe,'b0signalvoxel',voxelIndex);
     % val = feGet(fe,'b0signalvoxel',coords);
-    val = fe.life.diffusion_S0_img(feGet(fe,'voxelsindices',varargin), :);
+    val = fe.diffusion_S0_img(feGet(fe,'voxelsindices',varargin), :);
     
   case {'fiberssubset','fsub','subsetoffibers','fgsubset'}
     % Return a subset of fibers from the conenctome.
@@ -645,14 +645,14 @@ switch param
     % M contains only the rows for the specified voxels (all directions)
     if isempty(varargin)
       % Return the whole M matrix
-      val = fe.life.Mfiber;
+      val = fe.Mfiber;
     else
       % Return only the rows for the specified voxels, including all
       % directions.
       % voxelIndices     = feGet(fe,'voxelsindices',varargin);
       % voxelRowsToKeep  = feGet(fe,'voxel rows',voxelIndices);
       % val = fe.life.Mfiber(voxelRowsToKeep,:);
-      val = fe.life.Mfiber(feGet(fe,'voxel rows',feGet(fe,'voxelsindices',varargin)),:);
+      val = fe.Mfiber(feGet(fe,'voxel rows',feGet(fe,'voxelsindices',varargin)),:);
     end
     
   case {'mfibervoxelsubset','indexedafiber','mfiberindexed'}
@@ -731,8 +731,8 @@ switch param
     % Get the tensors for each node in each fiber going through this voxel:
     val = zeros(nNodes(voxIndex), 9); % Allocate space for all the tensors (9 is for the 3 x 3 tensor components)
     for ii = 1:nNodes(voxIndex)           % Get the tensors
-      val(ii,:) = fe.life.fibers.tensors{fe.life.voxel2FNpair{voxIndex}(ii,1)} ...
-        (fe.life.voxel2FNpair{voxIndex}(ii,2),:);
+      val(ii,:) = fe.fibers.tensors{fe.voxel2FNpair{voxIndex}(ii,1)} ...
+        (fe.voxel2FNpair{voxIndex}(ii,2),:);
     end
     
   case {'nnodes','numofnodes'}
@@ -758,7 +758,7 @@ switch param
     %                                             % specified by indexes
     % nFibers = feGet(fe,'uniquefnum',coords);    % for some the voxels,
     %                                             % specified by coordinates
-    val = fe.life.fibers.unique.num(feGet(fe,'voxelsindices',varargin));
+    val = fe.fibers.unique.num(feGet(fe,'voxelsindices',varargin));
     
   case {'indextouniquefibersbyvoxel','uniquef'}
     % Return the indexes of the fibers for all the voxels or in a set of
@@ -772,7 +772,7 @@ switch param
     vxIndex = feGet(fe,'voxels indices',varargin);
     val = cell(length(vxIndex),1);
     for ii = 1:length(vxIndex)
-      val{ii} = fe.life.fibers.unique.index{vxIndex(ii)};
+      val{ii} = fe.fibers.unique.index{vxIndex(ii)};
     end
     
   case {'numberoftotalfibersbyvoxels','totfnum'}
@@ -784,7 +784,7 @@ switch param
     %                                          % specified by indexes
     % nFibers = feGet(fe,'totfnum',coords);    % for some the voxels,
     %                                          % specified by coordinates
-    val = fe.life.fibers.total.num(feGet(fe,'voxels indices',varargin));
+    val = fe.fibers.total.num(feGet(fe,'voxels indices',varargin));
     
   case {'indexoftotalfibersbuvoxel','totf'}
     % Return the indexes of the fibers for all the voxels or in a set of
@@ -798,7 +798,7 @@ switch param
     vxIndex = feGet(fe,'voxels indices',varargin);
     val = cell(length(vxIndex),1);
     for ii = 1:length(vxIndex)
-      val{ii} = fe.life.fibers.total.index{vxIndex(ii)};
+      val{ii} = fe.fibers.total.index{vxIndex(ii)};
     end
     
   case {'nfibers'}
