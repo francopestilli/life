@@ -57,9 +57,6 @@ function fe = feConnectomeBuildModel(fe,zeroMean)
 % building the matrix a little strange.
 
 if notDefined('fe'),  error('LiFE (fe = feCreate) struct needed'); end
-if ~isfield(fe,'life')
-  error('LiFE - the field ''life'' is necessary in the fe structure.')
-end
 if notDefined('zeroMean'), zeroMean = true; end
 
 disp('LiFE - Building the connectome model...');
