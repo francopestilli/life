@@ -17,23 +17,23 @@ function [fe, indicesFibersKept] = feConnectomeReduceVoxels(fe,voxelsToKeep)
 vxRows = feGet(fe,'voxelrows',voxelsToKeep);
 
 % Return only the mode and the signal for the voxels we want to keep
-fe.life.Mfiber = fe.life.Mfiber(vxRows,:);
-fe.life.dSig   = fe.life.dSig(vxRows);
+fe.Mfiber = fe.Mfiber(vxRows,:);
+fe.dSig   = fe.dSig(vxRows);
 
 % Set the new number of voxels, by indexing inside the roi and
 % returning it as an ROI.
 fe.roi.coords = feGet(fe,'roi coords subset',voxelsToKeep);
 
 % Set the new diffusion signal, the one for only these subset of voxels.
-fe.life.diffusion_signal_img = fe.life.diffusion_signal_img(voxelsToKeep,:);
+fe.diffusion_signal_img = fe.diffusion_signal_img(voxelsToKeep,:);
 
 % Set the diffusion signal at 0 diffusion weighting (B0) for this voxel:
-if ~isempty(fe.life.diffusion_S0_img)
-fe.life.diffusion_S0_img = fe.life.diffusion_S0_img(voxelsToKeep);
+if ~isempty(fe.diffusion_S0_img)
+fe.diffusion_S0_img = fe.diffusion_S0_img(voxelsToKeep);
 end
 
 % Set the voxels to fiber/node pairs for a subset of voxels in the conncetome.
-fe.life.vovel2FNpair = [];
+fe.vovel2FNpair = [];
 
 % Now remove singals for the second data set if it was loaded
 if isfield(fe,'rep')   

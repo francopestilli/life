@@ -20,27 +20,27 @@ function [fe, removedFibers] = feConnectomeReduceFibers(fe, fibersToKeep)
 removedFibers = find(~fibersToKeep);
 
 if all(fibersToKeep==0)
-    fe.life.Mfiber = sparse(size(fe.life.Mfiber,1),size(fe.life.Mfiber,2));
+    fe.Mfiber = sparse(size(fe.Mfiber,1),size(fe.Mfiber,2));
 else
     % Delete fibers' columns from the model
-    fe.life.Mfiber = fe.life.Mfiber(:,fibersToKeep);
+    fe.Mfiber = fe.Mfiber(:,fibersToKeep);
 end
 
 % Clear the fields that depend o the original fiber group. These are:
 % (1) The fit of the model.
-if isfield(fe.life,'fit') && ~isempty(fe.life.fit)
-    fe.life.fit.weights         = fe.life.fit.weights(fibersToKeep);
-    fe.life.fit.results.nParams = sum(fibersToKeep);
+if isfield(fe.life,'fit') && ~isempty(fe.fit)
+    fe.fit.weights         = fe.fit.weights(fibersToKeep);
+    fe.fit.results.nParams = sum(fibersToKeep);
 end
-if isfield(fe.life,'voxfit') && ~isempty(fe.life.voxfit)
-    fe.life.voxfit = [];
+if isfield(fe.life,'voxfit') && ~isempty(fe.voxfit)
+    fe.voxfit = [];
 end
 % The field 'fibers' containing some statistics obtained from the original
 % fg
-if isfield(fe.life,'fibers') && ~isempty(fe.life.fibers.tensors)
-    fe.life.fibers.tensors = [];
-    fe.life.fibers.total   = [];
-    fe.life.fibers.unique  = [];
+if isfield(fe.life,'fibers') && ~isempty(fe.fibers.tensors)
+    fe.fibers.tensors = [];
+    fe.fibers.total   = [];
+    fe.fibers.unique  = [];
 end
 
 % The actual fiber group.

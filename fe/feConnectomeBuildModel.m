@@ -175,7 +175,7 @@ for vv = 1:nVoxels
   
   % Reorganize the diffusion data for each voxel into a long vector: 
   % nDirs X nVoxels.
-  fe.life.dSig(dense_rows) = feGet(fe,'diffusion signal in voxel',usedVoxels(vv));
+  fe.dSig(dense_rows) = feGet(fe,'diffusion signal in voxel',usedVoxels(vv));
 end
 
 % Install the matrix in the fe structure.
