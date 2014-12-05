@@ -24,7 +24,9 @@ function fe = feSet(fe,param,val,varargin)
 % Check for input parameters
 if notDefined('fe'),    error('fe structure required'); end
 if notDefined('param'), error('param required'); end
-if ~exist('val','var'), error('Value required'); end
+% if ~exist('val','var'), error('Value required'); end
+% This is better.  Let's see if much breaks (BW).
+if ~exist('val','var'), val = []; end
 
 % Squeeze out spaces and force lower case
 param = mrvParamFormat(param);
@@ -91,10 +93,24 @@ switch param
     fe       = feSet(fe,'v2fnp',[]);
     
   case {'roifromfg','fgroi','roifg'}
-    name   = sprintf('roi_%s', fe.fg.name);
-    randColor = rand(1,3);
-    fe.roi = dtiNewRoi(name,randColor,fefgGet(feGet(fe,'fg img'),'unique image coords'));
+      % This is not really a set.  It doesn't rely on val.  So nothing is
+      % set to val.
+      %
+      % It probably shouldn't be in this function, or what should be in
+      % this function is a real set that forces val to contains the roi
+      % coords.  Or the the whole roi.  The fragment below would make
+      % sense. (BW) 
+      %
+      %   c = feGet(fe,'img all fg coords')
+      %   fe = feSet(fe,'roi fg',c)
+      %
+      % As it stands this always creates an ROI that has all of
+      % the unique image coords from the fibers in the fe structure.
     
+      name   = sprintf('roi_%s', fe.fg.name);
+      randColor = rand(1,3);
+      fe.roi = dtiNewRoi(name,randColor,fefgGet(feGet(fe,'fg img'),'unique image coords'));
+      
   case 'xform'
     fe.xform = val;  % Transforms between coords for fg, roi, and dwi data
      

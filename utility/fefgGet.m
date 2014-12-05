@@ -101,7 +101,7 @@ function val = fefgGet(fg,param,varargin)
 % Copyright (2013-2014), Franco Pestilli, Stanford University, pestillifranco@gmail.com.
 val = [];
 
-switch strrep(lower(param),' ','')
+switch mrvParamFormat(param)
   
   % Basic fiber parameters
   case 'name'

@@ -48,9 +48,9 @@ end
 % So here we assume the fibers are read in acpc and we xform them in img.
 fe = feSet(fe,'fg from acpc',fg);
 
-% When the ROI is set to empty, LiFE uses all of the voxels within the
-% connectome as the ROI.
-fe = feSet(fe,'roi fg',[]);
+% Save an roi with coords corresponding to all the voxels in the fibers.
+% (These are the unique voxels).
+fe = feSet(fe,'roi fg');
 clear fg
 
 % Precompute the canonical tensors for each node in each fiber.
@@ -62,7 +62,7 @@ else % Default to stick and ball
   axialDiffusion  = 1;
   radialDiffusion = 0;
 end
-dParms(1) =  axialDiffusion; 
+dParms(1) = axialDiffusion; 
 dParms(2) = radialDiffusion; 
 dParms(3) = radialDiffusion;
 
