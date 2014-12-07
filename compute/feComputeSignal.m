@@ -40,6 +40,8 @@ function S = feComputeSignal(S0, bvecs, bvals, Q)
 %
 S = S0 * exp(- (repmat(bvals, 1, size(Q,1)) .* dtiADC(Q, bvecs)));
 
-% end
+% Plot the S values as a function of direction
+% p = diag(S)*bvecs;
+% mrvNewGraphWin; plot3(p(:,1),p(:,2),p(:,3),'o')
 
 end

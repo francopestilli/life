@@ -74,10 +74,10 @@ function val = feGet(fe,param,varargin)
 % val =feGet(fe,'dsiinvoxdemeaned',voxelsIndices);
 % val =feGet(fe,'dsiinvoxdemeaned',coords);
 %----------
-% Get the diffusion signal at 0 diffusion weighting (B0) for this voxel
-% val = feGet(fe,'b0signalvoxel');
-% val = feGet(fe,'b0signalvoxel',voxelIndex);
-% val = feGet(fe,'b0signalvoxel',coords);
+% Get the diffusion signal at 0 diffusion weighting (B0) for image voxels
+% val = feGet(fe,'b0 signal image');
+% val = feGet(fe,'b0 signal image',voxelIndex);
+% val = feGet(fe,'b0 signal image',coords);
 %----------
 % Return a subset of fibers from the conenctome.
 % fg = feGet(fe,'fiberssubset',fiberList);
@@ -544,12 +544,12 @@ switch param
     % THis seems to be wrong
     
   case {'b0signalimage','b0vox'}
+    % We are worried about this particular get. (SO/BW)
     % Get the diffusion signal at 0 diffusion weighting (B0) for this voxel
     %
-    % val = feGet(fe,'b0signalvoxel');
-    % val = feGet(fe,'b0signalvoxel',voxelIndex);
-    % val = feGet(fe,'b0signalvoxel',coords);
-    val = fe.diffusion_S0_img(feGet(fe,'voxelsindices',varargin), :);
+    % val = feGet(fe,'b0 signal image');
+    % val = feGet(fe,'b0 signal image',voxelIndex);
+    val = fe.diffusion_S0_img(feGet(fe,'voxels indices',varargin), :);
     
   case {'fiberssubset','fsub','subsetoffibers','fgsubset'}
     % Return a subset of fibers from the conenctome.
@@ -1506,7 +1506,7 @@ switch param
     % the coords
     %
     % FIX FIX FIX 
-    % Change name ofcall to add in the term 'logical' 
+    % Change name of call to add in the term 'logical' 
     % this function returns a logical index 
     varargin = varargin{1};
     if ( ~isempty(varargin) )
@@ -1533,6 +1533,8 @@ switch param
     % foundVoxels is a vector of 1's and 0's, there is a one for each
     % location the the connectome coordinates for which there is a match in
     % the coords
+    %
+    % Also seems broken (BW).
     
     % Compute the values for a subset of voxels
     if isempty(varargin)
@@ -1542,7 +1544,7 @@ switch param
       % The stored coordinates are at a resolution of the image, typically
       % 2mm isotropic.  The VOI should also be in image resolution.
       % ---- Franco:
-      % This is how I had it. I think it is worng:
+      % This is how I had it. I think it is wrong
       % val = ismember(feGet(fe,'roi coords'), varargin{1}, 'rows'); % This is slow
       % This is hwo I think it should be:
       if ~isinteger(varargin{1}), error('Coords should be integers'); end 
