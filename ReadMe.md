@@ -12,7 +12,7 @@ Standard tractography can use diffusion measurements from a living brain to gene
 
 ## [Documentation](http://francopestilli.github.io/life/doc/).
 
-## [Stable code release](https://github.com/francopestilli/life/releases/tag/v0.2).
+## [Stable code release](https://github.com/vistalab/life/releases/tag/v0.2).
 
 ## How to cite LiFE.
 [Pestilli, Franco, Jason D. Yeatman, Ariel Rokem, Kendrick N. Kay, and Brian A. Wandell. Evaluation and statistical inference for human connectomes. Nature methods 11, no. 10 (2014): 1058-1063.](http://www.nature.com/nmeth/journal/v11/n10/abs/nmeth.3098.html) [DOI](doi:10.1038/nmeth.3098)
