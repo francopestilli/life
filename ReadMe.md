@@ -9,7 +9,7 @@ Standard tractography can use diffusion measurements from a living brain to gene
 
 ## License.
 #### Copyright (2013-2015), [Franco Pestilli](http://francopestilli.com/), pestillifranco@gmail.com
-
+ 
 ## [Documentation](http://francopestilli.github.io/life/doc/).
 
 ## [Stable code release](https://github.com/vistalab/life/releases/tag/v0.2).
@@ -17,8 +17,8 @@ Standard tractography can use diffusion measurements from a living brain to gene
 ## How to cite LiFE.
 [Pestilli, Franco, Jason D. Yeatman, Ariel Rokem, Kendrick N. Kay, and Brian A. Wandell. Evaluation and statistical inference for human connectomes. Nature methods 11, no. 10 (2014): 1058-1063.](http://www.nature.com/nmeth/journal/v11/n10/abs/nmeth.3098.html)
 
-## LiFE in [Python](https://www.python.org/)[:Dipy](http://nipy.org/dipy/)
-The LiFE algorithm has been recently implemented in Python by [Ariel Rokem](http://arokem.org/) and is now available as part of the Dipy software: [LiFE@Dipy](http://nipy.org/dipy/examples_built/linear_fascicle_evaluation.html#example-linear-fascicle-evaluation).
+## LiFE in [Python](https://www.python.org/)[ : Dipy](http://nipy.org/dipy/)
+The LiFE algorithm has been recently implemented in Python by [Ariel Rokem](http://arokem.org/) and is now available as part of the Dipy software: [LiFE @ Dipy](http://nipy.org/dipy/examples_built/linear_fascicle_evaluation.html#example-linear-fascicle-evaluation).
 
 ## Installation.
 1. Download [LiFE](https://github.com/francopestilli/life).
