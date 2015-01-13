@@ -8,11 +8,11 @@ Standard tractography can use diffusion measurements from a living brain to gene
 * Perform statistical inference on white-matter connectomes: Compare white-matter connectomes, show the evidence for white-matter tracts and connections between brain areas.
 
 ## License.
-#### Copyright (2013-2014), [Franco Pestilli](http://francopestilli.com/), pestillifranco@gmail.com
+#### Copyright (2013-2015), [Franco Pestilli](http://francopestilli.com/), pestillifranco@gmail.com
 
-## [Documentation](http://vistalab.github.io/life/doc/).
+## [Documentation](http://francopestilli.github.io/life/doc/).
 
-## [Stable code release](https://github.com/vistalab/life/releases/tag/v0.2).
+## [Stable code release](https://github.com/francopestilli/life/releases/tag/v0.2).
 
 ## How to cite LiFE.
 [Pestilli, Franco, Jason D. Yeatman, Ariel Rokem, Kendrick N. Kay, and Brian A. Wandell. Evaluation and statistical inference for human connectomes. Nature methods 11, no. 10 (2014): 1058-1063.](http://www.nature.com/nmeth/journal/v11/n10/abs/nmeth.3098.html) [DOI](doi:10.1038/nmeth.3098)
@@ -21,7 +21,7 @@ Standard tractography can use diffusion measurements from a living brain to gene
 The LiFE algorithm has been recently implemented in Python by [Ariel Rokem](http://arokem.org/) and is now available as part of the Dipy software: [LiFE@Dipy](http://nipy.org/dipy/examples_built/linear_fascicle_evaluation.html#example-linear-fascicle-evaluation).
 
 ## Installation.
-1. Download [LiFE](https://github.com/vistalab/life).
+1. Download [LiFE](https://github.com/francopestilli/life).
 2. [Start MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
 3. Add LiFE to the [matlab search path](http://www.mathworks.com/help/matlab/ref/addpath.html).
 
@@ -31,10 +31,10 @@ The LiFE algorithm has been recently implemented in Python by [Ariel Rokem](http
 * [Matlab Brain Anatomy (MBA)](https://github.com/francopestilli/mba).
 
 ## Getting started.
-Learn about LiFE by using [life_demo.m](http://vistalab.github.io/life/doc/scripts/life_demo.html) in [MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
+Learn about LiFE by using [life_demo.m](http://francopestilli.github.io/life/doc/scripts/life_demo.html) in [MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
 
-### 1. [Download LiFE](https://github.com/vistalab/life).
-* Download the LiFE repository from the TAR/ZIP files linked [here](https://github.com/vistalab/life/archive/v0.2.zip).
+### 1. [Download LiFE](https://github.com/francopestilli/life).
+* Download the LiFE repository from the TAR/ZIP files linked [here](https://github.com/francopestilli/life/archive/v0.2.zip).
 * UNZIP/UNTAR the file.
 * Add the life folder to your matlab search path. To do so in the MatLab prompt type: 
 ```
@@ -63,7 +63,7 @@ Read the description of the calculations in the documentation inside the file, l
   >>  edit life_demo
 ```
 
-### 5. [Run the life_demo code](https://github.com/vistalab/life/blob/master/scripts/life_demo.m).
+### 5. [Run the life_demo code](https://github.com/francopestilli/life/blob/master/scripts/life_demo.m).
 This final step will run the life_demo code. The code will perform the operations described [here](http://vistalab.github.io/life/html/life_demo.html). 
 ```
   >>  life_demo
