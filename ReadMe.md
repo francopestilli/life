@@ -17,9 +17,6 @@ Standard tractography can use diffusion measurements from a living brain to gene
 ## How to cite LiFE.
 [Pestilli, Franco, Jason D. Yeatman, Ariel Rokem, Kendrick N. Kay, and Brian A. Wandell. Evaluation and statistical inference for human connectomes. Nature methods 11, no. 10 (2014): 1058-1063.](http://www.nature.com/nmeth/journal/v11/n10/abs/nmeth.3098.html)
 
-## LiFE in [Python](https://www.python.org/)[ : Dipy](http://nipy.org/dipy/)
-The LiFE algorithm has been recently implemented in Python by [Ariel Rokem](http://arokem.org/) and is now available as part of the Dipy software: [LiFE @ Dipy](http://nipy.org/dipy/examples_built/linear_fascicle_evaluation.html#example-linear-fascicle-evaluation).
-
 ## Installation.
 1. Download [LiFE](https://github.com/francopestilli/life).
 2. [Start MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
@@ -69,5 +66,8 @@ This final step will run the life_demo code. The code will perform the operation
   >>  life_demo
 ```
 life_demo.m runs in about 30 minutes on a modern Intel processor with 8GB of RAM. This code has been tested with MatLab 2012b on Ubuntu 12.10 and Mac OSX 10.9.
+
+## LiFE in [Python](https://www.python.org/)[ : Dipy](http://nipy.org/dipy/)
+The LiFE algorithm has been recently implemented in Python by [Ariel Rokem](http://arokem.org/) and is now available as part of the Dipy software: [LiFE @ Dipy](http://nipy.org/dipy/examples_built/linear_fascicle_evaluation.html#example-linear-fascicle-evaluation).
 
 
