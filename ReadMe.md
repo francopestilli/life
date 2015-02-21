@@ -12,6 +12,9 @@ Standard tractography can use diffusion measurements from a living brain to gene
  
 ## [Documentation](http://francopestilli.github.io/life/doc/).
 
+## Communication
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/francopestilli/life?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 ## [Stable code release](https://github.com/vistalab/life/releases/tag/v0.2).
 
 ## How to cite LiFE.
