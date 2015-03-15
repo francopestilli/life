@@ -1,6 +1,6 @@
 # Linear Fascicle Evaluation (LiFE)
 
-![alt tag](https://cloud.githubusercontent.com/assets/2119795/6656460/3d191324-cb02-11e4-8f7a-94b1e8e3a048.png)
+![alt tag](https://cloud.githubusercontent.com/assets/2119795/6656526/77db5232-cb03-11e4-81a5-85c2ef0f6e33.png)
 
 Statistical evaluation for brain connections and tracts.
 
