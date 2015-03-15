@@ -1,5 +1,11 @@
 # Linear Fascicle Evaluation (LiFE)
 
+https://cloud.githubusercontent.com/assets/2119795/6656460/3d191324-cb02-11e4-8f7a-94b1e8e3a048.png
+
+Statistical evaluation for brain connections and tracts.
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/francopestilli/life?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 Standard tractography can use diffusion measurements from a living brain to generate a large collection of candidate white-matter fascicles; the connectome. Linear Fascicle Evaluation (LiFE) takes any connectome and uses a forward modelling approach to predict diffusion measurements in the same brain. LiFE predicts the measured diffusion signal using the orientation of the fascicles present in a connectome. LiFE uses the difference between the measured and predicted diffusion signals to measure prediction error. The connectome model prediction error is used to compute two metrics to evaluate the evidence supporting properties of the connectome. One metric -the strength of evidence - compares the mean prediction error between alternative hypotheses. The second metric - the earth movers distance - compares full distributions of prediction error. These metrics can be used for: 1. Comparing tractography algorithms 2. Evaluating the quality of tractography solutions for individual brains or group of brains and 3. Testing hypotheses about white-matter tracts and connections.
 
 ## Application.
@@ -11,9 +17,6 @@ Standard tractography can use diffusion measurements from a living brain to gene
 #### Copyright (2013-2015), [Franco Pestilli](http://francopestilli.com/), pestillifranco@gmail.com
  
 ## [Documentation](http://francopestilli.github.io/life/doc/).
-
-## Communication
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/francopestilli/life?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## [Stable code release](https://github.com/vistalab/life/releases/tag/v0.2).
 
