@@ -5,8 +5,8 @@ function et_createETprecandidateconnectome(feinput, numconcatenate, fname)
 % 
 % This procedure is called "ETCpre (ETC-preselection)" in the following paper (S1 Text, Section 5; S11 Figure).
 % 
-% Takemura, H., Caiafa, C., Wandell, B.A. & Pestilli, F. (in press) Ensemble
-% Tractography. PLoS Computational Biol.
+% Takemura, H., Caiafa, C., Wandell, B.A. & Pestilli, F. (under review) Ensemble
+% Tractography. 
 % 
 % As compared with "include-them-all" model, the performance of this preselected connectome is only slightly worse.
 % For testing large-scale connectome with standard computer, sometimes using preslection has benefit on computational efficiency and modest memory demands.
