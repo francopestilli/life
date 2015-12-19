@@ -74,6 +74,9 @@ for i = 1:length(fginput)
     end
 end
 
+% Transpose dimension of fiber matrix
+fg_etc.fibers = transpose(fg_etc.fibers);
+
 % Write file
 fgWrite(fg_etc);
 
