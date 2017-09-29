@@ -1,6 +1,6 @@
 # Linear Fascicle Evaluation (LiFE)
 
-### A new version more efficient version of the LiFE code is developed at: https://github.com/brain-life/encode
+### A new version of the LiFE code is developed at: https://github.com/brain-life/encode
 
 #### [Caiafa, Cesar and Pestilli, Franco Multidimensional encoding of brain connectome. Scientific Reports 7, Article number: 11491 (2017)](https://www.nature.com/articles/s41598-017-09250-w)
 
