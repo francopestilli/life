@@ -8,7 +8,7 @@ Statistical evaluation for brain connections and tracts.
 
 This code is deprecated and unsupported. 
 
-## #The current version of the LiFE algorithm can be found at [GitHub.com/Brain-Life](https://github.com/brain-life/encode). 
+## The current version of the LiFE algorithm can be found at [GitHub.com/Brain-Life](https://github.com/brain-life/encode). 
 A new article describing the most recent approach: [Caiafa, C. and Pestilli, F. Multidimensional encoding of brain connectome. Nature Scientific Reports 7, Article number: 11491 (2017)](https://www.nature.com/articles/s41598-017-09250-w)
 
 # About
