@@ -1,5 +1,8 @@
 # Linear Fascicle Evaluation (LiFE)
 
+A new version more efficient version of the LiFE code is developed at: https://github.com/brain-life/encode
+See also [Caiafa, Cesar and Pestilli, Franco Multidimensional encoding of brain connectome. Scientific Reports 7, Article number: 11491 (2017) doi:10.1038/s41598-017-09250-w] (https://www.nature.com/articles/s41598-017-09250-w)
+
 Standard tractography can use diffusion measurements from a living brain to generate a large collection of candidate white-matter fascicles; the connectome. Linear Fascicle Evaluation (LiFE) takes any connectome and uses a forward modelling approach to predict diffusion measurements in the same brain. LiFE predicts the measured diffusion signal using the orientation of the fascicles present in a connectome. LiFE uses the difference between the measured and predicted diffusion signals to measure prediction error. The connectome model prediction error is used to compute two metrics to evaluate the evidence supporting properties of the connectome. One metric -the strength of evidence - compares the mean prediction error between alternative hypotheses. The second metric - the earth movers distance - compares full distributions of prediction error. These metrics can be used for: 1. Comparing tractography algorithms 2. Evaluating the quality of tractography solutions for individual brains or group of brains and 3. Testing hypotheses about white-matter tracts and connections.
 
 ## Application.
@@ -8,23 +11,24 @@ Standard tractography can use diffusion measurements from a living brain to gene
 * Perform statistical inference on white-matter connectomes: Compare white-matter connectomes, show the evidence for white-matter tracts and connections between brain areas.
 
 ## License.
-#### Copyright (2013-2015), [Franco Pestilli](http://francopestilli.com/), pestillifranco@gmail.com
+#### Copyright (2013-2017), [Franco Pestilli](http://francopestilli.com/), frakkopesto@gmail.com
  
 ## [Documentation](http://francopestilli.github.io/life/doc/).
 
 ## Communication
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/francopestilli/life?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-## [Stable code release](https://github.com/vistalab/life/releases/tag/v0.2).
+## [Stable code release](https://github.com/brain-life/encode/releases/tag/v0.45).
 
 ## How to cite LiFE.
 [Pestilli, Franco, Jason D. Yeatman, Ariel Rokem, Kendrick N. Kay, and Brian A. Wandell. Evaluation and statistical inference for human connectomes. Nature methods 11, no. 10 (2014): 1058-1063.](http://www.nature.com/nmeth/journal/v11/n10/abs/nmeth.3098.html)
+[Caiafa, Cesar and Pestilli, Franco Multidimensional encoding of brain connectome. Scientific Reports 7, Article number: 11491 (2017) doi:10.1038/s41598-017-09250-w] (https://www.nature.com/articles/s41598-017-09250-w)
 
 ## Funding.
-This work was supported by grants by US National Science Fundation (NSF BCS-1228397) and National Institute for Health (NEI EY015000).
+This work was supported by grants by US National Science Fundation (NSF BCS-1228397; NSF IIS-1636893; NSF BCS-1734853) and National Institute for Health (NEI EY015000).
 
 ## Installation.
-1. Download [LiFE](https://github.com/francopestilli/life).
+1. Download [LiFE](https://github.com/brain-life/encode).
 2. [Start MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
 3. Add LiFE to the [matlab search path](http://www.mathworks.com/help/matlab/ref/addpath.html).
 
@@ -36,7 +40,7 @@ This work was supported by grants by US National Science Fundation (NSF BCS-1228
 ## Getting started.
 Learn about LiFE by using [life_demo.m](http://francopestilli.github.io/life/doc/scripts/life_demo.html) in [MatLab](http://www.mathworks.com/help/matlab/startup-and-shutdown.html).
 
-### 1. [Download LiFE](https://github.com/francopestilli/life).
+### 1. [Download LiFE](https://github.com/brain-life/encode).
 * Download the LiFE repository from the TAR/ZIP files linked [here](https://github.com/francopestilli/life/archive/v0.2.zip).
 * UNZIP/UNTAR the file.
 * Add the life folder to your matlab search path. To do so in the MatLab prompt type: 
